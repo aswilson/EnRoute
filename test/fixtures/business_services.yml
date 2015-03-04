@@ -1,0 +1,11 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  business_id: 1
+  service_id: 1
+  active: false
+
+two:
+  business_id: 1
+  service_id: 1
+  active: false
