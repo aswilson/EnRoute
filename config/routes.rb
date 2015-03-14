@@ -1,4 +1,7 @@
 EnRoute::Application.routes.draw do
+  
+  root 'welcome#index'
+  
   resources :services
 
   resources :business_services
