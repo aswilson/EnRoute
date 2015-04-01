@@ -4,7 +4,8 @@ source 'https://rubygems.org'
 gem 'rails', '4.0.13'
 
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+gem 'pg'
+#gem 'sqlite3'
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.2'
@@ -30,6 +31,32 @@ gem 'jbuilder', '~> 1.2'
 group :doc do
   # bundle exec rake doc:rails generates the API under doc/api.
   gem 'sdoc', require: false
+end
+
+gem 'validates_timeliness'
+gem 'will_paginate'
+
+# Gems used only in testing
+group :development, :test do
+  gem 'faker'
+  gem 'hirb'
+  gem 'populator3'
+  gem 'wirble'
+  gem 'quiet_assets'
+  gem 'thin'
+  gem 'better_errors'
+  gem 'binding_of_caller'
+  gem 'meta_request'
+end
+
+# Gems used only in testing
+group :test do
+  gem 'factory_girl_rails'
+  gem 'shoulda'
+  gem 'shoulda-matchers'
+  gem 'simplecov'
+  gem 'turn'
+  gem 'single_test'
 end
 
 # Use ActiveModel has_secure_password
