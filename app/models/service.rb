@@ -1,5 +1,5 @@
 class Service < ActiveRecord::Base
-  includes EnRouteHelpers
+  include EnRouteHelpers
   
   has_many :business_services
   has_many :businesses, through: :business_services
