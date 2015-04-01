@@ -1,5 +1,5 @@
 class BusinessService < ActiveRecord::Base
-  includes EnRouteHelpers
+  include EnRouteHelpers
   
   #relationships
   belongs_to :business
