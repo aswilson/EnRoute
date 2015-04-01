@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
   #validations
   validates_presence_of :first_name, :last_name, :password_digest
   validates :username, presence: true, uniqueness: { case_sensitive: false }
-  validates :role, inclusion: { in: role_array}, message: "is not a valid role", allow_blank: false }
+  validates :role, inclusion: { in: role_array }, message: "is not a valid role", allow_blank: false 
   validates_format_of :phone, with: /\A(\d{10}|\(?\d{3}\)?[-. ]\d{3}[-.]\d{4})\z/, message: "should be 10 digits (area code needed) and delimited with dashes only"
   validates_format_of :email, :with => /\A[\w]([^@\s,;]+)@(([a-z0-9.-]+\.)+(com|edu|org|net|gov|mil|biz|info))\z/i, :message => "is not a valid format", :allow_blank => true
   
