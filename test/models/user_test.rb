@@ -37,8 +37,8 @@ class UserTest < ActiveSupport::TestCase
   should allow_value("my_name@me.org").for(:email)
   should allow_value("name123@me.gov").for(:email)
   should allow_value("my.name@me.net").for(:email)
-  should allow_value(nil).for(:email)
   
+  should_not allow_value(nil).for(:email)
   should_not allow_value("name").for(:email)
   should_not allow_value("name@me,com").for(:email)
   should_not allow_value("name@me.uk").for(:email)

@@ -11,7 +11,7 @@ class Business < ActiveRecord::Base
   validates_presence_of :name, :street_1, :city
   validates :state, inclusion: { in: STATES_LIST.map{|a,b| b}, message: "is not valid state", allow_blank: false }
   validates :zip_code, presence: true, format: { with: /\A\d{5}\z/, message: "should be five digits long", allow_blank: false }
-  validates_format_of :phone, with: /\A(\d{10}|\(?\d{3}\)?[-. ]\d{3}[-.]\d{4})\z/, message: "should be 10 digits (area code needed) and delimited with dashes only"
+  validates_format_of :phone, with: /\A(\d{10}|\(?\d{3}\)?[-. ]\d{3}[-.]\d{4})\z/, message: "should be 10 digits (area code needed) and delimited with dashes only", allow_blank: true
   
   #scopes
   scope :alphabetical, -> { order('name') }
