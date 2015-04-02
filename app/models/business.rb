@@ -1,5 +1,5 @@
 class Business < ActiveRecord::Base
-  #include EnRouteHelpers
+  include EnRouteHelpers
   
   belongs_to :user
   has_many :business_services
@@ -21,7 +21,7 @@ class Business < ActiveRecord::Base
   scope :by_service, -> (service_id) {joins(:business_service).where("service_id = ?". service_id)}
   
   #callbacks
-  before_validation :get_location_coordinates
+  before_save :get_location_coordinates
   before_validation :default_active
   before_save :reformat_phone
   
@@ -44,5 +44,12 @@ class Business < ActiveRecord::Base
     end
     coord
   end
+  
+  def reformat_phone
+    self.phone = self.phone.to_s.gsub(/[^0-9]/,"")
+  end
    
+  def default_active
+    self.active = true if self.active.nil?
+  end
 end

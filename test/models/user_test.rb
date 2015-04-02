@@ -10,6 +10,8 @@ class UserTest < ActiveSupport::TestCase
   should validate_presence_of(:first_name)
   should validate_presence_of(:last_name)
   should validate_presence_of(:password_digest)
+  should validate_presence_of(:street_1)
+  should validate_presence_of(:city)
   
   should allow_value('administrator').for(:role)
   should allow_value('business owner').for(:role)
@@ -42,4 +44,18 @@ class UserTest < ActiveSupport::TestCase
   should_not allow_value("name@me.uk").for(:email)
   should_not allow_value("my name@me.com").for(:email)
   should_not allow_value("name@me.con").for(:email)
+  
+  should allow_value('AL').for(:state)
+  should allow_value('CA').for(:state)
+  
+  should_not allow_value(nil).for(:state)
+  should_not allow_value('state').for(:state)
+  
+  should allow_value('15213').for(:zip_code)
+  should allow_value('21042').for(:zip_code)
+  
+  should_not allow_value('152133').for(:zip_code)
+  should_not allow_value('1521').for(:zip_code)
+  should_not allow_value(nil).for(:zip_code)
+  
 end
