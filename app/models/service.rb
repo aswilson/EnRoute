@@ -1,5 +1,4 @@
 class Service < ActiveRecord::Base
-  include EnRouteHelpers
   
   has_many :business_services
   has_many :businesses, through: :business_services
@@ -14,5 +13,10 @@ class Service < ActiveRecord::Base
   
   #callbacks
   before_validation :default_active
+  
+  private
+  def default_active
+    self.active = true if self.active.nil?
+  end
   
 end

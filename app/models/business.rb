@@ -1,5 +1,4 @@
 class Business < ActiveRecord::Base
-  include EnRouteHelpers
   
   belongs_to :user
   has_many :business_services
