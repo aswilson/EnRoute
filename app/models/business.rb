@@ -20,28 +20,28 @@ class Business < ActiveRecord::Base
   scope :by_service, -> (service_id) {joins(:business_service).where("service_id = ?". service_id)}
   
   #callbacks
-  before_validation :get_location_coordinates, :if => :street_1_changed?
+  #before_validation :get_location_coordinates, :if => :street_1_changed?
   before_validation :default_active
   before_save :reformat_phone
   
-  def create_map_link(zoom=12,width=800,height=800)
-    markers = "&markers=color:red%7Ccolor:red%7C#{self.latitude},#{self.longitude}"
-    map = "http://maps.google.com/maps/api/staticmap?center= #{latitude},#{longitude}&zoom=13&size=800x800&maptype=roadmap#{markers}&sensor=false"
-  end
-   
-  def get_location_coordinates
-    str = self.street_1
-    zip = self.zip_code
-    
-    coord = Geocoder.coordinates("#{str}, #{zip}")
-    if coord
-      self.latitude = coord[0]
-      self.longitude = coord[1]
-    else 
-      errors.add(:base, "Error with geocoding")
-    end
-    coord
-  end
+  #def create_map_link(zoom=12,width=800,height=800)
+  #  markers = "&markers=color:red%7Ccolor:red%7C#{self.latitude},#{self.longitude}"
+  #  map = "http://maps.google.com/maps/api/staticmap?center= #{latitude},#{longitude}&zoom=13&size=800x800&maptype=roadmap#{markers}&sensor=false"
+  #end
+  # 
+  #def get_location_coordinates
+  #  str = self.street_1
+  #  zip = self.zip_code
+  #  
+  #  coord = Geocoder.coordinates("#{str}, #{zip}")
+  #  if coord
+  #    self.latitude = coord[0]
+  #    self.longitude = coord[1]
+  #  else 
+  #    errors.add(:base, "Error with geocoding")
+  #  end
+  #  coord
+  #end
   
   private
   

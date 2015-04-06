@@ -9,5 +9,7 @@ class BusinessServiceTest < ActiveSupport::TestCase
   should belong_to(:service)
   
   
+  #@bs2 = FactoryGirl.create(:business_service, business: @dozen, service: @cupcake, active: false)
+  
   
 end

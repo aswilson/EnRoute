@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   
   #callbacks
   before_validation :default_active
-  before_validation :get_location_coordinates, :if => :street_1_changed?
+  #before_validation :get_location_coordinates, :if => :street_1_changed?
   before_save :reformat_phone
   
   #methods
@@ -34,19 +34,19 @@ class User < ActiveRecord::Base
   end
   
   #location function needs to be reformatted for use of cell phone locator coordinates?
-  def get_location_coordinates
-    str = self.street_1
-    zip = self.zip_code
-    
-    coord = Geocoder.coordinates("#{str}, #{zip}")
-    if coord
-      self.latitude = coord[0]
-      self.longitude = coord[1]
-    else 
-      errors.add(:base, "Error with geocoding")
-    end
-    coord
-  end
+  #def get_location_coordinates
+  #  str = self.street_1
+  #  zip = self.zip_code
+  #  
+  #  coord = Geocoder.coordinates("#{str}, #{zip}")
+  #  if coord
+  #    self.latitude = coord[0]
+  #    self.longitude = coord[1]
+  #  else 
+  #    errors.add(:base, "Error with geocoding")
+  #  end
+  #  coord
+  #end
   
   private
   def default_active

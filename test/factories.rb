@@ -4,10 +4,9 @@ FactoryGirl.define do
     first_name "John"
     last_name "Black"
     username "john123"
-    password "password"
-    password_confirmation "password"
+    password_digest "password"
     email "john@email.com"
-    phone "412-000-000"
+    phone "412-000-0000"
     role "administrator"
     active true
     street_1 "5000 Forbes Ave"

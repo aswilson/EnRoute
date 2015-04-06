@@ -23,11 +23,11 @@ class ActiveSupport::TestCase
   
   def create_users
     @john = FactoryGirl.create(:user)
-    sleep 1
+    #sleep 1
     @amy = FactoryGirl.create(:user, first_name: "Amy", last_name: "Smith", username: "itsamy", role: "business owner")
-    sleep 1
+    #sleep 1
     @tim = FactoryGirl.create(:user, first_name: "Tim", last_name: "Jones", username: "timmy2", role: "user", active: false)
-    sleep 1
+    #sleep 1
   end
   
   def remove_users
@@ -50,11 +50,11 @@ class ActiveSupport::TestCase
   
   def create_businesses
     @starbucks = FactoryGirl.create(:business, user: @amy)
-    sleep 1
+    #sleep 1
     @dozen = FactoryGirl.create(:business, name: "Dozen Cupcakes", description: "sells an assortment of gourmet cupcakes", active: false, user: @amy)
-    sleep 1
+    #sleep 1
     @factory = FactoryGirl.create(:business, name: "Bagel Factory", description: "sells an assortment of bagels", active: true, user: @john)
-    sleep 1
+    #sleep 1
   end
   
   def remove_businesses
@@ -65,16 +65,14 @@ class ActiveSupport::TestCase
   
   def create_business_services
     @bs1 = FactoryGirl.create(:business_service, business: @starbucks, service: @coffee)
-    @bs2 = FactoryGirl.create(:business_service, business: @dozen, service: @cupcake, active: false)
-    @bs3 = FactoryGirl.create(:business_service, business: @factory, service: @coffee)
-    @bs4 = FactoryGirl.create(:business_service, business: @factory, service: @bagel)
+    @bs2 = FactoryGirl.create(:business_service, business: @factory, service: @coffee)
+    @bs3 = FactoryGirl.create(:business_service, business: @factory, service: @bagel)
   end
   
   def remove_business_services
     @bs1.destroy
     @bs2.destroy
     @bs3.destroy
-    @bs4.destroy
   end
   
   def create_contexts
