@@ -58,4 +58,44 @@ class UserTest < ActiveSupport::TestCase
   should_not allow_value('1521').for(:zip_code)
   should_not allow_value(nil).for(:zip_code)
   
+  context "With a proper context, " do
+    
+    setup do
+      create_contexts
+    end
+    
+    teardown do
+      remove_contexts
+    end
+    
+    #scopes
+    
+    should "sort users in alphabetical order" do
+      assert_equal ["Black, John", "Jones, Tim", "Smith, Amy"], User.alphabetical.map(&:name)
+    end
+    
+    should "show that there are 2 active users" do
+      assert_equal ["Black, John", "Smith, Amy"], User.active.alphabetical.map(&:name)
+    end
+    
+    should "show that there is 1 active user" do
+      assert_equal ["Jones, Tim"], User.inactive.alphabetical.map(&:name)
+    end
+    
+    #methods
+    
+    should "show that there is a working proper name method" do
+      assert_equal "John Black", @john.proper_name
+      assert_equal "Amy Smith", @amy.proper_name
+      assert_equal "Tim Jones", @tim.proper_name
+    end
+    
+    should "show that there is a working name method" do
+      assert_equal "Black, John", @john.name
+      assert_equal "Smith, Amy", @amy.name
+      assert_equal "Jones, Tim", @tim.name
+    end
+    
+  end
+  
 end

@@ -20,7 +20,7 @@ class Business < ActiveRecord::Base
   scope :by_service, -> (service_id) {joins(:business_service).where("service_id = ?". service_id)}
   
   #callbacks
-  before_save :get_location_coordinates
+  before_validation :get_location_coordinates, :if => :street_1_changed?
   before_validation :default_active
   before_save :reformat_phone
   
@@ -29,7 +29,6 @@ class Business < ActiveRecord::Base
     map = "http://maps.google.com/maps/api/staticmap?center= #{latitude},#{longitude}&zoom=13&size=800x800&maptype=roadmap#{markers}&sensor=false"
   end
    
-  private
   def get_location_coordinates
     str = self.street_1
     zip = self.zip_code
@@ -43,6 +42,8 @@ class Business < ActiveRecord::Base
     end
     coord
   end
+  
+  private
   
   def reformat_phone
     self.phone = self.phone.to_s.gsub(/[^0-9]/,"")

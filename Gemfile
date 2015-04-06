@@ -36,6 +36,11 @@ end
 gem 'validates_timeliness'
 gem 'will_paginate'
 
+gem 'simple_form', '3.0.1'
+gem 'nested_form','0.3.2'
+gem 'foundation-rails', '5.1.1.0'
+gem 'geocoder'
+
 # Gems used only in testing
 group :development, :test do
   gem 'faker'

@@ -21,7 +21,7 @@ class User < ActiveRecord::Base
   
   #callbacks
   before_validation :default_active
-  before_save :get_location_coordinates
+  before_validation :get_location_coordinates, :if => :street_1_changed?
   before_save :reformat_phone
   
   #methods
@@ -33,7 +33,6 @@ class User < ActiveRecord::Base
     last_name + ", " + first_name
   end
   
-  private
   #location function needs to be reformatted for use of cell phone locator coordinates?
   def get_location_coordinates
     str = self.street_1
@@ -49,6 +48,7 @@ class User < ActiveRecord::Base
     coord
   end
   
+  private
   def default_active
     self.active = true if self.active.nil?
   end
