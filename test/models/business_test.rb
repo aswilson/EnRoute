@@ -38,4 +38,31 @@ class BusinessTest < ActiveSupport::TestCase
   should_not allow_value("412/268/0000").for(:phone)
   should_not allow_value("412-2683-259").for(:phone)
   
+  
+  context "With a proper context, " do
+    
+    setup do
+      create_contexts
+    end
+    
+    teardown do
+      remove_contexts
+    end
+    
+    #scopes
+    
+    should "sort businesses in alphabetical order" do
+      assert_equal ["Bagel Factory","Dozen Cupcakes","Starbucks"], Business.alphabetical.map(&:name)
+    end
+    
+    should "show that there are 2 active businesses" do
+      assert_equal ["Bagel Factory", "Starbucks"], Business.active.alphabetical.map(&:name)
+    end
+    
+    should "show that there is 1 inactive business" do
+      assert_equal ["Dozen Cupcakes"], Business.inactive.alphabetical.map(&:name)
+    end
+    
+  end
+  
 end

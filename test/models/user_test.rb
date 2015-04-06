@@ -78,7 +78,7 @@ class UserTest < ActiveSupport::TestCase
       assert_equal ["Black, John", "Smith, Amy"], User.active.alphabetical.map(&:name)
     end
     
-    should "show that there is 1 active user" do
+    should "show that there is 1 inactive user" do
       assert_equal ["Jones, Tim"], User.inactive.alphabetical.map(&:name)
     end
     

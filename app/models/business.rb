@@ -17,7 +17,6 @@ class Business < ActiveRecord::Base
   scope :alphabetical, -> { order('name') }
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
-  scope :by_service, -> (service_id) {joins(:business_service).where("service_id = ?". service_id)}
   
   #callbacks
   #before_validation :get_location_coordinates, :if => :street_1_changed?
