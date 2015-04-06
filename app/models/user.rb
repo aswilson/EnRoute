@@ -1,7 +1,11 @@
 class User < ActiveRecord::Base
+  
+  # Use built-in rails support for password protection
+   has_secure_password
+   
   has_many :businesses
   
-  role_array = ["administrator", "business owner", "user"]
+  role_array = ["administrator", "business owner", "member"]
   
   STATES_LIST = [['Alabama', 'AL'],['Alaska', 'AK'],['Arizona', 'AZ'],['Arkansas', 'AR'],['California', 'CA'],['Colorado', 'CO'],['Connectict', 'CT'],['Delaware', 'DE'],['District of Columbia ', 'DC'],['Florida', 'FL'],['Georgia', 'GA'],['Hawaii', 'HI'],['Idaho', 'ID'],['Illinois', 'IL'],['Indiana', 'IN'],['Iowa', 'IA'],['Kansas', 'KS'],['Kentucky', 'KY'],['Louisiana', 'LA'],['Maine', 'ME'],['Maryland', 'MD'],['Massachusetts', 'MA'],['Michigan', 'MI'],['Minnesota', 'MN'],['Mississippi', 'MS'],['Missouri', 'MO'],['Montana', 'MT'],['Nebraska', 'NE'],['Nevada', 'NV'],['New Hampshire', 'NH'],['New Jersey', 'NJ'],['New Mexico', 'NM'],['New York', 'NY'],['North Carolina','NC'],['North Dakota', 'ND'],['Ohio', 'OH'],['Oklahoma', 'OK'],['Oregon', 'OR'],['Pennsylvania', 'PA'],['Rhode Island', 'RI'],['South Carolina', 'SC'],['South Dakota', 'SD'],['Tennessee', 'TN'],['Texas', 'TX'],['Utah', 'UT'],['Vermont', 'VT'],['Virginia', 'VA'],['Washington', 'WA'],['West Virginia', 'WV'],['Wisconsin ', 'WI'],['Wyoming', 'WY']]
   
@@ -31,6 +35,18 @@ class User < ActiveRecord::Base
   
   def name
     last_name + ", " + first_name
+  end
+  
+  # for use in authorizing with CanCan
+  ROLES = [['Administrator', :admin], ['Business Owner', :business], ['Member', :member]]
+
+  def self.authenticate(username,password)
+    find_by_username(username).try(:authenticate, password)
+  end
+
+  def role?(authorized_role)
+    return false if role.nil?
+    role.downcase.to_sym == authorized_role
   end
   
   #location function needs to be reformatted for use of cell phone locator coordinates?

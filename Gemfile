@@ -36,6 +36,8 @@ end
 gem 'validates_timeliness'
 gem 'will_paginate'
 
+gem 'cancancan'
+
 gem 'simple_form', '3.0.1'
 gem 'nested_form','0.3.2'
 gem 'foundation-rails', '5.1.1.0'
@@ -65,7 +67,7 @@ group :test do
 end
 
 # Use ActiveModel has_secure_password
-# gem 'bcrypt', '~> 3.1.7'
+ gem 'bcrypt', '~> 3.1.7'
 
 # Use unicorn as the app server
 # gem 'unicorn'

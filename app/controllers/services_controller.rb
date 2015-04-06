@@ -1,5 +1,7 @@
 class ServicesController < ApplicationController
   before_action :set_service, only: [:show, :edit, :update, :destroy]
+  #before_action :check_login
+  #authorize_resource
 
   # GET /services
   # GET /services.json

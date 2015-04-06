@@ -1,5 +1,7 @@
 class BusinessesController < ApplicationController
   before_action :set_business, only: [:show, :edit, :update, :destroy]
+  #before_action :check_login
+  #authorize_resource
 
   # GET /businesses
   # GET /businesses.json
