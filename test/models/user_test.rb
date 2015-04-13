@@ -15,7 +15,7 @@ class UserTest < ActiveSupport::TestCase
   
   should allow_value('administrator').for(:role)
   should allow_value('business owner').for(:role)
-  should allow_value('user').for(:role)
+  should allow_value('member').for(:role)
   
   should_not allow_value(nil).for(:role)
   should_not allow_value('admin').for(:role)
@@ -94,6 +94,11 @@ class UserTest < ActiveSupport::TestCase
       assert_equal "Black, John", @john.name
       assert_equal "Smith, Amy", @amy.name
       assert_equal "Jones, Tim", @tim.name
+    end
+    
+    should "have a method to identify geocoordinates" do
+      assert_in_delta(40.4411533, @john.latitude, 0.0001)
+      assert_in_delta(-79.9421533, @john.longitude, 0.0001)
     end
     
   end

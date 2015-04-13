@@ -23,11 +23,11 @@ class ActiveSupport::TestCase
   
   def create_users
     @john = FactoryGirl.create(:user)
-    #sleep 1
+    sleep 1
     @amy = FactoryGirl.create(:user, first_name: "Amy", last_name: "Smith", username: "itsamy", role: "business owner")
-    #sleep 1
-    @tim = FactoryGirl.create(:user, first_name: "Tim", last_name: "Jones", username: "timmy2", role: "user", active: false)
-    #sleep 1
+    sleep 1
+    @tim = FactoryGirl.create(:user, first_name: "Tim", last_name: "Jones", username: "timmy2", role: "member", active: false)
+    sleep 1
   end
   
   def remove_users
@@ -50,11 +50,11 @@ class ActiveSupport::TestCase
   
   def create_businesses
     @starbucks = FactoryGirl.create(:business, user: @amy)
-    #sleep 1
+    sleep 1
     @dozen = FactoryGirl.create(:business, name: "Dozen Cupcakes", description: "sells an assortment of gourmet cupcakes", active: false, user: @amy)
-    #sleep 1
+    sleep 1
     @factory = FactoryGirl.create(:business, name: "Bagel Factory", description: "sells an assortment of bagels", active: true, user: @john)
-    #sleep 1
+    sleep 1
   end
   
   def remove_businesses

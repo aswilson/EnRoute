@@ -63,6 +63,11 @@ class BusinessTest < ActiveSupport::TestCase
       assert_equal ["Dozen Cupcakes"], Business.inactive.alphabetical.map(&:name)
     end
     
+    should "have a method to identify geocoordinates" do
+      assert_in_delta(40.444592, @starbucks.latitude, 0.0001)
+      assert_in_delta(-79.9485208, @starbucks.longitude, 0.0001)
+    end
+    
   end
   
 end
