@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150402191630) do
+ActiveRecord::Schema.define(version: 20150413182326) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -34,14 +34,14 @@ ActiveRecord::Schema.define(version: 20150402191630) do
     t.string   "city"
     t.string   "state"
     t.string   "zip_code"
-    t.string   "latitude"
-    t.string   "longitude"
     t.float    "rating"
     t.integer  "number_of_raters"
     t.integer  "user_id"
     t.boolean  "active"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.float    "latitude"
+    t.float    "longitude"
   end
 
   create_table "services", force: true do |t|
@@ -62,8 +62,6 @@ ActiveRecord::Schema.define(version: 20150402191630) do
     t.date     "password_reset_sent_at"
     t.string   "email"
     t.string   "phone"
-    t.string   "latitute"
-    t.string   "longitude"
     t.string   "role"
     t.boolean  "active"
     t.datetime "created_at"
@@ -73,6 +71,8 @@ ActiveRecord::Schema.define(version: 20150402191630) do
     t.string   "city"
     t.string   "state"
     t.string   "zip_code"
+    t.float    "latitude"
+    t.float    "longitude"
   end
 
 end
