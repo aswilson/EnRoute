@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>EnRoute - Plan your next stop</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="plan_route.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+</head>
+
+<body>
+
+	<div style="position:absolute">
+		<div id="sign-in" class="toolbar up-right">
+			<button id="login" class="btn btn-default teal" type="submit">SIGN IN</button>
+		</div>
+		
+		<div id="top-menu">
+			<a href="index.html"><img src="logo_small.png"/></a>
+		</div>
+		
+		<div id="content">
+			<div id="route-planning-panel">
+				<div class="row input-group">
+					<table id="tasks">
+						<tr id="taskPrototype">
+							<td class="move-button"><img src="move.png"/></td>
+							<td class="task-label"><input type="text" class="form-control" value="Home"/></td>
+							<td class="edit-button"><img src="edit.png"/></td>
+							<td class="delete-button"><img src="X.png"/></td>
+						</tr>
+					</table>
+					<button id="add-stop" class="btn btn-default" type="submit">ADD STOP</button>
+				</div>
+				<div class="row options">
+					<span>LEAST: &nbsp;&nbsp;
+						<input id="least-time" type="radio" name="least" value="time" checked/>&nbsp; time &nbsp;
+						<input id="least-distance" type="radio" name="least" value="distance"/>&nbsp; distance &nbsp;
+					</span>
+				</div>
+				<div class="row options">
+					<span>Time allowed for trip (minutes): &nbsp;&nbsp;
+						<input id="time-limit" type="text" value=""/>
+					</span>
+				</div>
+				<div class="space"></div>
+				<button id="find-route" class="btn btn-default" type="submit">FIND ROUTE</button>
+				<span id="message"></span>
+			</div>
+			
+			<div id="map-display-panel">
+				Map goes here, but I disabled it for speed during this phase of testing.
+				<!--<iframe id="embedded-map" src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d6072.98611128042!2d-79.94444662201191!3d40.442222924091624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1425457837553">
+				</iframe>-->
+			</div>
+		</div>
+	</div>
+	
+	
+	<!-- Popup stuff -->
+	<!--<div class="popup-container">-->
+		<div id="popup-locChoices" class="popup-container" hidden>
+			<span id="locChoices-message">Location choices:</span>
+			<ul id="locChoices-list">
+				<li>Loc 1: Addr 1</li>
+				<li>Loc 2: Addr 2</li>
+			</ul>
+		</div>
+	<!--</div>-->
+	<!--<div class="popup-container">-->
+		<div id="popup-task-editor" class="popup-container" hidden>
+			<table border="5">
+				<tr><td>Label:</td>
+					<td><input id="popup-label" type="text"/></td>
+					<td>An activity type (ex: Coffee), business name, or address</td></tr>
+				<tr><td>Address:</td>
+					<td><input id="popup-address" type="text"/></td>
+					<td rowspan="4">Optional details (later auto-filled-out based on Label if left blank)</td></tr>
+				<tr><td>Business Name:</td>
+					<td><input id="popup-businessName" type="text"/></td></tr>
+				<tr><td>Lattitude:</td>
+					<td><input id="popup-lat" type="text"/></td></tr>
+				<tr><td>Longitude:</td>
+					<td><input id="popup-lon" type="text"/></td></tr>
+				<tr><td>Flexible Ordering:</td>
+					<td><input id="popup-flexibleOrdering" type="checkbox"/></td>
+					<td>If checked, we will re-arrange the order of this task if it helps save time.</td></tr>
+				<tr><td>Minutes Needed:</td>
+					<td><input id="popup-minutesNeeded" type="text"/></td>
+					<td>Number of minutes you will need.  Leave it blank if you don't care.</td></tr>
+				<tr><td>Start Time:</td>
+					<td><input id="popup-startTime" type="text"/></td>
+					<td>Start time, in minutes.  Leave it blank if you don't care.</td></tr>
+				<tr><td>End Time:</td>
+					<td><input id="popup-endTime" type="text"/></td>
+					<td>End time, in minutes.  Leave it blank if you don't care.</td></tr>
+				<tr><td>Earliest Allowed Arrival:</td>
+					<td><input id="popup-whenToArrive-start" type="text"/></td>
+					<td>Earliest possible arrival time, in minutes.  Leave it blank if you don't care.</td></tr>
+				<tr><td>Latest Allowed Arrival:</td>
+					<td><input id="popup-whenToArrive-end" type="text"/></td>
+					<td>Latest possible arrival time, in minutes.  Leave it blank if you don't care.</td></tr>
+				<tr><td>Earliest Allowed Leaving:</td>
+					<td><input id="popup-whenToLeave-start" type="text"/></td>
+					<td>Earliest possible leaving time, in minutes.  Leave it blank if you don't care.</td></tr>
+				<tr><td>Latest Allowed Leaving:</td>
+					<td><input id="popup-whenToLeave-end" type="text"/></td>
+					<td>Latest possible leaving time, in minutes.  Leave it blank if you don't care.</td></tr>
+			</table>
+			<button id="accept-popup-task-editor" class="btn btn-default" type="submit">Ok</button>
+			&nbsp;&nbsp;&nbsp;
+			<button id="cancel-popup-task-editor" class="btn btn-default" type="submit">Cancel</button>
+		</div>
+	<!--</div>-->
+	
+	
+	<!-- Scripts -->
+		<script src="jquery-1.11.0.js"></script>
+		<script src="bootstrap.min.js"></script>
+		<script src="RouteTools.js"></script>
+		<script src="map.js"></script>
+		<script src="routeForm.js"></script>
+	<!-- end Scripts-->
+</body>
+
+</html>

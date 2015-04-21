@@ -1,0 +1,98 @@
+@font-face {
+    font-family: mainFont;
+    src: url(MyriadPro-Regular.otf);
+}
+
+body {
+    overflow: hidden;
+}
+
+div {
+    font-family: mainFont;
+}
+
+iframe {
+    position: absolute;
+    top: -40px;
+    height: 115%;
+    width: 100%;
+}
+
+input {
+    position: inline;
+}
+
+span {
+    padding: 10px;
+}
+
+.teal {
+    background-color: #26C6DA;
+}
+
+.transparant-background {
+    opacity: 0.1;
+}
+
+.row {
+    padding: 1px;
+    width: 100%;
+}
+
+.input-text {
+    width: 80%;
+    border: 2px solid grey;
+    font-size: 17px;
+}
+
+.space {
+    height: 60px;
+}
+
+.options {
+    font-size: 17px
+}
+
+.up-right {
+    position: absolute;
+    right: 20px;
+    top: 30px;
+}
+
+#add-stop {
+    left: 240px;
+    font-size: 12px;
+    right: 0;
+    position: absolute;
+}
+
+#map-content {
+    opacity:1.0;
+    position: absolute;
+    width: 340px;
+    height: 320px;
+    top: 70px;
+    left: 50px;
+}
+
+#menu {
+    position: absolute;
+    top: 30px;
+    width: 400px;
+    height: 370px;
+}
+
+#find-route {
+    background-color: #F37046;
+    right: 0;
+    bottom: 0;
+    position: absolute;
+    color: #ffffff;
+}
+
+#login {
+    padding-top: 10px;
+    padding-left: 30px;
+    padding-right: 30px;
+    color: #ffffff;
+}

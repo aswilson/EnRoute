@@ -1,0 +1,182 @@
+/* Popups still need some work (well, everyting does...).  This link may help:
+   http://webdesignandsuch.com/posts/css-popup/css-popup.html# */
+
+@font-face {
+    font-family: mainFont;
+    src: url(MyriadPro-Regular.otf);
+}
+
+div#sign-in {
+	padding: 5px;				/* to make debug easy */
+	background-color: orange;	/* to make debug easy */
+}
+
+div#top-menu {
+    width: 100%;
+	padding: 4px;
+	background-color: red;	/* to make debug easy */
+}
+
+div#content {
+	float: left;
+	width: 100%;
+	display: inline;
+	background-color: yellow;	/* to make debug easy */
+}
+
+div#route-planning-panel {
+	float: left;
+    width: 270px;
+	padding: 20px;
+	margin: 2px;
+	background-color: green;	/* to make debug easy */
+}
+
+div#map-display-panel {
+	float: left;
+	padding: 20px;
+	margin: 2px;
+	width: 550px;
+	height: 350px;
+	background-color: brown;	/* to make debug easy */
+}
+
+div.popup-container {
+	/* http://webdesignandsuch.com/posts/css-popup/css-popup.html# */
+	position:absolute;
+	background-color:gray;
+	z-index: 9000;
+}
+
+div#popup-task-editor  {
+	width: 100%;
+	height: 100%;
+}
+
+div#popup-suggestions {
+	left: 300px;
+	top: 100px;
+	width: 300px;
+	height: 150px;
+}
+
+iframe#embedded-map {
+/*    position: absolute;*/
+/*    top: -40px;
+    height: 115%;*/
+    width: 100%;
+	height: 100%;
+}
+
+table#tasks {
+	border: 2px solid black;	/* to make debug easy */
+	width: 110%;			/* DIRTY */
+}
+
+table#tasks td {
+	border: 2px solid black;	/* to make debug easy */
+}
+
+
+
+
+
+
+#find-route {
+    background-color: #F37046;
+/*    position: absolute;*/
+	right: 0;
+    bottom: 0;
+    color: #ffffff;
+}
+
+#add-stop {
+/*    left: 240px;*/
+    font-size: 12px;
+	float: right;
+    /*right: 0;*/
+/*    position: absolute;*/
+}
+
+#time-limit {
+	float: right;
+}
+
+#message {
+}
+
+#suggestions-message {
+}
+
+#suggestions-list {
+}
+
+#login {
+/*    padding-top: 10px;
+    padding-left: 30px;
+    padding-right: 30px;*/
+    color: #ffffff;
+}
+
+
+
+
+body {
+/*    overflow: hidden;*/
+}
+
+div {
+    font-family: mainFont;
+}
+
+input {
+    position: inline;
+}
+
+span {
+    padding: 10px;
+	white-space: nowrap;
+}
+
+.teal {
+    background-color: #26C6DA;
+}
+
+.transparant-background {
+    opacity: 0.1;
+}
+
+.row {
+    padding: 1px;
+    width: 100%;
+}
+
+td.task-label  input {
+    width: 100%;
+    border: 2px solid grey;
+    font-size: 17px;
+}
+
+td.move-button img {
+	cursor: ns-resize;	/*move, row-resize, ns-resize*/
+}
+
+td.edit-button img {
+}
+
+td.delete-button img {
+}
+
+.space {
+    height: 30px;
+}
+
+.options {
+    font-size: 17px
+}
+
+.up-right {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+}

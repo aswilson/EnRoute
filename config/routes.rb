@@ -11,12 +11,17 @@ EnRoute::Application.routes.draw do
   resources :users
   
   resources :sessions
+
   
   
   get 'user/edit' => 'users#edit', as: :edit_current_user
   get 'signup' => 'users#new', as: :signup
   get 'logout' => 'sessions#destroy', as: :logout
   get 'login' => 'sessions#new', as: :login
+  
+  get 'welcome/plan_route', to: 'welcome#plan_route', as: :plan_route
+  get 'welcome/rate_business', to: 'welcome#rate_business', as: :rate_business
+  get 'welcome/edit_settings', to: 'welcome#edit_settings', as: :edit_settings
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

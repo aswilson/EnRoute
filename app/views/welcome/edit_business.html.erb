@@ -8,7 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Welcome to EnRoute</title>
+    <title>EnRoute - Plan your next stop</title>
 
     <!-- Bootstrap Core CSS -->
     <link href="bootstrap.min.css" rel="stylesheet">
@@ -26,21 +26,24 @@
 
     <div id="main-menu">
 		<div>
-			<center>
-			<%= link_to 'Plan Route', 'welcome/plan_route', :class => 'btn btn-primary btn-lg outline' %>
-		</center>
-		<center>
-			<%= link_to 'Rate Business', 'welcome/rate_business', :class => 'btn btn-primary btn-lg outline' %>
-		</center>
-		<center>
-			<%= link_to 'Edit Settings', 'welcome/edit_settings', :class => 'btn btn-primary btn-lg outline' %>
-		</center>
+			<a href="plan_route.html">
+				<button id="plan-route" class="btn btn-default main-menu-option" type="submit">PLAN MY ROUTE</button>
+			</a>
+			<a href="rate_business.html">
+				<button id="rate-business" class="btn btn-default main-menu-option" type="submit">RATE A BUSINESS</button>
+			</a>
+			<a href="edit_business.html">
+				<button id="edit-businesses" class="btn btn-default main-menu-option" type="submit">ADD/EDIT A BUSINESS</button>
+			</a>
+			<a href="edit_settings.html">
+				<button id="edit-settings" class="btn btn-default main-menu-option" type="submit">MY SETTINGS</button>
+			</a>
 		</div>
 		<div class="little-space"></div>
 		<div>
-			<center>
-			<%= link_to 'Login', login_path, :class => 'btn btn-primary btn-lg outline' %>
-		</center>
+			<a href="login.html">
+				<button id="login" class="btn btn-default main-menu-option" type="submit">SIGN IN</button>
+			</a>
 		</div>
     </div>
 

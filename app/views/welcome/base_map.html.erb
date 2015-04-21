@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>EnRoute - Plan your next stop</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link href="bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom CSS -->
+    <link href="map.css" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+</head>
+
+<body>
+    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d6072.98611128042!2d-79.94444662201191!3d40.442222924091624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1425457837553">
+    </iframe>
+
+    <div id="menu" class="teal transparant-background" style="width:500; ">
+    </div>
+
+    <div id="map-content">
+        <div class="row input-group" top="20px">
+            <input type="text" class="form-control input-text" placeholder="start" />
+            <input type="image" hidden="true"/>
+        </div>
+        <div class="row input-group">
+            <input type="image" hidden="true"/>
+            <input type="text" class="input-text form-control" placeholder="to" />
+            <input type="image" hidden="true"/>
+            <input type="image" hidden="true"/>
+        </div>
+        <div id="add-stop" class="row">
+            <input type="image" hidden="true"/>
+            ADD STOP
+        </div>
+        <div class="space"></div>
+        <div class="row options">
+            <span> LEAST: </span>
+            <input type="radio" name="least" value="distance"/> <span>distance</span>
+            <input type="radio" name="least" value="time"/> <span>time</span>
+        </div>
+        <div class="row options">
+            <span> AVOID: </span>
+            <input type="checkbox"/> <span>highway</span>
+            <input type="checkbox"/> <span>tollroad</span>
+        </div>
+
+        <button id="find-route" class="btn btn-default" type="submit">FIND ROUTE</button>
+    </div>
+
+    <div class="toolbar up-right">
+        <input type="image" hidden="true"/>
+        <input type="image" hidden="true"/>
+        <button id="login" class="btn btn-default teal" type="submit">SIGN IN</button>
+    </div>
+
+    <!-- jQuery Version 1.11.0 -->
+    <script src="jquery-1.11.0.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="bootstrap.min.js"></script>
+
+</body>
+
+</html>

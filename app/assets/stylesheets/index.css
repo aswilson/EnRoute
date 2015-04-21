@@ -1,0 +1,54 @@
+@font-face {
+    font-family: mainFont;
+    src: url(MyriadPro-Regular.otf);
+}
+
+#big-header {
+	background-color: red;	/* to make debug easy */
+	text-align: center;
+}
+
+#main-menu {
+	background-color: blue;	/* to make debug easy */
+	text-align: center;
+}
+
+
+/* For other pages */
+div#sign-in {
+	padding: 5px;				/* to make debug easy */
+	background-color: orange;	/* to make debug easy */
+}
+div#top-menu {
+    width: 100%;
+	padding: 4px;
+	background-color: red;	/* to make debug easy */
+}
+div#content {
+	float: left;
+	width: 100%;
+	display: inline;
+	background-color: yellow;	/* to make debug easy */
+}
+
+
+
+.main-menu-option {
+	width: 50%;
+	height: 50px;
+	padding: 5px;
+	margin: 8px;
+	background-color: green; /* I ain't makin' it pretty */
+	color: #ffffff;
+}
+
+.little-space {
+    height: 10px;
+}
+
+body {
+}
+
+div {
+    font-family: mainFont;
+}
