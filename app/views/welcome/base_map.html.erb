@@ -32,9 +32,11 @@
 
     <!-- Custom Fonts -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
 </head>
 
 <body>
+    
     <!-- Map -->
     <div id="map-canvas"></div>
 
@@ -58,7 +60,56 @@
 
             <!-- Save tab -->
             <div role="tabpanel" class="tab-pane active" id="tab2">
-                Save Tab - Yet to be implemented
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="thick-border-bottom" data-toggle="collapse" data-target="#savedRoutesCollapse" class="accordion-toggle">
+                            <td>
+                                <div class="row-text align-left">Saved Routes</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="hiddenRow">
+                                <div class="collapse" id="savedRoutesCollapse">
+                                    <table width="100%">
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">To-do</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">Sunday Errands</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="thick-border-bottom" data-toggle="collapse" data-target="#pastRoutesCollapse" class="accordion-toggle">
+                            <td>
+                                <div class="row-text align-left">Past Routes</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="hiddenRow">
+                                <div class="collapse" id="pastRoutesCollapse">
+                                    <table width="100%">
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">FROM x TO y</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">FROM a TO b</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <!-- Settings tab -->
@@ -248,6 +299,7 @@
         </div>
     </div>
     <!-- END Modal for Login -->
+    
 
 </body>
 
