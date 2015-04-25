@@ -4,12 +4,12 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
     <meta name="description" content="">
     <meta name="author" content="">
 
     <title>EnRoute - Plan your next stop</title>
-
+    
     <!-- Bootstrap Core CSS -->
     <link href="bootstrap.min.css" rel="stylesheet">
 
@@ -17,61 +17,496 @@
     <link href="map.css" rel="stylesheet">
 
     <!-- Custom JS -->
-    <script src="RouteTools.js"></script>
-    <script src="map.js"></script>
-    <script src="routeForm.js"></script>
-
-    <!-- Custom Fonts -->
-</head>
-
-<body>
-    <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d6072.98611128042!2d-79.94444662201191!3d40.442222924091624!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1425457837553">
-    </iframe>
-
-    <div id="menu" class="teal transparant-background" style="width:500; ">
-    </div>
-
-    <div id="map-content">
-        <div class="row input-group" top="20px">
-            <input type="text" class="form-control input-text" placeholder="start" />
-            <input type="image" hidden="true"/>
-        </div>
-        <div class="row input-group">
-            <input type="image" hidden="true"/>
-            <input type="text" class="input-text form-control" placeholder="to" />
-            <input type="image" hidden="true"/>
-            <input type="image" hidden="true"/>
-        </div>
-        <div id="add-stop" class="row">
-            <input type="image" hidden="true"/>
-            ADD STOP
-        </div>
-        <div class="space"></div>
-        <div class="row options">
-            <span> LEAST: </span>
-            <input type="radio" name="least" value="distance"/> <span>distance</span>
-            <input type="radio" name="least" value="time"/> <span>time</span>
-        </div>
-        <div class="row options">
-            <span> AVOID: </span>
-            <input type="checkbox"/> <span>highway</span>
-            <input type="checkbox"/> <span>tollroad</span>
-        </div>
-
-        <button id="find-route" class="btn btn-default" type="submit">FIND ROUTE</button>
-    </div>
-
-    <div class="toolbar up-right">
-        <input type="image" hidden="true"/>
-        <input type="image" hidden="true"/>
-        <button id="login" class="btn btn-default teal" type="submit">SIGN IN</button>
-    </div>
+    <script type="text/javascript"
+      src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBD-Jj7sqAT8QMdakHot8YBL5mdKr-F-cA">
+    </script>
 
     <!-- jQuery Version 1.11.0 -->
     <script src="jquery-1.11.0.js"></script>
 
     <!-- Bootstrap Core JavaScript -->
     <script src="bootstrap.min.js"></script>
+    <script src="map.js"></script>
+    <script src="RouteTools.js"></script>
+    <script src="routeForm.js"></script>
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+
+</head>
+
+<body>
+    
+    <!-- Map -->
+    <div id="map-canvas"></div>
+
+    <!-- Transparant Background -->
+    <div class="teal transparant menu"></div>
+
+    <!-- Menu -->
+    <div role="tabpanel" class="menu">
+
+        <!-- Nav tabs -->
+        <ul class="nav nav-tabs gray" role="tablist" id="tabs">
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><img src="tab-Normal-02.png" name="02" width="41px" height = "41px"></a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><img src="tab-Normal-03.png" name="03" width="41px" height = "41px" ></a></li>
+            <li role="presentation class="active""><a href="#tab5" aria-controls="tab5" role="tab" data-toggle="tab"><img src="tab-ClickOn-05.png" name="05" width="41px" height = "41px"></a></li>
+            <li role="presentation"><a href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab"><img src="tab-Normal-04.png" name="04" width="41px" height = "41px"></a></li>
+            <li role="presentation"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><img src="tab-Normal-01.png" name="01" width="41px" height = "41px"></a></li>
+        </ul>
+
+        <!-- Tab panes -->
+        <div class="tab-content">
+
+            <!-- Save tab -->
+            <div role="tabpanel" class="tab-pane active" id="tab2">
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="thick-border-bottom" data-toggle="collapse" data-target="#savedRoutesCollapse" class="accordion-toggle">
+                            <td>
+                                <div class="row-text align-left">Saved Routes</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="hiddenRow">
+                                <div class="collapse" id="savedRoutesCollapse">
+                                    <table width="100%">
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">To-do</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">Sunday Errands</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr class="thick-border-bottom" data-toggle="collapse" data-target="#pastRoutesCollapse" class="accordion-toggle">
+                            <td>
+                                <div class="row-text align-left">Past Routes</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="6" class="hiddenRow">
+                                <div class="collapse" id="pastRoutesCollapse">
+                                    <table width="100%">
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">FROM x TO y</div>
+                                            </td>
+                                        </tr>
+                                        <tr class="border-bottom">
+                                            <td>
+                                                <div class="row-text align-left">FROM a TO b</div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Settings tab -->
+            <div role="tabpanel" class="tab-pane" id="tab3">
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td width="50%">
+                                <div class="row-text align-left">Least</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">time</div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <div class="row-text align-left">Distance Unit</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">miles</div>
+                            </td>
+                        </tr>
+                        <tr class="thick-border-bottom">
+                            <td>
+                                <div class="row-text align-left">Navigation Unit</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">none</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <div class="row-text align-left">About EnRoute</div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <div class="row-text align-left">Privacy, Terms, and Conditions</div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="row-text align-left">Feedback</div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Route tab -->
+            <div role="tabpanel" class="tab-pane" id="tab5">
+                <div class="table-container">
+                    <table>
+                        <tr class="text-input">
+                            <td></td>
+                            <td>
+                                <input type="text" id="input-first-location" class="input-text form-control inline" value="Current Location"/>
+                            </td>
+                        </tr>
+                        <!-- Template for new row when we add route -->
+                        <tr class="text-input">
+                            <td>
+                                <img src="findroute-Normal-01.png" width="21.545px" height="21.545px">
+                                <a id="time-options-button" data-toggle="modal" data-target="#optionsModal">
+                                    <img src="findroute-Normal-02.png" width="21.545px" height="21.545px">
+                                </a>
+                            </td>
+                            <td>
+                                <input type="text" id="input-location" class="input-text form-control inline"/>
+                                <img src="findroute-Normal-03.png" width="21.545px" height="21.545px">
+                            </td>
+                        </tr>
+                        <!-- END Template for new row when we add route -->
+                    </table>
+                    <table class="footer-table" width="100%">
+                        <tr>
+                            <td width="46px"></td>
+                            <td>
+                                <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
+                                <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Favorites tab -->
+            <div role="tabpanel" class="tab-pane" id="tab4">
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="thick-border-bottom">
+                            <td>
+                                <div class="row-text align-left">Favorites</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Normal-07.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <img src="Category_ClickPins-09.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Starbucks</div>
+                            </td>
+                            <td>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
+                                    <div class="row-text align-right">edit</div>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Normal-07.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <img src="Category_ClickPins-11.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Chipotle</div>
+                            </td>
+                            <td>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
+                                    <div class="row-text align-right">edit</div>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Normal-07.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <img src="Category_ClickPins-05.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Library</div>
+                            <td>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
+                                    <div class="row-text align-right">edit</div>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="footer-table" width="100%">
+                        <tr>
+                            <td width="46px"></td>
+                            <td>
+                                <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
+                                <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+
+            <!-- User tab -->
+            <div role="tabpanel" class="tab-pane" id="tab1">
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <div class="row-text align-left">Username</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">lcorry</div>
+                            </td>
+                        </tr>
+                        <tr class="thick-border-bottom">
+                            <td>
+                                <div class="row-text align-left">Password</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">*****</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-02.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Home</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">5000 Forbes Ave.</div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-04.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Work</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">123 Main St.</div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-08.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Bank</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right"></div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-06.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Pharmacy</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+
+    <!-- Upper Right Toolbar -->
+    <!-- Help and Login Buttons --> 
+    <div class="toolbar up-right">
+        <input id="help-button" type="image" src="help.png" width="33.66px" height="33.66px"/>
+        <a id="login-button" data-toggle="modal" data-target="#loginModal">
+            <img src="button-Normal-02.png" width="99px" height="33.66px">
+        </a>
+    </div>
+
+    <!-- Modal for Login -->
+    <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog transparant">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="LogInWindow-03.png" width="39.349pxpx" height="39.349pxpx">
+                    <span class="modal-title" id="myModalLabel">Log in</span>
+                </div>
+                <div class="modal-body teal">
+                    <div class="table-container">
+                        <table>
+                            <!-- Input Username -->
+                            <tr class="text-input">
+                                <td class="input-label">
+                                    <div> Username </div>
+                                </td>
+                                <td>
+                                    <input type="text" id="input-username" class="input-text form-control inline"/>
+                                    <img src="LogInWindow-01.png" width="21.545px" height="21.545px">
+                                </td>
+                            </tr>
+                            <!-- Input Password --> 
+                            <tr class="text-input">
+                                <td class="input-label">
+                                    <div> Password </div>
+                                </td>
+                                <td>
+                                    <input type="text" id="input-password" class="input-text form-control inline"/>
+                                </td>
+                            </tr>
+                            <tr class="footer">
+                                <td></td>
+                                <td>
+                                    <img src="login-Normal-04.png" width="93.086px" height="28.164pxpx">
+                                    <img src="login-Normal-05.png" width="93.086px" height="28.164pxpx">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal for Login -->
+
+    <!-- Modal for Options -->
+    <div class="modal fade" id="optionsModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog transparant">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="TimeSetting.png" width="39.349pxpx" height="39.349pxpx">
+                    <span class="modal-title" id="myModalLabel">Category</span>
+                </div>
+                <div class="modal-body teal">
+                    <div class="options-table-container">
+                        <table width="100%">
+                            <tr class="border-bottom">
+                                <td width="50%">
+                                    <div class="row-text align-left">Arrive</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">time</div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <div class="row-text align-left">Stop</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">time</div>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal for Options -->
+    
+    <!-- Modal for Favorites -->
+    <div class="modal fade" id="favoritesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog transparant">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="tab-Normal-04.png" width="39.349pxpx" height="39.349pxpx">
+                    <span class="modal-title" id="myModalLabel">Favorite</span>
+                </div>
+                <div class="modal-body teal">
+                    <div class="options-table-container">
+                        <table width="100%">
+                            <tr class="border-bottom">
+                                <td width="50%">
+                                    <div class="row-text align-left">Name</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">.....</div>
+                                </td>
+                            </tr>
+                            <tr class="thick-border-bottom">
+                                <td>
+                                    <div class="row-text align-left">Location</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">.....</div>
+                                </td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td>
+                                    <div class="row-text align-left">Note</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">.....</div>
+                                </td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td>
+                                    <div class="row-text align-left">Category</div>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td><img src="AddCategory-01.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-02.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-03.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-04.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-05.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-06.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="AddCategory-07.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-08.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-09.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-10.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-11.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="footer-table" width="100%">
+                            <tr>
+                                <td width="46px"></td>
+                                <td>
+                                    <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
+                                    <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal for Favorites -->
 
 </body>
 
