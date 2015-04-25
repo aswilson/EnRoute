@@ -1,10 +1,10 @@
-<%= form_for(@business) do |f| %>
-  <% if @business.errors.any? %>
+<%= form_for(@favorite) do |f| %>
+  <% if @favorite.errors.any? %>
     <div id="error_explanation">
-      <h2><%= pluralize(@business.errors.count, "error") %> prohibited this business from being saved:</h2>
+      <h2><%= pluralize(@favorite.errors.count, "error") %> prohibited this favorite from being saved:</h2>
 
       <ul>
-      <% @business.errors.full_messages.each do |msg| %>
+      <% @favorite.errors.full_messages.each do |msg| %>
         <li><%= msg %></li>
       <% end %>
       </ul>
@@ -14,18 +14,6 @@
   <div class="field">
     <%= f.label :name %><br>
     <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :description %><br>
-    <%= f.text_area :description %>
-  </div>
-  <div class="field">
-    <%= f.label :phone %><br>
-    <%= f.text_field :phone %>
-  </div>
-  <div class="field">
-    <%= f.label :schedule %><br>
-    <%= f.text_field :schedule %>
   </div>
   <div class="field">
     <%= f.label :street_1 %><br>
@@ -48,20 +36,28 @@
     <%= f.text_field :zip_code %>
   </div>
   <div class="field">
-    <%#= f.label :rating %><br>
-    <%#= f.text_field :rating %>
+    <%= f.label :latitude %><br>
+    <%= f.text_field :latitude %>
   </div>
   <div class="field">
-    <%#= f.label :number_of_raters %><br>
-    <%#= f.number_field :number_of_raters %>
+    <%= f.label :longitude %><br>
+    <%= f.text_field :longitude %>
   </div>
   <div class="field">
-    <%#= f.label :user_id %><br>
-    <%#= f.number_field :user_id %>
+    <%= f.label :type %><br>
+    <%= f.text_field :type %>
   </div>
   <div class="field">
-    <%#= f.label :active %><br>
-    <%#= f.check_box :active %>
+    <%= f.label :notes %><br>
+    <%= f.text_area :notes %>
+  </div>
+  <div class="field">
+    <%= f.label :user_id %><br>
+    <%= f.number_field :user_id %>
+  </div>
+  <div class="field">
+    <%= f.label :business_id %><br>
+    <%= f.number_field :business_id %>
   </div>
   <div class="actions">
     <%= f.submit %>
