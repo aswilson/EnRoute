@@ -200,12 +200,143 @@
 
             <!-- Favorites tab -->
             <div role="tabpanel" class="tab-pane" id="tab4">
-                Favorites Tab - Yet to be Implemented
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="thick-border-bottom">
+                            <td>
+                                <div class="row-text align-left">Favorites</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Normal-07.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <img src="Category_ClickPins-09.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Starbucks</div>
+                            </td>
+                            <td>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
+                                    <div class="row-text align-right">edit</div>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Normal-07.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <img src="Category_ClickPins-11.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Chipotle</div>
+                            </td>
+                            <td>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
+                                    <div class="row-text align-right">edit</div>
+                                </a>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Normal-07.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <img src="Category_ClickPins-05.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Library</div>
+                            <td>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
+                                    <div class="row-text align-right">edit</div>
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                    <table class="footer-table" width="100%">
+                        <tr>
+                            <td width="46px"></td>
+                            <td>
+                                <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
+                                <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
 
             <!-- User tab -->
             <div role="tabpanel" class="tab-pane" id="tab1">
-                User Tab - Yet to be Implemented
+                <div class="options-table-container">
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <div class="row-text align-left">Username</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">lcorry</div>
+                            </td>
+                        </tr>
+                        <tr class="thick-border-bottom">
+                            <td>
+                                <div class="row-text align-left">Password</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">*****</div>
+                            </td>
+                        </tr>
+                    </table>
+                    <table width="100%">
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-02.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Home</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">5000 Forbes Ave.</div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-04.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Work</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right">123 Main St.</div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-08.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Bank</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right"></div>
+                            </td>
+                        </tr>
+                        <tr class="border-bottom">
+                            <td>
+                                <img src="Category_ClickPins-06.png" width="42px" height="42px">
+                            </td>
+                            <td>
+                                <div class="row-text align-left">Pharmacy</div>
+                            </td>
+                            <td>
+                                <div class="row-text align-right"></div>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
@@ -298,8 +429,84 @@
             </div>
         </div>
     </div>
-    <!-- END Modal for Login -->
+    <!-- END Modal for Options -->
     
+    <!-- Modal for Favorites -->
+    <div class="modal fade" id="favoritesModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+        <div class="modal-dialog transparant">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <img src="tab-Normal-04.png" width="39.349pxpx" height="39.349pxpx">
+                    <span class="modal-title" id="myModalLabel">Favorite</span>
+                </div>
+                <div class="modal-body teal">
+                    <div class="options-table-container">
+                        <table width="100%">
+                            <tr class="border-bottom">
+                                <td width="50%">
+                                    <div class="row-text align-left">Name</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">.....</div>
+                                </td>
+                            </tr>
+                            <tr class="thick-border-bottom">
+                                <td>
+                                    <div class="row-text align-left">Location</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">.....</div>
+                                </td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td>
+                                    <div class="row-text align-left">Note</div>
+                                </td>
+                                <td>
+                                    <div class="row-text align-right">.....</div>
+                                </td>
+                            </tr>
+                            <tr class="border-bottom">
+                                <td>
+                                    <div class="row-text align-left">Category</div>
+                                </td>
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td><img src="AddCategory-01.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-02.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-03.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-04.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-05.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-06.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                        </tr>
+                                        <tr>
+                                            <td><img src="AddCategory-07.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-08.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-09.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-10.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><img src="AddCategory-11.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="footer-table" width="100%">
+                            <tr>
+                                <td width="46px"></td>
+                                <td>
+                                    <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
+                                    <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- END Modal for Favorites -->
 
 </body>
 
