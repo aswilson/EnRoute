@@ -1,52 +1,151 @@
-@font-face {
-    font-family: mainFont;
-    src: url(MyriadPro-Regular.otf);
-}
-
 body {
     overflow: hidden;
+    font-family: 'Open Sans', serif;
+    font-size: 12px;
+    color: #202020;
+    line-height: 0px;
 }
 
-div {
-    font-family: mainFont;
+ul.nav {
+    margin:auto;
 }
 
-iframe {
+img {
+    vertical-align: top;
+}
+
+input[type=text] {
+    width: 165.823px;
+    height: 21.545px;
+    color: #0082A4;
+    border: 1px solid black;
+    border-radius: 0px;
+    padding: 0px;
+    padding-left: 8px;
+    font-size: 12px;
+}
+
+tr.text-input > td {
+    padding-bottom: 15px;
+}
+
+tr.footer > td {
+    padding-top: 14px;
+}
+
+td.input-label {
+    width: 61px;
+}
+
+.align-left {
+    text-align: left;
+}
+
+.align-right {
+    text-align: right;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #616669;
+}
+
+.thick-border-bottom {
+    border-bottom: 2px solid #616669;
+}
+
+.footer-table {
     position: absolute;
-    top: -40px;
-    height: 115%;
-    width: 100%;
+    bottom: 20px;
 }
 
-input {
-    position: inline;
+.gray {
+    background-color: gray;
 }
 
-span {
-    padding: 10px;
+.inline {
+    display: inline;
 }
 
-.teal {
-    background-color: #26C6DA;
+.modal .modal-dialog { width: 346px; }
+
+.modal-header {
+    background-color: gray;
+    color: #00B4E3;
+    height: 39.349px;
+    padding: 0px;
 }
 
-.transparant-background {
-    opacity: 0.1;
+.modal-body {
+    padding: 0px;
+}
+
+.modal-title {
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+    line-height: 0px;
+}
+
+.modal-backdrop.in {
+    background-color: #ffffff;
+    opacity: 0.5;
+}
+
+.nav {
+    padding-left: none;
+}
+
+.nav>li>a {
+    margin:auto;
+    padding-top: 0px;
+    padding-bottom: 0px;
+    padding-left: 5px;
+    padding-right:5px;
+}
+.nav-tabs>li>a {
+    line-height: 0px;
 }
 
 .row {
+    display: inline;
+    margin: 0;
     padding: 1px;
     width: 100%;
 }
 
-.input-text {
-    width: 80%;
-    border: 2px solid grey;
-    font-size: 17px;
+.row-text {
+    padding: 15px;
 }
 
-.space {
-    height: 60px;
+.menu {
+    position: absolute;
+    left: 30px;
+    top: 16px;
+    width: 346px;
+    height: 258.667px;
+}
+
+.table-container {
+    height: 100%;
+    padding-top: 29px;
+    padding-left: 39px;
+    padding-right: 39px;
+    padding-bottom: 20px;
+}
+
+.options-table-container {
+    padding-top: 14px;
+    padding-left: 17px;
+    padding-right: 17px;
+    padding-bottom: 14px;
+}
+
+.teal {
+    background-color: #DAE5E5;
+}
+
+.transparant {
+    opacity: 0.8;
 }
 
 .options {
@@ -55,15 +154,16 @@ span {
 
 .up-right {
     position: absolute;
-    right: 20px;
-    top: 30px;
+    right: 30px;
+    top: 16px;
 }
 
 #add-stop {
-    left: 240px;
-    font-size: 12px;
-    right: 0;
-    position: absolute;
+    left: 30px;
+}
+
+#help-button {
+    margin-right: 5px;
 }
 
 #map-content {
@@ -71,28 +171,37 @@ span {
     position: absolute;
     width: 340px;
     height: 320px;
-    top: 70px;
+    top: 90px;
     left: 50px;
 }
 
-#menu {
+#map-canvas {
     position: absolute;
-    top: 30px;
-    width: 400px;
-    height: 370px;
+    height: 100%; 
+    width: 100%;
+    margin: 0; 
+    padding: 0;
 }
 
 #find-route {
     background-color: #F37046;
-    right: 0;
-    bottom: 0;
-    position: absolute;
     color: #ffffff;
 }
 
-#login {
-    padding-top: 10px;
-    padding-left: 30px;
-    padding-right: 30px;
-    color: #ffffff;
+#list-of-places {
+    overflow-y: auto;
+}
+
+#login-button {
+    padding-top:0px;
+}
+
+#tabs li a:hover {
+    background-color: #DAE5E5;
+}
+
+#tabs li.active a {
+    background-color: #DAE5E5;
+    opacity: 0.8;
+    background-image: url(tab-ClickOn-03.png);
 }
