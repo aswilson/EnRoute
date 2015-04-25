@@ -41,11 +41,11 @@
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs gray" role="tablist" id="tabs">
-            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><img src="tab-Normal-02.png" name="02" width="41px" height = "41px"></a></li>
-            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><img src="tab-Normal-03.png" name="03" width="41px" height = "41px" ></a></li>
-            <li role="presentation class="active""><a href="#tab5" aria-controls="tab5" role="tab" data-toggle="tab"><img src="tab-ClickOn-05.png" name="05" width="41px" height = "41px"></a></li>
-            <li role="presentation"><a href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab"><img src="tab-Normal-04.png" name="04" width="41px" height = "41px"></a></li>
-            <li role="presentation"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><img src="tab-Normal-01.png" name="01" width="41px" height = "41px"></a></li>
+            <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-02.png", size:"41x41" %></a></li>
+            <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-03.png", size:"41x41" %></a></li>
+            <li role="presentation class="active""><a href="#tab5" aria-controls="tab5" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-05.png", size:"41x41" %></a></li>
+            <li role="presentation"><a href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-04.png", size:"41x41" %></a></li>
+            <li role="presentation"><a href="#tab1" aria-controls="tab1" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-01.png", size:"41x41" %></a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -167,14 +167,14 @@
                         <!-- Template for new row when we add route -->
                         <tr class="text-input">
                             <td>
-                                <img src="findroute-Normal-01.png" width="21.545px" height="21.545px">
+								<%= image_tag "findroute-Normal-01.png", size:"21.545x21.545" %>
                                 <a id="time-options-button" data-toggle="modal" data-target="#optionsModal">
-                                    <img src="findroute-Normal-02.png" width="21.545px" height="21.545px">
+                                    <%= image_tag "findroute-Normal-02.png", size:"21.545x21.545" %>
                                 </a>
                             </td>
                             <td>
                                 <input type="text" id="input-location" class="input-text form-control inline"/>
-                                <img src="findroute-Normal-03.png" width="21.545px" height="21.545px">
+                                <%= image_tag "findroute-Normal-03.png", size:"21.545x21.545" %>
                             </td>
                         </tr>
                         <!-- END Template for new row when we add route -->
@@ -183,8 +183,8 @@
                         <tr>
                             <td width="46px"></td>
                             <td>
-                                <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
-                                <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+								<%= image_tag "button-Normal-03.png", size:"93.086x28.164" %>
+								<%= image_tag "button-Normal-01.png", size:"93.086x28.164" %>
                             </td>
                         </tr>
                     </table>
@@ -204,10 +204,11 @@
                     <table width="100%">
                         <tr class="border-bottom">
                             <td>
-                                <img src="Normal-07.png" width="42px" height="42px">
+								<%= image_tag "Normal-07.png", size:"42x42" %>
                             </td>
                             <td>
-                                <img src="Category_ClickPins-09.png" width="42px" height="42px">
+								<%= image_tag "Category_ClickPins-09.png", size:"42x42" %>
+                                
                             </td>
                             <td>
                                 <div class="row-text align-left">Starbucks</div>
@@ -220,10 +221,10 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <img src="Normal-07.png" width="42px" height="42px">
+                                <%= image_tag "Normal-07.png", size:"42x42" %>
                             </td>
                             <td>
-                                <img src="Category_ClickPins-11.png" width="42px" height="42px">
+                                <%= image_tag "Category_ClickPins-11.png", size:"42x42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Chipotle</div>
@@ -236,10 +237,10 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <img src="Normal-07.png" width="42px" height="42px">
+                                <%= image_tag "Normal-07.png", size:"42x42" %>
                             </td>
                             <td>
-                                <img src="Category_ClickPins-05.png" width="42px" height="42px">
+                                <%= image_tag "Category_ClickPins-05.png", size:"42x42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Library</div>
