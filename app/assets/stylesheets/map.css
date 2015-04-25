@@ -196,15 +196,6 @@ td.input-label {
     padding-top:0px;
 }
 
-#tabs li a:hover {
-    background-color: #DAE5E5;
-}
-
-#tabs li.active a {
-    background-color: #DAE5E5;
-    opacity: 0.8;
-    background-image: asset_path(tab-ClickOn-03.png);
-}
 body {
     overflow: hidden;
     font-family: 'Open Sans', serif;
@@ -401,14 +392,4 @@ td.input-label {
 
 #login-button {
     padding-top:0px;
-}
-
-#tabs li a:hover {
-    background-color: #DAE5E5;
-}
-
-#tabs li.active a {
-    background-color: #DAE5E5;
-    opacity: 0.8;
-    background-image: asset_path(tab-ClickOn-03.png);
 }
