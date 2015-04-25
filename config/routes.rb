@@ -24,7 +24,8 @@ EnRoute::Application.routes.draw do
   get 'welcome/base_map', to: 'welcome#base_map', as: :base_map
   get 'welcome/rate_business', to: 'welcome#rate_business', as: :rate_business
   get 'welcome/edit_settings', to: 'welcome#edit_settings', as: :edit_settings
-
+  
+  get 'welcome/findHome', to: 'welcome#findHome'
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 
