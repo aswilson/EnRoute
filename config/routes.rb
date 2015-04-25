@@ -1,5 +1,7 @@
 EnRoute::Application.routes.draw do
   
+  resources :favorites
+
   root 'welcome#index'
   
   resources :services
@@ -19,7 +21,7 @@ EnRoute::Application.routes.draw do
   get 'logout' => 'sessions#destroy', as: :logout
   get 'login' => 'sessions#new', as: :login
   
-  get 'welcome/plan_route', to: 'welcome#plan_route', as: :plan_route
+  get 'welcome/base_map', to: 'welcome#base_map', as: :base_map
   get 'welcome/rate_business', to: 'welcome#rate_business', as: :rate_business
   get 'welcome/edit_settings', to: 'welcome#edit_settings', as: :edit_settings
 

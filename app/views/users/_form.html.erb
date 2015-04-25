@@ -24,20 +24,12 @@
     <%= f.text_field :username %>
   </div>
   <div class="field">
-    <%= f.label :password_digest %><br>
-    <%= f.text_field :password_digest %>
+    <%= f.label :password %><br>
+    <%= f.text_field :password %>
   </div>
   <div class="field">
-    <%= f.label :active_after %><br>
-    <%= f.date_select :active_after %>
-  </div>
-  <div class="field">
-    <%= f.label :password_reset_token %><br>
-    <%= f.text_field :password_reset_token %>
-  </div>
-  <div class="field">
-    <%= f.label :password_reset_sent_at %><br>
-    <%= f.date_select :password_reset_sent_at %>
+    <%= f.label :password_confirmation %><br>
+    <%= f.text_field :password_confirmation %>
   </div>
   <div class="field">
     <%= f.label :email %><br>
@@ -48,20 +40,12 @@
     <%= f.text_field :phone %>
   </div>
   <div class="field">
-    <%= f.label :latitute %><br>
-    <%= f.text_field :latitute %>
-  </div>
-  <div class="field">
-    <%= f.label :longitude %><br>
-    <%= f.text_field :longitude %>
-  </div>
-  <div class="field">
     <%= f.label :role %><br>
     <%= f.text_field :role %>
   </div>
   <div class="field">
-    <%= f.label :active %><br>
-    <%= f.check_box :active %>
+    <%#= f.label :active %><br>
+    <%#= f.check_box :active %>
   </div>
   <div class="actions">
     <%= f.submit %>
