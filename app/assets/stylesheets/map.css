@@ -203,7 +203,7 @@ td.input-label {
 #tabs li.active a {
     background-color: #DAE5E5;
     opacity: 0.8;
-    background-image: url(tab-ClickOn-03.png);
+    background-image: asset_path(tab-ClickOn-03.png);
 }
 body {
     overflow: hidden;
@@ -410,5 +410,5 @@ td.input-label {
 #tabs li.active a {
     background-color: #DAE5E5;
     opacity: 0.8;
-    background-image: url(tab-ClickOn-03.png);
+    background-image: asset_path(tab-ClickOn-03.png);
 }
