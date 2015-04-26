@@ -34,10 +34,10 @@
     <div id="map-canvas"></div>
 
     <!-- Transparant Background -->
-    <div class="teal transparant menu"></div>
+    <div id="menu-background" class="teal transparant menu"></div>
 
     <!-- Menu -->
-    <div role="tabpanel" class="menu">
+    <div id="menu" role="tabpanel" class="menu">
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs gray" role="tablist" id="tabs">
@@ -114,7 +114,14 @@
                                 <div class="row-text align-left">Least</div>
                             </td>
                             <td>
-                                <div class="row-text align-right">time</div>
+                                <div class="row-text align-right dropdown">
+                                    <a id="least-option" data-target="#" data-toggle="dropdown" class="dropdown-toggle" href="#" value="time">time
+                                    </a>
+                                    <ul id="least-option-dropdown" class="dropdown-menu align-right">
+                                       <li><a href="#" value="time">time</a></li>
+                                       <li><a href="#" value="distance">distance</a></li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                         <tr class="border-bottom">
@@ -122,12 +129,19 @@
                                 <div class="row-text align-left">Distance Unit</div>
                             </td>
                             <td>
-                                <div class="row-text align-right">miles</div>
+                                <div class="row-text align-right dropdown">
+                                    <a id="distance-option" data-target="#" data-toggle="dropdown" class="dropdown-toggle" href="#" value="miles">miles
+                                    </a>
+                                    <ul id="distance-option-dropdown" class="dropdown-menu align-right">
+                                       <li><a href="#" value="miles">miles</a></li>
+                                       <li><a href="#" value="kilometers">kilometers</a></li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                         <tr class="thick-border-bottom">
                             <td>
-                                <div class="row-text align-left">Navigation Unit</div>
+                                <div class="row-text align-left">Navigation Voice</div>
                             </td>
                             <td>
                                 <div class="row-text align-right">none</div>
@@ -156,8 +170,9 @@
 
             <!-- Route tab -->
             <div role="tabpanel" class="tab-pane" id="tab5">
-                <div class="table-container">
-                    <table>
+                <!-- Input -->
+                <div id="route-input" class="table-container">
+                    <table id="stops-table">
                         <tr class="text-input">
                             <td></td>
                             <td>
@@ -167,14 +182,14 @@
                         <!-- Template for new row when we add route -->
                         <tr class="text-input">
                             <td>
-								<%= image_tag "findroute-Normal-01.png", size:"21.545" %>
+								<%= image_tag "findroute-Normal-01.png", size:"22" %>
                                 <a id="time-options-button" data-toggle="modal" data-target="#optionsModal">
-                                    <%= image_tag "findroute-Normal-02.png", size:"21.545" %>
+                                    <%= image_tag "findroute-Normal-02.png", size:"22" %>
                                 </a>
                             </td>
                             <td>
                                 <input type="text" id="input-location" class="input-text form-control inline"/>
-                                <%= image_tag "findroute-Normal-03.png", size:"21.545" %>
+                                <%= image_tag "findroute-Normal-03.png", size:"22" %>
                             </td>
                         </tr>
                         <!-- END Template for new row when we add route -->
@@ -189,6 +204,85 @@
                         </tr>
                     </table>
                 </div>
+                <!-- END Input -->
+                <!-- Output -->
+                <div id="route-output" hidden="true">
+                    <div class="options-table-container">
+                        <!-- Header -->
+                        <table width="100%">
+                            <tr class="thick-border-bottom">
+                                <td width="50%">
+                                    <div class="row-text align-left bebasNeue">Least Time Route</div>
+                                </td>
+                                <td>
+                                    <div class="align-right"> 
+                                        <%= image_tag "Normal-08.png", size:'41' %>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Stops -->
+                        <table width="100%">
+                            <tr class="border-bottom">
+                                <td width="50%">
+                                    <div id="location" class="row-text align-left" style="color: #202020">My Location</div>
+                                </td>
+                                <td>
+                                    <div id="location-address" class="row-text align-right" style="color: #202020">123 Main St.</div>
+                                </td>
+                            </tr>
+                            <!-- Next Stop -->
+                            <tr class="border-bottom">
+                                <td colspan='2'>
+                                    <div class="directions-table">
+                                        <table width='100%'>
+                                            <tr>
+                                                <td><%= image_tag "map-32.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><%= image_tag "map-32.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Next Stop -->
+                            <tr class="border-bottom">
+                                <td colspan='2'>
+                                    <div class="directions-table">
+                                        <table width='100%'>
+                                            <tr>
+                                                <td><%= image_tag "map-32.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><%= image_tag "map-33.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><%= image_tag "map-34.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="footer-table" width="100%">
+                            <tr>
+                                <td width="201px"></td>
+                                <td>
+                                    <%= image_tag "button-Normal-01.png", width:"93" height:"28", :id => "route-back-button" %>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <!-- END Output -->
             </div>
 
             <!-- Favorites tab -->
@@ -204,10 +298,10 @@
                     <table width="100%">
                         <tr class="border-bottom">
                             <td>
-								<%= image_tag "Normal-07.png", size:"42x42" %>
+								<%= image_tag "Normal-07.png", size:"42" %>
                             </td>
                             <td>
-								<%= image_tag "Category_ClickPins-09.png", size:"42x42" %>
+								<%= image_tag "Category_ClickPins-09.png", size:"42" %>
                                 
                             </td>
                             <td>
@@ -221,10 +315,10 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <%= image_tag "Normal-07.png", size:"42x42" %>
+                                <%= image_tag "Normal-07.png", size:"42" %>
                             </td>
                             <td>
-                                <%= image_tag "Category_ClickPins-11.png", size:"42x42" %>
+                                <%= image_tag "Category_ClickPins-11.png", size:"42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Chipotle</div>
@@ -237,10 +331,10 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <%= image_tag "Normal-07.png", size:"42x42" %>
+                                <%= image_tag "Normal-07.png", size:"42" %>
                             </td>
                             <td>
-                                <%= image_tag "Category_ClickPins-05.png", size:"42x42" %>
+                                <%= image_tag "Category_ClickPins-05.png", size:"42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Library</div>
@@ -255,8 +349,8 @@
                         <tr>
                             <td width="46px"></td>
                             <td>
-                                <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
-                                <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                                <%= image_tag "button-Normal-03.png", width:"93" height:"28" %>
+                                <%= image_tag "button-Normal-01.png", width:"93" height:"28" %>
                             </td>
                         </tr>
                     </table>
@@ -287,7 +381,7 @@
                     <table width="100%">
                         <tr class="border-bottom">
                             <td>
-                                <img src="Category_ClickPins-02.png" width="42px" height="42px">
+                                <%= image_tag "Category_ClickPins-02.png", size:"42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Home</div>
@@ -298,7 +392,7 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <img src="Category_ClickPins-04.png" width="42px" height="42px">
+                                <%= image_tag "Category_ClickPins-04.png", size:"42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Work</div>
@@ -309,7 +403,7 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <img src="Category_ClickPins-08.png" width="42px" height="42px">
+                                <%= image_tag "Category_ClickPins-08.png", size:"42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Bank</div>
@@ -320,7 +414,7 @@
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <img src="Category_ClickPins-06.png" width="42px" height="42px">
+                                <%= image_tag "Category_ClickPins-06.png", size:"42" %>
                             </td>
                             <td>
                                 <div class="row-text align-left">Pharmacy</div>
@@ -339,9 +433,9 @@
     <!-- Upper Right Toolbar -->
     <!-- Help and Login Buttons --> 
     <div class="toolbar up-right">
-        <input id="help-button" type="image" src="help.png" width="33.66px" height="33.66px"/>
+        <%= image_tag "help.png", size:"34" %>
         <a id="login-button" data-toggle="modal" data-target="#loginModal">
-            <img src="button-Normal-02.png" width="99px" height="33.66px">
+            <%= image_tag "button-Normal-02.png", width:"99" height:"34" %>
         </a>
     </div>
 
@@ -350,7 +444,7 @@
         <div class="modal-dialog transparant">
             <div class="modal-content">
                 <div class="modal-header">
-                    <img src="LogInWindow-03.png" width="39.349pxpx" height="39.349pxpx">
+                    <%= image_tag "LogInWindow-03.png", size:"39" %>
                     <span class="modal-title" id="myModalLabel">Log in</span>
                 </div>
                 <div class="modal-body teal">
@@ -363,11 +457,11 @@
                                 </td>
                                 <td>
                                     <input type="text" id="input-username" class="input-text form-control inline"/>
-                                    <img src="LogInWindow-01.png" width="21.545px" height="21.545px">
+                                    <%= image_tag "LogInWindow-01.png", size:"22" %>
                                 </td>
                             </tr>
                             <!-- Input Password --> 
-                            <tr class="text-input">
+                            <tr class="text-input"
                                 <td class="input-label">
                                     <div> Password </div>
                                 </td>
@@ -378,8 +472,8 @@
                             <tr class="footer">
                                 <td></td>
                                 <td>
-                                    <img src="login-Normal-04.png" width="93.086px" height="28.164pxpx">
-                                    <img src="login-Normal-05.png" width="93.086px" height="28.164pxpx">
+                                    <%= image_tag "login-Normal-04.png", width:"93" height:"28" %>
+                                    <%= image_tag "login-Normal-05.png", width:"93" height:"28" %>
                                 </td>
                             </tr>
                         </table>
@@ -395,7 +489,7 @@
         <div class="modal-dialog transparant">
             <div class="modal-content">
                 <div class="modal-header">
-                    <img src="TimeSetting.png" width="39.349pxpx" height="39.349pxpx">
+                    <%= image_tag "TimeSetting.png", size:"39" %>
                     <span class="modal-title" id="myModalLabel">Category</span>
                 </div>
                 <div class="modal-body teal">
@@ -430,7 +524,7 @@
         <div class="modal-dialog transparant">
             <div class="modal-content">
                 <div class="modal-header">
-                    <img src="tab-Normal-04.png" width="39.349pxpx" height="39.349pxpx">
+                    <%= image_tag "tab-Normal-04.png", size:"39" %>
                     <span class="modal-title" id="myModalLabel">Favorite</span>
                 </div>
                 <div class="modal-body teal">
@@ -467,19 +561,19 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td><img src="AddCategory-01.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-02.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-03.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-04.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-05.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-06.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><%= image_tag "AddCategory-01.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-02.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-03.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-04.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-05.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-06.png", size:"39" %></td>
                                         </tr>
                                         <tr>
-                                            <td><img src="AddCategory-07.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-08.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-09.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-10.png" width="39.349pxpx" height="39.349pxpx"></td>
-                                            <td><img src="AddCategory-11.png" width="39.349pxpx" height="39.349pxpx"></td>
+                                            <td><%= image_tag "AddCategory-07.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-08.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-09.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-10.png", size:"39" %></td>
+                                            <td><%= image_tag "AddCategory-11.png", size:"39" %></td>
                                             <td></td>
                                         </tr>
                                     </table>
@@ -490,8 +584,8 @@
                             <tr>
                                 <td width="46px"></td>
                                 <td>
-                                    <img src="button-Normal-03.png" width="93.086px" height="28.164pxpx">
-                                    <img src="button-Normal-01.png" width="93.086px" height="28.164pxpx">
+                                    <%= image_tag "button-Normal-03.png", width:"93" height:"28" %>
+                                    <%= image_tag "button-Normal-01.png", width:"93" height:"28" %>
                                 </td>
                             </tr>
                         </table>
