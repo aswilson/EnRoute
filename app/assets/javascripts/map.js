@@ -203,12 +203,46 @@ return MapControls;
 
 
 $(function () {
-    $('#tabs a[href="#tab5').tab('show')
+    $('#tabs a[href="#tab5').tab('show');
+    $('#menu-background').height($('#menu').height());
 })
 
 $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
-  var target = $(e.target).children().first()
-  target.attr("src", "tab-ClickOn-" + target.attr("name") + ".png")
-  var related = $(e.relatedTarget).children().first()
-  related.attr("src", "tab-Normal-" + related.attr("name") + ".png")
+  var target = $(e.target).children().first();
+  target.attr("src" , '<%= image_path "tab-ClickOn-" + target.attr("name") + ".png" %>' );
+  //target.attr("src", "tab-ClickOn-" + target.attr("name") + ".png");
+  var related = $(e.relatedTarget).children().first();
+  target.attr("src" , '<%= image_path "tab-Normal-" + related.attr("name") + ".png" %>' );
+  //related.attr("src", "tab-Normal-" + related.attr("name") + ".png");
+    $('#menu-background').height($('#menu').height());
+})
+
+$(function(){
+    $("#least-option-dropdown li a").click(function(){
+      $("#least-option").text($(this).text());
+      $("#least-option").val($(this).text());
+   });
+});
+
+$(function(){
+    $("#distance-option-dropdown li a").click(function(){
+      $("#distance-option").text($(this).text());
+      $("#distance-option").val($(this).text());
+   });
+});
+
+$(function() {
+  $("#findroute-button").click(function() {
+    $("#route-input").hide();
+    $("#route-output").show();
+    $('#menu-background').height($('#menu').height());
+  })
+})
+
+$(function() {
+  $("#route-back-button").click(function() {
+    $("#route-output").hide();
+    $("#route-input").show();
+    $('#menu-background').height($('#menu').height());
+  })
 })

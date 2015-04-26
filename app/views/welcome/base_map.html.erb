@@ -34,10 +34,10 @@
     <div id="map-canvas"></div>
 
     <!-- Transparant Background -->
-    <div class="teal transparant menu"></div>
+    <div id="menu-background" class="teal transparant menu"></div>
 
     <!-- Menu -->
-    <div role="tabpanel" class="menu">
+    <div id="menu" role="tabpanel" class="menu">
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs gray" role="tablist" id="tabs">
@@ -114,7 +114,14 @@
                                 <div class="row-text align-left">Least</div>
                             </td>
                             <td>
-                                <div class="row-text align-right">time</div>
+                                <div class="row-text align-right dropdown">
+                                    <a id="least-option" data-target="#" data-toggle="dropdown" class="dropdown-toggle" href="#" value="time">time
+                                    </a>
+                                    <ul id="least-option-dropdown" class="dropdown-menu align-right">
+                                       <li><a href="#" value="time">time</a></li>
+                                       <li><a href="#" value="distance">distance</a></li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                         <tr class="border-bottom">
@@ -122,12 +129,19 @@
                                 <div class="row-text align-left">Distance Unit</div>
                             </td>
                             <td>
-                                <div class="row-text align-right">miles</div>
+                                <div class="row-text align-right dropdown">
+                                    <a id="distance-option" data-target="#" data-toggle="dropdown" class="dropdown-toggle" href="#" value="miles">miles
+                                    </a>
+                                    <ul id="distance-option-dropdown" class="dropdown-menu align-right">
+                                       <li><a href="#" value="miles">miles</a></li>
+                                       <li><a href="#" value="kilometers">kilometers</a></li>
+                                    </ul>
+                                </div>
                             </td>
                         </tr>
                         <tr class="thick-border-bottom">
                             <td>
-                                <div class="row-text align-left">Navigation Unit</div>
+                                <div class="row-text align-left">Navigation Voice</div>
                             </td>
                             <td>
                                 <div class="row-text align-right">none</div>
@@ -156,8 +170,9 @@
 
             <!-- Route tab -->
             <div role="tabpanel" class="tab-pane" id="tab5">
-                <div class="table-container">
-                    <table>
+                <!-- Input -->
+                <div id="route-input" class="table-container">
+                    <table id="stops-table">
                         <tr class="text-input">
                             <td></td>
                             <td>
@@ -183,12 +198,91 @@
                         <tr>
                             <td width="46px"></td>
                             <td>
-								<%= image_tag "button-Normal-03.png", width:"93" height:"28" %>
-								<%= image_tag "button-Normal-01.png", width:"93" height:"28" %>
+								<%= image_tag "button-Normal-03.png", width:"93" height:"28", :id => "addstop-button" %>
+								<%= image_tag "button-Normal-01.png", width:"93" height:"28", :id => "findroute-button" %>
                             </td>
                         </tr>
                     </table>
                 </div>
+                <!-- END Input -->
+                <!-- Output -->
+                <div id="route-output" hidden="true">
+                    <div class="options-table-container">
+                        <!-- Header -->
+                        <table width="100%">
+                            <tr class="thick-border-bottom">
+                                <td width="50%">
+                                    <div class="row-text align-left bebasNeue">LeastTimeRoute</div>
+                                </td>
+                                <td>
+                                    <div class="align-right"> 
+                                        <%= image_tag "Normal-08.png", size:'41' %>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <!-- Stops -->
+                        <table width="100%">
+                            <tr class="border-bottom">
+                                <td width="50%">
+                                    <div id="location" class="row-text align-left" style="color: #202020">My Location</div>
+                                </td>
+                                <td>
+                                    <div id="location-address" class="row-text align-right" style="color: #202020">123 Main St.</div>
+                                </td>
+                            </tr>
+                            <!-- Next Stop -->
+                            <tr class="border-bottom">
+                                <td colspan='2'>
+                                    <div class="directions-table">
+                                        <table width='100%'>
+                                            <tr>
+                                                <td><%= image_tag "map-32.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><%= image_tag "map-32.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                            <!-- Next Stop -->
+                            <tr class="border-bottom">
+                                <td colspan='2'>
+                                    <div class="directions-table">
+                                        <table width='100%'>
+                                            <tr>
+                                                <td><%= image_tag "map-32.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><%= image_tag "map-33.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                            </tr>
+                                            <tr>
+                                                <td><%= image_tag "map-34.png", size:'21' %></td>
+                                                <td><div>Head North on asdf</div></td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
+                        <table class="footer-table" width="100%">
+                            <tr>
+                                <td width="201px"></td>
+                                <td>
+                                    <%= image_tag "button-Normal-01.png", width:"93" height:"28", :id => "route-back-button" %>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <!-- END Output -->
             </div>
 
             <!-- Favorites tab -->
