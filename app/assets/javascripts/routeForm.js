@@ -36,7 +36,7 @@ function myStringToFloat(s) {
 	return parseFloat(s) || undefined;
 }
 function doAjax(ty,action,dat,onSuccess,onFail) {
-	$.ajax({ type: ty, url: ourServerUrl+"/"+action, data: dat
+	$.ajax({ type: ty, url: "/"+action, data: dat
 	}).done( function(reply) {
 		onSuccess(reply)
 	}).fail( function( xmlHttpRequest, statusText, errorThrown ) {
@@ -171,8 +171,8 @@ function asyncSetToHome(taskNo) {
 		}
 		var onFailure = function(err) {
 		}
-		setTimeout(function(){onSuccess(fakeHomeLoc);}, 2000);	//pretend we're doing ajax here
-		//doAjax("GET","findHome",userName,onSuccess,onFailure);
+		//setTimeout(function(){onSuccess(fakeHomeLoc);}, 2000);	//pretend we're doing ajax here
+		doAjax("GET","welcome/findHome.json",{apple:userName},onSuccess,onFailure);
 	}
 }
 
@@ -260,7 +260,7 @@ function updateLocChoicesArea(locSuggestions) {
 	}
 }
 function updatePins() {
-	MapControls.clearMap();
+/*	MapControls.clearMap();
 	var prevPinNum = undefined;
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var loc = myRoute.tasks.loc;
@@ -271,7 +271,7 @@ function updatePins() {
 			prevPinNum = pinNum;
 		}
 	}
-	MapControls.recenter();
+	MapControls.recenter();*/
 }
 function updateTaskEditWindow(task) {
 	$('input#popup-label').val(task.label);
@@ -375,4 +375,4 @@ $(document).ready(function() {
 	updatePins();
 });
 
-})("enroute-dhcs.herokuapp.com", RouteTools.ROUTESTARTINGATCMU);	//end IIAF
+})("localhost:3000", RouteTools.ROUTESTARTINGATCMU);	//end IIAF

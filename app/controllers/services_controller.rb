@@ -12,9 +12,6 @@ class ServicesController < ApplicationController
   # GET /services/1
   # GET /services/1.json
   def show
-    respond_to do |format|
-      format.json { render json: @service.name }
-    end
   end
 
   # GET /services/new
