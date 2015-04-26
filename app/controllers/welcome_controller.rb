@@ -24,15 +24,15 @@ class WelcomeController < ApplicationController
     @services = Service.active.all.map(&:name)
     @coord = Geocoder.coordinates(@label)
     @businesses = Business.active.all.map(&:name)
-    if @label IN @favs
+    if @favs.include?(@label)
       @fav = Favorite.by_name(@label)
       @lat = @fav.latitude
       @lon = @fav.longitude
       @addr = @fav.street_1 + ' ' + @fav.city + ', ' + @fav.state + ' ' + @fav.zip_code
       @reply = {"lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr}
-    elsif @coord
+    elsif @coord then
       @reply = {"addr"=>@coord}
-    elsif @label IN @services
+    elsif @services.include?(@label)
       @service = Service.by_name(@label)
       @businesses = Business.by_service(@service.id).nearby(@point[0], @point[1], 30).limit(@num)
       @list = []
@@ -44,7 +44,7 @@ class WelcomeController < ApplicationController
         @list += [@lat,@lon,@name,@addr]
       end
       @reply = {"businesses"=>@list}
-    elsif @label IN @businesses
+    elsif @business.include?(@label)
       #assumes unique name
       @business = Business.by_name(@label)
       @lat = @business.latitude
