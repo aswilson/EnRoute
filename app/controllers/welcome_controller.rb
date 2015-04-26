@@ -1,8 +1,8 @@
 class WelcomeController < ApplicationController
   def findHome
     #@username = params["apple"];
-    @current_user = User.find(10)
-    #@current_user ||= User.find(session[:user_id]) if session[:user_id]
+    #@current_user = User.find(10)
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @addr = @current_user.street_1 + ' ' + @current_user.city + ', ' + @current_user.state + ' ' + @current_user.zip_code
     @lat = @current_user.latitude
     @lon = @current_user.longitude
@@ -18,9 +18,9 @@ class WelcomeController < ApplicationController
     @point = params["fixedPoint"]
     @label = params["label"]
     @num = params["num"]
-    @current_user = User.find(10)
-    #@current_user ||= User.find(session[:user_id]) if session[:user_id]
-    @favs = Favorite.for_user(:current_user.id).all
+    #@current_user = User.find(10)
+    @current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @favs = Favorite.for_user(@current_user.id).all
     @services = Service.active.all.map(&:name)
     @coord = Geocoder.coordinates(@label)
     @businesses = Business.active.all.map(&:name)

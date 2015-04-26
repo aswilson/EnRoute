@@ -1,10 +1,13 @@
 class FavoritesController < ApplicationController
   before_action :set_favorite, only: [:show, :edit, :update, :destroy]
+  #before_action :check_login
+  #authorize_resource
 
   # GET /favorites
   # GET /favorites.json
   def index
-    @favorites = Favorite.all
+    @user = :current_user
+    @favorites = Favorite.for_user(session[:user_id]).all
   end
 
   # GET /favorites/1

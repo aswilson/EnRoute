@@ -6,15 +6,8 @@
       <th>First name</th>
       <th>Last name</th>
       <th>Username</th>
-      <th>Password digest</th>
-      <th>Active after</th>
-      <th>Password reset token</th>
-      <th>Password reset sent at</th>
       <th>Email</th>
       <th>Phone</th>
-      <th>Latitude</th>
-      <th>Longitude</th>
-      <th>Role</th>
       <th>Active</th>
       <th></th>
       <th></th>
@@ -28,15 +21,8 @@
         <td><%= user.first_name %></td>
         <td><%= user.last_name %></td>
         <td><%= user.username %></td>
-        <td><%= user.password_digest %></td>
-        <td><%= user.active_after %></td>
-        <td><%= user.password_reset_token %></td>
-        <td><%= user.password_reset_sent_at %></td>
         <td><%= user.email %></td>
         <td><%= user.phone %></td>
-        <td><%= user.latitude %></td>
-        <td><%= user.longitude %></td>
-        <td><%= user.role %></td>
         <td><%= user.active %></td>
         <td><%= link_to 'Show', user %></td>
         <td><%= link_to 'Edit', edit_user_path(user) %></td>

@@ -1,6 +1,6 @@
 class UsersController < ApplicationController
   before_action :set_user, only: [:show, :edit, :update, :destroy]
-  #before_action :check_login, :except => [:new, :show]
+  #before_action :check_login, :except => [:new, :create, :show]
   #authorize_resource
 
   # GET /users
