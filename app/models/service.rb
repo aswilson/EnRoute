@@ -10,6 +10,7 @@ class Service < ActiveRecord::Base
   scope :alphabetical, -> { order('name') }
   scope :active, -> { where(active: true) }
   scope :inactive, -> { where(active: false) }
+  scope :by_name, -> (name) {where("name = ?", name)}
   
   #callbacks
   before_validation :default_active

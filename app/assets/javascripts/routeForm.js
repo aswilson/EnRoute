@@ -152,7 +152,7 @@ function getOptionsFromServer() {
 		busy = false;
 	}
 	setTimeout(function(){onFailure("NotImplemented");}, 3000);	//pretend we're doing ajax here
-	//doAjax("GET","getAllNearby",requestBody,onSuccess,onFailure);
+	doAjax("GET","welcome/getAllNearby.json",{fixedPoint:[lat,lon], label:label, num:n},onSuccess,onFailure);
 }
 function asyncSetToHome(taskNo) {
 	if (cachedHomeLoc!=undefined) {

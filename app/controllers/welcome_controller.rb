@@ -1,6 +1,6 @@
 class WelcomeController < ApplicationController
   def findHome
-    #@username = params["username"];
+    #@username = params["apple"];
     @current_user = User.find(10)
     #@current_user ||= User.find(session[:user_id]) if session[:user_id]
     @addr = @current_user.street_1 + ' ' + @current_user.city + ', ' + @current_user.state + ' ' + @current_user.zip_code
@@ -15,15 +15,48 @@ class WelcomeController < ApplicationController
   end
   
   def getAllNearby
-    #if label = thing in favs pick that
-    #if label = address pick that
-    #if label = service do below
-    #if label = business name do that
-    # above options must be a list
-    #if label is nothing relevant/acceptable = return a string rather than a list
-    #accepts lat,long as fixedpoints and label and n is num points closesr
-    #need business.by_service
-    #give Business.nearby(lat, long, dist?) limit by n
-    #provide that thing as lat, long
+    @point = params["fixedPoint"]
+    @label = params["label"]
+    @num = params["num"]
+    @current_user = User.find(10)
+    #@current_user ||= User.find(session[:user_id]) if session[:user_id]
+    @favs = Favorite.for_user(:current_user.id).all
+    @services = Service.active.all.map(&:name)
+    @coord = Geocoder.coordinates(@label)
+    @businesses = Business.active.all.map(&:name)
+    if @label IN @favs
+      @fav = Favorite.by_name(@label)
+      @lat = @fav.latitude
+      @lon = @fav.longitude
+      @addr = @fav.street_1 + ' ' + @fav.city + ', ' + @fav.state + ' ' + @fav.zip_code
+      @reply = {"lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr}
+    elsif @coord
+      @reply = {"addr"=>@coord}
+    elsif @label IN @services
+      @service = Service.by_name(@label)
+      @businesses = Business.by_service(@service.id).nearby(@point[0], @point[1], 30).limit(@num)
+      @list = []
+      for business in @businesses
+        @lat = business.latitude
+        @lon = business.longitude
+        @name = business.name
+        @addr = business.street_1 + ' ' + business.city + ', ' + business.state + ' ' + business.zip_code
+        @list += [@lat,@lon,@name,@addr]
+      end
+      @reply = {"businesses"=>@list}
+    elsif @label IN @businesses
+      #assumes unique name
+      @business = Business.by_name(@label)
+      @lat = @business.latitude
+      @lon = @business.longitude
+      @name = @business.name
+      @addr = @business.street_1 + ' ' + @business.city + ', ' + @business.state + ' ' + @business.zip_code
+      @reply = {"lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr}
+    else
+      @reply = "Input is not acceptable"
+    end
+    respond_to do |format|
+      format.json {render json: @reply}
+    end
   end
 end
