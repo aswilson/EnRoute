@@ -26,6 +26,14 @@
     <!-- Custom Fonts -->
 
 
+
+
+
+
+
+
+
+
 </head>
 
 <body>
@@ -180,7 +188,8 @@
                             </td>
                         </tr>
                         <!-- Template for new row when we add route -->
-                        <tr class="text-input">
+                        <!-- increment tr id=stopx -->
+                        <tr id="stop1" class="text-input">
                             <td>
 								<%= image_tag "findroute-Normal-01.png", size:"22" %>
                                 <a id="time-options-button" data-toggle="modal" data-target="#optionsModal">
@@ -378,7 +387,7 @@
                                 <div class="row-text align-left">Password</div>
                             </td>
                             <td>
-                                <div class="row-text align-right">*****</div>
+                                <a href="/change-password"><div class="row-text align-right">*****</div></a>
                             </td>
                         </tr>
                     </table>
@@ -567,19 +576,19 @@
                                     <div class="category-table-container">
                                         <table>
                                             <tr>
-                                                <td><%= image_tag "AddCategory-01.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-02.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-03.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-04.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-05.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-06.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-01.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-02.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-03.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-04.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-05.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-06.png", size:"39" %></td>
                                             </tr>
                                             <tr>
-                                                <td><%= image_tag "AddCategory-07.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-08.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-09.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-10.png", size:"39" %></td>
-                                                <td><%= image_tag "AddCategory-11.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-07.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-08.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-09.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-10.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-11.png", size:"39" %></a></td>
                                                 <td></td>
                                             </tr>
                                         </table>

@@ -679,6 +679,46 @@ $(function() {
   });
 })
 
+// Helper functions to convert between selected category
+// image url and unselected
+function toSelected (url) {
+  // Assumes url is unselected url
+  var num = parseInt(url.match(/\d+/)[0]) + 11;
+  return "AddCategory-" + num + ".png";
+}
+
+function toUnselected (url) {
+  // Assumes url is selected url
+  var n = parseInt(url.match(/\d+/)[0]) - 11;
+  var num = n > 9 ? "" + n: "0" + n;
+  return "AddCategory-" + num + ".png";
+}
+
+// Visually changes category icon in Edit Favorite modal
+// when selected
+$(function() {
+  $('.favorite-category-icon').click(function() {
+    var target = $( this ).children().first();
+    var fileString = target.attr("src");
+    if (target.hasClass("selected")) {
+      return;
+    } else {
+      // Unselect previously selected category
+      var unselected = $('.favorite-category-icon').find(".selected");
+      if (unselected.length != 0) {
+        unselected.removeClass("selected");
+        target.attr("src" , '<%= image_path ' + toUnselected(unselected.attr("src") + ' %>' );
+        //unselected.attr("src", toUnselected(unselected.attr("src")));
+      }
+
+      // Select clicked category
+      target.addClass("selected");
+      target.attr("src" , '<%= image_path ' + toSelected(target.attr("src")) + ' %>' );
+      //target.attr("src", toSelected(target.attr("src")));
+    }
+  });
+})
+
 // Closes Edit Favorite modal when click back button
 $(function() {
   $('#favorite-back-button').click(function() {
