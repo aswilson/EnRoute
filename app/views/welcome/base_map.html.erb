@@ -372,6 +372,10 @@
                         </tr>
                     </table>
                 </div>
+                <% if logged_in? %>
+                <% else %>
+                <div id="overlay"><div style="display: table-cell; vertical-align: middle;">Please Login<br>or Register</div></div>
+                <% end %>
             </div>
 
             <!-- User tab -->
@@ -442,10 +446,14 @@
                         </tr>
                     </table>
                 </div>
+                <% if logged_in? %>
+                <% else %>
+                <div id="overlay"><div style="display: table-cell; vertical-align: middle;">Please Login<br>or Register</div></div>
+                <% end %>
             </div>
         </div>
     </div>
-    
+
     <!-- Upper Right Toolbar -->
     <!-- Help and Login Buttons --> 
     <div class="toolbar up-right">
