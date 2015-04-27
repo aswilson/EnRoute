@@ -11,6 +11,10 @@ class Favorite < ActiveRecord::Base
   validates :state, inclusion: { in: STATES_LIST.map{|a,b| b}, message: "is not valid state", allow_blank: true }
   validates :zip_code, format: { with: /\A\d{5}\z/, message: "should be five digits long", allow_blank: true }
   
+  scope :alphabetical, -> { order('name') }
+  scope :for_user, -> (user_id) {where("user_id = ?", user_id)}
+  scope :by_name, -> (name) {where("name = ?", name)}
+  
   before_validation :get_location_coordinates
   
   #fill in address if business_id chosen and let be blank otherwise???
