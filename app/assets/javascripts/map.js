@@ -35,6 +35,15 @@ function map_recenter(latlng,offsetx,offsety) {
 
 
 function initialize() {
+  var mapStyle =[
+    {
+        featureType: "poi",
+        elementType: "labels",
+        stylers: [
+              { visibility: "off" }
+        ]
+    }
+];
   var mapOptions = {
       zoom: 13,
       center: new google.maps.LatLng(40.4397, -79.9764),
@@ -44,7 +53,8 @@ function initialize() {
       scaleControl: false,
       streetViewControl: false,
       navigationControl: false,
-      disableDefaultUI: true
+      disableDefaultUI: true,
+      styles: mapStyle
     };
     
     map = new google.maps.Map(document.getElementById('map-canvas'),
@@ -109,16 +119,20 @@ function addLatLng(event) {
   var html = '<div class="pin-popover">\
     <table class="table-container">\
         <tr>\
-            <td id="popover-icon"><img src="AddCategory-03.png" width="25px" height="25px"/></td>\
+            <td><img id="popover-icon" src="Category_ClickPins-09.png" width="35px" height="35px"/></td>\
             <td><div id="popover-category" class="row-text">Coffee</div></td>\
         </tr>\
         <tr>\
             <td></td>\
-            <td><div id="popover-name" class="row-text">Starbucks</div></td>\
+            <td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
         </tr>\
         <tr>\
             <td></td>\
-            <td><div id="popover-address" class="row-text">Address</div></td>\
+            <td><div id="popover-address-1" class="row-text-2">Address</div></td>\
+        </tr>\
+        <tr>\
+            <td></td>\
+            <td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
         </tr>\
     </table>\
   </div>';
@@ -127,7 +141,7 @@ function addLatLng(event) {
      content: html,
      boxStyle: { 
         width: "226px",
-        height: "151px",
+        height: "131px",
         backgroundColor: "#808080"
      },
      infoBoxClearance: new google.maps.Size(1, 1)
@@ -141,8 +155,12 @@ function addLatLng(event) {
   google.maps.event.addListener(marker, 'click', function() {
     infobox.open(map,marker);
   });
+  google.maps.event.addListener(map, "click", function(event) {
+    infobox.close();
+  });
 }
 */
+
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
@@ -264,16 +282,20 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
   var html = '<div class="pin-popover">\
     <table class="table-container">\
         <tr>\
-            <td id="popover-icon"><img src="AddCategory-03.png" width="25px" height="25px"/></td>\
+            <td><img id="popover-icon" src="Category_ClickPins-09.png" width="35px" height="35px"/></td>\
             <td><div id="popover-category" class="row-text">Coffee</div></td>\
         </tr>\
         <tr>\
             <td></td>\
-            <td><div id="popover-name" class="row-text">Starbucks</div></td>\
+            <td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
         </tr>\
         <tr>\
             <td></td>\
-            <td><div id="popover-address" class="row-text">Address</div></td>\
+            <td><div id="popover-address-1" class="row-text-2">Address</div></td>\
+        </tr>\
+        <tr>\
+            <td></td>\
+            <td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
         </tr>\
     </table>\
   </div>';
@@ -296,6 +318,8 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
   google.maps.event.addListener(marker, 'click', function() {
     infobox.open(map,marker);
   });
+  google.maps.event.addListener(map, "click", function(event) {
+    infobox.close();
   return marker.position.toString();
 };
 
