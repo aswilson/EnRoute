@@ -1,0 +1,25 @@
+<div class="container">
+	<div class="row">
+		<div class = "col-sm-12">
+
+			<ul class="nav nav-pills nav-justified">
+				<li><%= link_to 'Account', edit_user_path(session[:user_id]) %></li> 
+				<li><%= link_to 'Businesses', businesses_path %></li>
+				<li><%= link_to 'Favorites', favorites_path %></li>
+				<li><%= link_to 'Services', services_path %></li>
+				<%# if logged_in? %>
+				<li><%= link_to 'Logout', logout_path %></li>
+				<%# end %> 
+				<!-- <li class="dropdown">
+					<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">Dropdown <span class="caret"></span></a>
+					<ul class="dropdown-menu" role="menu">
+						<li><a href="#">Account</a></li>
+						<li><a href="#">Another action</a></li>
+						<li><a href="#">Something else here</a></li>
+					</ul>
+				</li> -->
+			</ul>
+
+		</div>
+	</div>
+</div>
