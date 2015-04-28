@@ -320,6 +320,7 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
   });
   google.maps.event.addListener(map, "click", function(event) {
     infobox.close();
+  });
   return marker.position.toString();
 };
 
@@ -392,11 +393,11 @@ $(function () {
 // Changes image on menu tab bar icons when selected
 $(document).on('shown.bs.tab', 'a[data-toggle="tab"]', function (e) {
   var target = $(e.target).children().first();
-  //target.attr("src" , '<%= image_path "tab-ClickOn-" + target.attr("name") + ".png" %>' );
-  target.attr("src", "tab-ClickOn-" + target.attr("name") + ".png");
+  target.attr("src" , '<%= image_path "tab-ClickOn-" + target.attr("name") + ".png" %>' );
+  //target.attr("src", "tab-ClickOn-" + target.attr("name") + ".png");
   var related = $(e.relatedTarget).children().first();
-  //target.attr("src" , '<%= image_path "tab-Normal-" + related.attr("name") + ".png" %>' );
-  related.attr("src", "tab-Normal-" + related.attr("name") + ".png");
+  target.attr("src" , '<%= image_path "tab-Normal-" + related.attr("name") + ".png" %>' );
+  //related.attr("src", "tab-Normal-" + related.attr("name") + ".png");
   $('#menu-background').height($('#menu').height());
 
   var overlay = $(".overlay");
@@ -522,12 +523,14 @@ $(function() {
       var unselected = $('.favorite-category-icon').find(".selected");
       if (unselected.length != 0) {
         unselected.removeClass("selected");
-        unselected.attr("src", toUnselected(unselected.attr("src")));
+        unselected.attr("src" , '<%= image_path ' + toUnselected(unselected.attr("src")) + ' %>' );
+        //unselected.attr("src", toUnselected(unselected.attr("src")));
       }
 
       // Select clicked category
       target.addClass("selected");
-      target.attr("src", toSelected(target.attr("src")));
+      target.attr("src" , '<%= image_path ' + toSelected(target.attr("src")) + ' %>' );
+      //target.attr("src", toSelected(target.attr("src")));
     }
   });
 })
