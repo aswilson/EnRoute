@@ -26,6 +26,14 @@
     <!-- Custom Fonts -->
 
 
+
+
+
+
+
+
+
+
 </head>
 
 <body>
@@ -41,7 +49,9 @@
 
         <!-- Nav tabs -->
         <ul class="nav nav-tabs gray" role="tablist" id="tabs">
+            <!-- Commenting out the settings tab
             <li role="presentation"><a href="#tab2" aria-controls="tab2" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-02.png", size:"41" %></a></li>
+        -->
             <li role="presentation"><a href="#tab3" aria-controls="tab3" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-03.png", size:"41" %></a></li>
             <li role="presentation class="active""><a href="#tab5" aria-controls="tab5" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-05.png", size:"41" %></a></li>
             <li role="presentation"><a href="#tab4" aria-controls="tab4" role="tab" data-toggle="tab"><%= image_tag "tab-Normal-04.png", size:"41" %></a></li>
@@ -148,6 +158,7 @@
                             </td>
                         </tr>
                     </table>
+                    <!-- Commenting out the last 3 lines
                     <table width="100%">
                         <tr class="border-bottom">
                             <td>
@@ -165,6 +176,7 @@
                             </td>
                         </tr>
                     </table>
+                -->
                 </div>
             </div>
 
@@ -180,7 +192,8 @@
                             </td>
                         </tr>
                         <!-- Template for new row when we add route -->
-                        <tr class="text-input">
+                        <!-- increment tr id=stopx -->
+                        <tr id="stop1" class="text-input">
                             <td>
 								<%= image_tag "findroute-Normal-01.png", size:"22" %>
                                 <a id="time-options-button" data-toggle="modal" data-target="#optionsModal">
@@ -295,10 +308,12 @@
                             </td>
                         </tr>
                     </table>
-                    <table width="100%">
+                    <form id="favorite-form"><table width="100%" id="favorite-table" >
+                        <!-- Favorite Row element -->
                         <tr class="border-bottom">
                             <td>
-								<%= image_tag "Normal-07.png", size:"42" %>
+                                <!-- Radio button -->
+                                <input type="radio" name="favToAdd" value="favorite1">
                             </td>
                             <td>
 								<%= image_tag "Category_ClickPins-09.png", size:"42" %>
@@ -307,15 +322,16 @@
                             <td>
                                 <div class="row-text align-left">Starbucks</div>
                             </td>
-                            <td>
-                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
-                                    <div class="row-text align-right">edit</div>
+                            <td width="25%">
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal" hidden="true">
+                                    <div class="row-text align-right">Edit</div>
                                 </a>
                             </td>
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <%= image_tag "Normal-07.png", size:"42" %>
+                                <!-- Radio button -->
+                                <input type="radio" name="favToAdd" value="favorite2">
                             </td>
                             <td>
                                 <%= image_tag "Category_ClickPins-11.png", size:"42" %>
@@ -324,14 +340,15 @@
                                 <div class="row-text align-left">Chipotle</div>
                             </td>
                             <td>
-                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
-                                    <div class="row-text align-right">edit</div>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal" hidden="true">
+                                    <div class="row-text align-right">Edit</div>
                                 </a>
                             </td>
                         </tr>
                         <tr class="border-bottom">
                             <td>
-                                <%= image_tag "Normal-07.png", size:"42" %>
+                                <!-- Radio button -->
+                                <input type="radio" name="favToAdd" value="favorite3">
                             </td>
                             <td>
                                 <%= image_tag "Category_ClickPins-05.png", size:"42" %>
@@ -339,15 +356,15 @@
                             <td>
                                 <div class="row-text align-left">Library</div>
                             <td>
-                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal">
-                                    <div class="row-text align-right">edit</div>
+                                <a id="time-options-button" data-toggle="modal" data-target="#favoritesModal"hidden="true">
+                                    <div class="row-text align-right">Edit</div>
                                 </a>
                             </td>
                         </tr>
-                    </table>
+                    </form></table>
                     <table class="footer-table" width="100%">
                         <tr>
-                            <td width="46px"></td>
+                            <td width="34%"></td>
                             <td>
                                 <%= image_tag "button-Normal-03.png", size:"93x28" %>
                                 <%= image_tag "button-Normal-01.png", size:"93x28" %>
@@ -355,6 +372,10 @@
                         </tr>
                     </table>
                 </div>
+                <% if logged_in? %>
+                <% else %>
+                <div id="overlay"><div style="display: table-cell; vertical-align: middle;">Please Login<br>or Register</div></div>
+                <% end %>
             </div>
 
             <!-- User tab -->
@@ -374,7 +395,7 @@
                                 <div class="row-text align-left">Password</div>
                             </td>
                             <td>
-                                <div class="row-text align-right">*****</div>
+                                <a href="/change-password"><div class="row-text align-right">*****</div></a>
                             </td>
                         </tr>
                     </table>
@@ -425,18 +446,30 @@
                         </tr>
                     </table>
                 </div>
+                <% if logged_in? %>
+                <% else %>
+                <div id="overlay"><div style="display: table-cell; vertical-align: middle;">Please Login<br>or Register</div></div>
+                <% end %>
             </div>
         </div>
     </div>
-    
 
     <!-- Upper Right Toolbar -->
     <!-- Help and Login Buttons --> 
     <div class="toolbar up-right">
-        <%= image_tag "help.png", size:"34" %>
-        <a id="login-button" data-toggle="modal" data-target="#loginModal">
+        <span class="dropdown pull-right">
+            <a id="help-button" data-target="#" data-toggle="dropdown" class="dropdown-toggle" href="#"><%= image_tag "help.png", size:"34" %></a>
+            <ul id="least-option-dropdown" class="dropdown-menu align-right help-dropdown">
+               <li><a href="/about">About EnRoute</a></li>
+               <hr>
+               <li><a href="/privacy">Privacy, Terms, and Conditions</a></li>
+               <hr>
+               <li><a href="/feedback">Feedback</a></li>
+            </ul>
+            <a id="login-button" data-toggle="modal" data-target="#loginModal">
             <%= image_tag "button-Normal-02.png", size:"99x34" %>
         </a>
+        </span>
     </div>
 
     <!-- Modal for Login -->
@@ -531,11 +564,12 @@
                     <div class="options-table-container">
                         <table width="100%">
                             <tr class="border-bottom">
-                                <td width="50%">
+                                <td width="155px" >
                                     <div class="row-text align-left">Name</div>
                                 </td>
                                 <td>
-                                    <div class="row-text align-right">.....</div>
+                                    <a id="favorite-name" class="actually-text-field row-text align-right">-----</a>
+                                    <input type='text' class='not-actually-text-field row-text' value="" hidden="true">
                                 </td>
                             </tr>
                             <tr class="thick-border-bottom">
@@ -543,46 +577,48 @@
                                     <div class="row-text align-left">Location</div>
                                 </td>
                                 <td>
-                                    <div class="row-text align-right">.....</div>
+                                    <a id="favorite-location" class="actually-text-field row-text align-right">-----</a>
+                                    <input type='text' class='not-actually-text-field row-text' value="" hidden="true">
                                 </td>
                             </tr>
                             <tr class="border-bottom">
                                 <td>
-                                    <div class="row-text align-left">Note</div>
+                                    <div class="row-text align-left">Notes</div>
                                 </td>
                                 <td>
-                                    <div class="row-text align-right">.....</div>
+                                    <a id="favorite-notes" class="actually-text-field row-text align-right">-----</a>
+                                    <input type='text' class='not-actually-text-field row-text' value="" hidden="true">
                                 </td>
                             </tr>
                             <tr class="border-bottom">
-                                <td>
+                                <td colspan="2">
                                     <div class="row-text align-left">Category</div>
-                                </td>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td><%= image_tag "AddCategory-01.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-02.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-03.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-04.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-05.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-06.png", size:"39" %></td>
-                                        </tr>
-                                        <tr>
-                                            <td><%= image_tag "AddCategory-07.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-08.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-09.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-10.png", size:"39" %></td>
-                                            <td><%= image_tag "AddCategory-11.png", size:"39" %></td>
-                                            <td></td>
-                                        </tr>
-                                    </table>
+                                    <div class="category-table-container">
+                                        <table>
+                                            <tr>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-01.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-02.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-03.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-04.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-05.png", size:"39" %></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-06.png", size:"39" %></td>
+                                            </tr>
+                                            <tr>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-07.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-08.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-09.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-10.png", size:"39" %></a></td>
+                                                <td><a class="favorite-category-icon"><%= image_tag "AddCategory-11.png", size:"39" %></a></td>
+                                                <td></td>
+                                            </tr>
+                                        </table>
+                                    </div>
                                 </td>
                             </tr>
                         </table>
                         <table class="footer-table" width="100%">
                             <tr>
-                                <td width="46px"></td>
+                                <td width="34%"></td>
                                 <td>
                                     <%= image_tag "button-Normal-03.png", size:"93x28" %>
                                     <%= image_tag "button-Normal-01.png", size:"93x28" %>

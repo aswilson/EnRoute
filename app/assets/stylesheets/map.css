@@ -15,6 +15,11 @@ ul.nav {
     margin:auto;
 }
 
+hr {
+    margin-top: 0px;
+    margin-bottom: 0px;
+}
+
 img {
     vertical-align: top;
 }
@@ -30,16 +35,30 @@ input[type=text] {
     font-size: 12px;
 }
 
+input[type=radio] {
+    margin-left: 15px;
+}
+
 tr.text-input > td {
     padding-bottom: 15px;
 }
 
-tr.footer > td {
-    padding-top: 14px;
-}
-
 td.input-label {
     width: 61px;
+}
+
+div.category-table-container td {
+    padding-right: 8px;
+    padding-left: 8px;
+    padding-bottom: 8px;
+    padding-top: 0px;
+}
+
+.actually-text-field {
+    display: block;
+    width: 155px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .align-left {
@@ -67,12 +86,21 @@ td.input-label {
     margin-bottom: 10px;
 }
 
+.pull-right>.help-dropdown {
+    right: 110px;
+}
+
+.dropdown-menu {
+    font-size: 12px;
+}
+
 .thick-border-bottom {
     border-bottom: 2px solid #616669;
 }
 
 .footer-table {
     margin-top: 20px;
+    margin-bottom: 6px;
 }
 
 .gray {
@@ -109,7 +137,7 @@ td.input-label {
 }
 
 .nav {
-    padding-left: none;
+    padding-left: 65px;
 }
 
 .nav>li>a {
@@ -131,7 +159,15 @@ td.input-label {
 }
 
 .row-text {
-    padding: 15px;
+    padding: 21px 15px;
+}
+
+.row-text-2 {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0px;
+    padding-bottom: 10px;
+    line-height: 1.42857143;
 }
 
 .menu {
@@ -150,10 +186,17 @@ td.input-label {
 }
 
 .options-table-container {
-    padding-top: 14px;
+    padding-top: 0px;
     padding-left: 17px;
     padding-right: 17px;
     padding-bottom: 14px;
+}
+
+.category-table-container {
+    padding-bottom: 7px;
+    padding-top: 0px;
+    padding-left: 11px;
+    padding-right: 0px;
 }
 
 .teal {
@@ -178,8 +221,13 @@ td.input-label {
     top: 16px;
     color: #00B4E3;
 }
-#popover-address {
-    color: "#e0dede";
+
+#popover-address-1 {
+    color: #e0dede;
+}
+
+#popover-address-2 {
+    color: #e0dede;
 }
 
 #add-stop {
@@ -218,4 +266,20 @@ td.input-label {
 
 #login-button {
     padding-top: 0px;
+}
+
+#popover-icon {
+    margin-left: 15px;
+}
+
+.overlay {
+    position: absolute;
+    display: table;
+    top: 43px;
+    left: 0px;
+    width: 346px;
+    line-height: 1.42857143;
+    background-color: #DAE5E5;
+    opacity: 1.0;
+    text-align: center;
 }
