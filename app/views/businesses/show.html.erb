@@ -1,79 +1,16 @@
-<p id="notice"><%= notice %></p>
+<div class="row">
+  <div class="small-7 columns">
+    <!-- MAIN CONTENT GOES HERE -->
+    <%= render :partial => "business_details" %>
+  </div>
 
-<p>
-  <strong>Name:</strong>
-  <%= @business.name %>
-</p>
+  <div class="small-1 columns">
+    &nbsp;
+  </div>
 
-<p>
-  <strong>Description:</strong>
-  <%= @business.description %>
-</p>
+  <div class="small-4 columns">
+    <!-- SIDEBAR CONTENT GOES HERE -->
+    <%= render partial: 'services' %>
+  </div>
+</div>
 
-<p>
-  <strong>Phone:</strong>
-  <%= @business.phone %>
-</p>
-
-<p>
-  <strong>Schedule:</strong>
-  <%= @business.schedule %>
-</p>
-
-<p>
-  <strong>Street 1:</strong>
-  <%= @business.street_1 %>
-</p>
-
-<p>
-  <strong>Street 2:</strong>
-  <%= @business.street_2 %>
-</p>
-
-<p>
-  <strong>City:</strong>
-  <%= @business.city %>
-</p>
-
-<p>
-  <strong>State:</strong>
-  <%= @business.state %>
-</p>
-
-<p>
-  <strong>Zip code:</strong>
-  <%= @business.zip_code %>
-</p>
-
-<p>
-  <strong>Latitude:</strong>
-  <%= @business.latitude %>
-</p>
-
-<p>
-  <strong>Longitude:</strong>
-  <%= @business.longitude %>
-</p>
-
-<p>
-  <strong>Rating:</strong>
-  <%= @business.rating %>
-</p>
-
-<p>
-  <strong>Number of raters:</strong>
-  <%= @business.number_of_raters %>
-</p>
-
-<p>
-  <strong>User:</strong>
-  <%= @business.user_id %>
-</p>
-
-<p>
-  <strong>Active:</strong>
-  <%= @business.active %>
-</p>
-
-<%= link_to 'Edit', edit_business_path(@business) %> |
-<%= link_to 'Back', businesses_path %>

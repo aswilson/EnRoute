@@ -12,6 +12,7 @@ class BusinessesController < ApplicationController
   # GET /businesses/1
   # GET /businesses/1.json
   def show
+    @services = @business.services.alphabetical.to_a
   end
 
   # GET /businesses/new
@@ -71,6 +72,6 @@ class BusinessesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def business_params
-      params.require(:business).permit(:name, :description, :phone, :schedule, :street_1, :street_2, :city, :state, :zip_code, :latitude, :longitude, :rating, :number_of_raters, :user_id, :active)
+      params.require(:business).permit(:name, :description, :phone, :schedule, :street_1, :street_2, :city, :state, :zip_code, :latitude, :longitude, :rating, :number_of_raters, :user_id, :active, :service_ids => [])
     end
 end

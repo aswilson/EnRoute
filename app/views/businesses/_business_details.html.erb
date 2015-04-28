@@ -1,0 +1,50 @@
+<h3>Business Details</h3><br />
+<p>
+  <strong>Name:</strong>
+  <%= @business.name %>
+</p>
+
+<p>
+  <strong>Description:</strong>
+  <%= @business.description %>
+</p>
+
+<p>
+  <strong>Phone:</strong>
+  <%= @business.phone %>
+</p>
+
+<p>
+  <strong>Schedule:</strong>
+  <%= @business.schedule %>
+</p>
+
+<p>
+  <strong>Street 1:</strong>
+  <%= @business.street_1 %>
+</p>
+
+<p>
+  <strong>Street 2:</strong>
+  <%= @business.street_2 %>
+</p>
+
+<p>
+  <strong>City:</strong>
+  <%= @business.city %>
+</p>
+
+<p>
+  <strong>State:</strong>
+  <%= @business.state %>
+</p>
+
+<p>
+  <strong>Zip code:</strong>
+  <%= @business.zip_code %>
+</p>
+
+
+
+<%= link_to "Edit this business", edit_business_path(@business), class: "button tiny radius" %>&nbsp;&nbsp;
+<%= link_to 'Destroy business', business_path(@business), data: { confirm: 'Are you sure you want to permanently remove this camp from the system?' }, method: :delete, class: "button tiny radius alert" %>&nbsp;&nbsp;
