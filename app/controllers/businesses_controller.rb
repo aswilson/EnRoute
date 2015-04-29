@@ -6,7 +6,7 @@ class BusinessesController < ApplicationController
   # GET /businesses
   # GET /businesses.json
   def index
-    @businesses = Business.all
+    @businesses = Business.all.paginate(:page => params[:page]).per_page(15)
   end
 
   # GET /businesses/1

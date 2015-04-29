@@ -26,15 +26,19 @@
         <td><%= favorite.city %></td>
         <td><%= favorite.state %></td>
         <td><%= favorite.zip_code %></td>
-        <td><%= favorite.type %></td>
+        <td><%= favorite.label %></td>
         <td><%= favorite.notes %></td>
         <td><%= link_to 'Show', favorite %></td>
         <td><%= link_to 'Edit', edit_favorite_path(favorite) %></td>
-        <td><%= link_to 'Destroy', favorite, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Remove from favorites', favorite, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
   </tbody>
 </table>
+
+<span class="paginate">
+<%= will_paginate @favorites, :previous_label => "Previous&nbsp;", :next_label => "&nbsp;Next" %>
+</span>
 
 <br>
 

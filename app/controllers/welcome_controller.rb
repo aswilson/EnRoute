@@ -20,12 +20,12 @@ class WelcomeController < ApplicationController
     @num = params["num"]
     #@current_user = User.find(10)
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
-    @favs = Favorite.for_user(@current_user.id).all
+    @favs = Favorite.for_user(@current_user.id).map(&:label).all
     @services = Service.active.all.map(&:name)
     @coord = Geocoder.coordinates(@label)
     @businesses = Business.active.all.map(&:name)
     if @favs.include?(@label)
-      @fav = Favorite.by_name(@label)
+      @fav = Favorite.by_label(@label)
       @lat = @fav.latitude
       @lon = @fav.longitude
       @addr = @fav.street_1 + ' ' + @fav.city + ', ' + @fav.state + ' ' + @fav.zip_code

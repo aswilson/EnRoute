@@ -1,4 +1,4 @@
-<%= form_for(@favorite) do |f| %>
+<%= simple_form_for @favorite, :html => { :class => 'form-horizontal' } do |f| %>
   <% if @favorite.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@favorite.errors.count, "error") %> prohibited this favorite from being saved:</h2>
@@ -10,48 +10,26 @@
       </ul>
     </div>
   <% end %>
-
-  <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :street_1 %><br>
-    <%= f.text_field :street_1 %>
-  </div>
-  <div class="field">
-    <%= f.label :street_2 %><br>
-    <%= f.text_field :street_2 %>
-  </div>
-  <div class="field">
-    <%= f.label :city %><br>
-    <%= f.text_field :city %>
-  </div>
-  <div class="field">
-    <%= f.label :state %><br>
-    <%= f.text_field :state %>
-  </div>
-  <div class="field">
-    <%= f.label :zip_code %><br>
-    <%= f.text_field :zip_code %>
-  </div>
-  <div class="field">
-    <%= f.label :type %><br>
-    <%= f.text_field :type %>
-  </div>
-  <div class="field">
-    <%= f.label :notes %><br>
-    <%= f.text_area :notes %>
-  </div>
-  <div class="field">
-    <%= f.label :user_id %><br>
-    <%= f.number_field :user_id %>
-  </div>
-  <div class="field">
-    <%= f.label :business_id %><br>
-    <%= f.number_field :business_id %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+  
+ 
+<fieldset>
+ 
+    <%= f.input :name %><br>
+	<%= f.input :label, :collection => Favorite::LABELS_LIST %><br>
+	<h5>Pick a business from the dropdown OR fill out the address of an unincluded business<h5>
+	<%= f.input :business_id, :collection => Business.active.alphabetical %><br>
+    <%= f.input :street_1 %><br>
+    <%= f.input :street_2 %><br>
+    <%= f.input :city %><br>
+    <%= f.input :state, :collection => Favorite::STATES_LIST.map{|a,b| b} %><br>
+    <%= f.input :zip_code %><br>
+    <%= f.input :notes %><br>
+	<%= f.input :user_id, :collection => User.where('id = ?', current_user.id)%>
+    
+  <br></br>
+      <div class="form-actions">
+        <%= f.submit nil, :class => 'button radius' %>
+        <%= link_to 'Cancel',favorites_path, :class => 'button alert radius' %>
+      </div>
+   </fieldset>
 <% end %>

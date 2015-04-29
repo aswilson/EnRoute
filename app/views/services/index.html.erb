@@ -26,6 +26,10 @@
   </tbody>
 </table>
 
+<span class="paginate">
+<%= will_paginate @services, :previous_label => "Previous&nbsp;", :next_label => "&nbsp;Next" %>
+</span>
+
 <br>
 
 <%= link_to 'New Service', new_service_path %>

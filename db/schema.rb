@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150423193758) do
+ActiveRecord::Schema.define(version: 20150428230907) do
 
   create_table "business_services", force: true do |t|
     t.integer  "business_id"
@@ -50,12 +50,12 @@ ActiveRecord::Schema.define(version: 20150423193758) do
     t.string   "zip_code"
     t.float    "latitude"
     t.float    "longitude"
-    t.string   "type"
     t.text     "notes"
     t.integer  "user_id"
     t.integer  "business_id"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "label"
   end
 
   create_table "services", force: true do |t|

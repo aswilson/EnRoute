@@ -1,4 +1,4 @@
-<%= simple_form_for(@user) do |f| %>
+<%= simple_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
   <% if @user.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
@@ -20,8 +20,8 @@
 		<%= f.input :password %>
 		<%= f.input :password_confirmation %>
 		
-		<%= f.input :email %>
-		<%= f.input :phone %>
+		<%= f.input :email, :input_html => {:maxlength => 25} %>
+		<%= f.input :phone, :input_html => {:maxlength => 15} %>
 		
 		<%= f.input :street_1 %>
 		<%= f.input :street_2 %>

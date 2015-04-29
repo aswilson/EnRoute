@@ -6,7 +6,6 @@
       <th>Name</th>
       <th>Description</th>
       <th>Phone</th>
-      <th>Schedule</th>
       <th>Street 1</th>
       <th>Street 2</th>
       <th>City</th>
@@ -25,7 +24,6 @@
         <td><%= business.name %></td>
         <td><%= business.description %></td>
         <td><%= business.phone %></td>
-        <td><%= business.schedule %></td>
         <td><%= business.street_1 %></td>
         <td><%= business.street_2 %></td>
         <td><%= business.city %></td>
@@ -39,6 +37,10 @@
     <% end %>
   </tbody>
 </table>
+
+<span class="paginate">
+<%= will_paginate @businesses, :previous_label => "Previous&nbsp;", :next_label => "&nbsp;Next" %>
+</span>
 
 <br>
 
