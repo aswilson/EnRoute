@@ -32,6 +32,10 @@
   </tbody>
 </table>
 
+<span class="paginate">
+<%= will_paginate @users, :previous_label => "Previous&nbsp;", :next_label => "&nbsp;Next" %>
+</span>
+
 <br>
 
 <%= link_to 'New User', new_user_path %>

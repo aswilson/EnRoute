@@ -10,46 +10,24 @@
 
     <title>Welcome to EnRoute</title>
 
-    <!-- Bootstrap Core CSS -->
-    <link href="bootstrap.min.css" rel="stylesheet">
-
-    <!-- Custom CSS -->
-    <link href="index.css" rel="stylesheet">
-
-    <!-- Custom Fonts -->
 </head>
 
 <body>
-	<div id="big-header">
-		<img src="logo.png"/>
+	<center>
+		<br></br>
+<div>
+		<%= image_tag "logo_car.png"%>
 	</div>
-
-    <div id="main-menu">
+		<h1>Welcome to EnRoute</h1>
+		<h3>Plan. Schedule. Go.</h3>
+		
+		<br></br>
 		<div>
-			<center>
-			<%= link_to 'Plan Route', 'welcome/base_map', :class => 'btn btn-primary btn-lg outline' %>
-		</center>
-		<center>
-			<%= link_to 'Rate Business', 'welcome/rate_business', :class => 'btn btn-primary btn-lg outline' %>
-		</center>
-		<center>
-			<%= link_to 'Edit Settings', 'welcome/edit_settings', :class => 'btn btn-primary btn-lg outline' %>
-		</center>
+			<%= link_to 'Login', login_path %>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+			<%= link_to 'Sign Up', new_user_path %>
+
 		</div>
-		<div class="little-space"></div>
-		<div>
-			<center>
-			<%= link_to 'Login', login_path, :class => 'btn btn-primary btn-lg outline' %>
-		</center>
-		</div>
-    </div>
-
-    <!-- jQuery Version 1.11.0 -->
-    <script src="jquery-1.11.0.js"></script>
-
-    <!-- Bootstrap Core JavaScript -->
-    <script src="bootstrap.min.js"></script>
-
+</center>
 </body>
 
 </html>

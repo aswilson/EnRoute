@@ -162,6 +162,14 @@ div.category-table-container td {
     padding: 21px 15px;
 }
 
+.row-text-2 {
+    padding-left: 15px;
+    padding-right: 15px;
+    padding-top: 0px;
+    padding-bottom: 10px;
+    line-height: 1.42857143;
+}
+
 .menu {
     position: absolute;
     left: 30px;
@@ -213,7 +221,12 @@ div.category-table-container td {
     top: 16px;
     color: #00B4E3;
 }
-#popover-address {
+
+#popover-address-1 {
+    color: #e0dede;
+}
+
+#popover-address-2 {
     color: #e0dede;
 }
 
@@ -253,4 +266,20 @@ div.category-table-container td {
 
 #login-button {
     padding-top: 0px;
+}
+
+#popover-icon {
+    margin-left: 15px;
+}
+
+.overlay {
+    position: absolute;
+    display: table;
+    top: 43px;
+    left: 0px;
+    width: 346px;
+    line-height: 1.42857143;
+    background-color: #DAE5E5;
+    opacity: 1.0;
+    text-align: center;
 }

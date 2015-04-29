@@ -30,34 +30,15 @@
   <%= @favorite.zip_code %>
 </p>
 
-<p>
-  <strong>Latitude:</strong>
-  <%= @favorite.latitude %>
-</p>
 
 <p>
-  <strong>Longitude:</strong>
-  <%= @favorite.longitude %>
-</p>
-
-<p>
-  <strong>Type:</strong>
-  <%= @favorite.type %>
+  <strong>Label:</strong>
+  <%= @favorite.label %>
 </p>
 
 <p>
   <strong>Notes:</strong>
   <%= @favorite.notes %>
-</p>
-
-<p>
-  <strong>User:</strong>
-  <%= @favorite.user_id %>
-</p>
-
-<p>
-  <strong>Business:</strong>
-  <%= @favorite.business_id %>
 </p>
 
 <%= link_to 'Edit', edit_favorite_path(@favorite) %> |

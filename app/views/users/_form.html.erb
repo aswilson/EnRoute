@@ -1,4 +1,4 @@
-<%= form_for(@user) do |f| %>
+<%= simple_form_for @user, :html => { :class => 'form-horizontal' } do |f| %>
   <% if @user.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@user.errors.count, "error") %> prohibited this user from being saved:</h2>
@@ -11,63 +11,29 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :first_name %><br>
-    <%= f.text_field :first_name %>
-  </div>
-  <div class="field">
-    <%= f.label :last_name %><br>
-    <%= f.text_field :last_name %>
-  </div>
-  <div class="field">
-    <%= f.label :username %><br>
-    <%= f.text_field :username %>
-  </div>
-  <div class="field">
-    <%= f.label :password %><br>
-    <%= f.text_field :password %>
-  </div>
-  <div class="field">
-    <%= f.label :password_confirmation %><br>
-    <%= f.text_field :password_confirmation %>
-  </div>
-  <div class="field">
-    <%= f.label :email %><br>
-    <%= f.text_field :email %>
-  </div>
-  <div class="field">
-    <%= f.label :phone %><br>
-    <%= f.text_field :phone %>
-  </div>
-  <div class="field">
-    <%= f.label :street_1 %><br>
-    <%= f.text_field :street_1 %>
-  </div>
-  <div class="field">
-    <%= f.label :street_2 %><br>
-    <%= f.text_field :street_2 %>
-  </div>
-  <div class="field">
-    <%= f.label :city %><br>
-    <%= f.text_field :city %>
-  </div>
-  <div class="field">
-    <%= f.label :state %><br>
-    <%= f.text_field :state %>
-  </div>
-  <div class="field">
-    <%= f.label :zip_code %><br>
-    <%= f.text_field :zip_code %>
-  </div>
-  <div class="field">
-    <%= f.label :role %><br>
-    <%= f.text_field :role %>
-  </div>
-  <div class="field">
-    <%#= f.label :active %><br>
-    <%#= f.check_box :active %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+<fieldset>
+
+		<%= f.input :first_name %>
+		<%= f.input :last_name %>
+		
+		<%= f.input :username %>
+		<%= f.input :password %>
+		<%= f.input :password_confirmation %>
+		
+		<%= f.input :email, :input_html => {:maxlength => 25} %>
+		<%= f.input :phone, :input_html => {:maxlength => 15} %>
+		
+		<%= f.input :street_1 %>
+		<%= f.input :street_2 %>
+		<%= f.input :city %>
+		<%= f.input :state, :collection => User::STATES_LIST.map{|a,b| b}%>
+		<%= f.input :zip_code %>
+
+		<%= f.input :role, :collection => User::ROLES_LIST2, :prompt => true %>
+<br></br>
+    <div class="form-actions">
+      <%= f.submit nil, :class => 'button radius' %>
+      <%= link_to 'Cancel',users_path, :class => 'button alert radius' %>
+    </div>
+  </fieldset>
 <% end %>

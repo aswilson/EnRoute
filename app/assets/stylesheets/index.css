@@ -1,6 +1,6 @@
 @font-face {
-    font-family: mainFont;
-    src: url(MyriadPro-Regular.otf);
+    font-family: bebasNeue;
+    src: url(TypoPRO-BebasNeue-Bold.woff);
 }
 
 #big-header {
@@ -47,6 +47,20 @@ div#content {
 }
 
 body {
+    overflow: hidden;
+    font-family: 'Open Sans', serif;
+    font-size: 12px;
+    color: #202020;
+    line-height: 0px;
+}
+img {
+    vertical-align: top;
+}
+
+.bebasNeue {
+    font-family: bebasNeue;
+    font-size: 19px;
+    color: #0082A4;
 }
 
 div {

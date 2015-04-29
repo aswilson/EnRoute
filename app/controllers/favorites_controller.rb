@@ -6,8 +6,7 @@ class FavoritesController < ApplicationController
   # GET /favorites
   # GET /favorites.json
   def index
-    @user = :current_user
-    @favorites = Favorite.for_user(session[:user_id]).all
+    @favorites = Favorite.for_user(session[:user_id]).paginate(:page => params[:page]).per_page(15)
   end
 
   # GET /favorites/1
@@ -72,6 +71,6 @@ class FavoritesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def favorite_params
-      params.require(:favorite).permit(:name, :street_1, :street_2, :city, :state, :zip_code, :latitude, :longitude, :type, :notes, :user_id, :business_id)
+      params.require(:favorite).permit(:name, :street_1, :street_2, :city, :state, :zip_code, :latitude, :longitude, :label, :notes, :user_id, :business_id)
     end
 end

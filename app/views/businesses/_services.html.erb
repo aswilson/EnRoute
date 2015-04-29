@@ -1,0 +1,16 @@
+<% unless @services.empty? %>
+  <!-- <h3>&nbsp;</h3> -->
+  <div class="panel clearfix">
+    <h5>Services</h5>
+    <ul class="side-nav">
+      <% @services.each do |service| %>
+        <li><%= service.name %></li>
+      <% end %>
+    </ul>
+  </div>
+
+<% else %>
+  <div class="panel clearfix">
+    <h5>No Services</h5>
+  </div>
+<% end %>

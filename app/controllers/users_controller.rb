@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   # GET /users
   # GET /users.json
   def index
-    @users = User.all
+    @users = User.all.paginate(:page => params[:page]).per_page(15)
   end
 
   # GET /users/1
@@ -71,6 +71,6 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :username, :password_digest, :active_after, :password_reset_token, :password_reset_sent_at, :email, :phone, :latitute, :longitude, :role, :active)
+      params.require(:user).permit(:first_name, :last_name, :username, :password_digest, :active_after, :password_reset_token, :password_reset_sent_at, :email, :phone, :latitute, :longitude, :role, :active, :street_1, :street_2, :city, :state, :zip_code, :password, :password_confirmation)
     end
 end

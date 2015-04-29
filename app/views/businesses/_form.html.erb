@@ -1,4 +1,4 @@
-<%= form_for(@business) do |f| %>
+<%= simple_form_for @business, :html => { :class => 'form-horizontal' } do |f| %>
   <% if @business.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@business.errors.count, "error") %> prohibited this business from being saved:</h2>
@@ -11,59 +11,38 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= f.label :name %><br>
-    <%= f.text_field :name %>
-  </div>
-  <div class="field">
-    <%= f.label :description %><br>
-    <%= f.text_area :description %>
-  </div>
-  <div class="field">
-    <%= f.label :phone %><br>
-    <%= f.text_field :phone %>
-  </div>
-  <div class="field">
-    <%= f.label :schedule %><br>
-    <%= f.text_field :schedule %>
-  </div>
-  <div class="field">
-    <%= f.label :street_1 %><br>
-    <%= f.text_field :street_1 %>
-  </div>
-  <div class="field">
-    <%= f.label :street_2 %><br>
-    <%= f.text_field :street_2 %>
-  </div>
-  <div class="field">
-    <%= f.label :city %><br>
-    <%= f.text_field :city %>
-  </div>
-  <div class="field">
-    <%= f.label :state %><br>
-    <%= f.text_field :state %>
-  </div>
-  <div class="field">
-    <%= f.label :zip_code %><br>
-    <%= f.text_field :zip_code %>
-  </div>
-  <div class="field">
-    <%#= f.label :rating %><br>
-    <%#= f.text_field :rating %>
-  </div>
-  <div class="field">
-    <%#= f.label :number_of_raters %><br>
-    <%#= f.number_field :number_of_raters %>
-  </div>
-  <div class="field">
-    <%#= f.label :user_id %><br>
-    <%#= f.number_field :user_id %>
-  </div>
-  <div class="field">
-    <%#= f.label :active %><br>
-    <%#= f.check_box :active %>
-  </div>
-  <div class="actions">
-    <%= f.submit %>
-  </div>
+<fieldset>
+
+    <%= f.input :name %><br>
+
+    <%= f.input :description %><br>
+
+
+    <%= f.input :phone, :input_html => {:maxlength => 15} %><br>
+
+
+    <%= f.input :schedule %><br>
+
+
+    <%= f.input :street_1 %><br>
+
+
+    <%= f.input :street_2 %><br>
+
+
+    <%= f.input :city %><br>
+
+    <%= f.input :state, :collection => Business::STATES_LIST.map{|a,b| b} %><br>
+
+
+    <%= f.input :zip_code %><br>
+	
+	<h3>Service(s)</h3>
+    <%= f.input :service_ids, label: "", collection: Service.active.alphabetical, as: :check_boxes %>
+  <br></br>
+      <div class="form-actions">
+        <%= f.submit nil, :class => 'button radius' %>
+        <%= link_to 'Cancel',businesses_path, :class => 'button alert radius' %>
+      </div>
+   </fieldset>
 <% end %>
