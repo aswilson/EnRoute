@@ -1,10 +1,56 @@
+
+/* Image name-changing notes (not neccicarilly meaningful to anyone but me)
+//Category_ClickPins -> category-blue1
+//AddCategory-01 -> category-blue2
+//AddCategory-12 -> category-red1
+//AddCategory-23 -> category-red2
+//SearchBox -> category-grey
+//-Normal -> -normal
+//-ClickOn -> -clicked
+//-MoveOver -> -hovered
+//Normal/ClickOn/MouseOver -> textButton-normal2 | tab-normal2 | icon-
+//button- -> textButton-
+//login- -> textButton-
+//tab- -> tab-
+	//01 -> user
+	//02 -> save
+	//03 -> settings
+	//04 -> favorites
+	//05 -> route
+//findroute- -> taskIcons-
+	//01 -> unlocked (blue)
+	//02 -> clock (blue)
+	//03 -> delete (red)
+	//04 -> help (red)
+	//05 -> locked (blue)
+	//06 -> move (blue)
+//LogInWindow-01 -> checkmarkInCircle (green)
+//LogInWindow-02 -> xInCircle (red)
+//LogInWindow-02 -> tab-normal2-user (blue1)
+//01 -> findRoute
+//02 -> signIn
+//03 -> addStop
+//04 -> register
+//05 -> logIn
+//06 -> go
+//4 -> favorites (should be in tabs-_2)
+//5 -> map (should be in tabs-_2)
+//-07 -> {nothing_}radioButton{(Selected/Unselected}
+//08 -> save
+//09 - zoomOut
+//10 - zoomIn
+//USED DIRECTLY: Help, TimeSetting, checkmarkInCircle (after change),
+//NOTE DONE YET (also not searched for in .html, .js): map-,
+*/
+
+
 var TestData = {
 	CMULoc: { name:"CMU", addr:"500 Rorbes Avenue, Pittsburgh, PA 15213", lat:3, lon:4 },
 	fakeUserName: "Bob",
 	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:10, lon:11 },
 	fakeFavorites: [
 		{ name:"Starbucks", addr:"456 Fake Street, Pittsburgh PA 12345", lat:10, lon:12, category:"coffee", notes:"" },
-		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:10, lon:13, category:"restaurant", notes:"" },
+		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:10, lon:13, category:"restaurant", notes:"Note note note" },
 		{ name:"Library", addr:"987 Fake Street, Pittsburgh PA 12345", lat:10, lon:14, category:"books", notes:"" }
 	],
 	makeFakeSuggestions: function(str) { return [
@@ -13,6 +59,7 @@ var TestData = {
 		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:13, lon:9, notes:"" }
 	];}
 }
+
 
 var RouteTools = (function() {
 
@@ -56,63 +103,9 @@ function _replaceSpecifiedMembers(base,extender) {
 	return o;
 };
 
-
 var publicStuff = {};
 
 publicStuff.EMPTYRANGE = EMPTYRANGE;
-
-publicStuff.categories = {
-  'restaurant' : 'AddCategory-01.png',
-  'atm' : 'AddCategory-02.png',
-  'coffee' : 'AddCategory-03.png',
-  'bank' : 'AddCategory-04.png',
-  'groceries' : 'AddCategory-05.png',
-  'pharmacy' : 'AddCategory-06.png',
-  'books' : 'AddCategory-07.png',
-  'work' : 'AddCategory-08.png',
-  'gas' : 'AddCategory-09.png',
-  'home' : 'AddCategory-10.png',
-  'postOffice' : 'AddCategory-11.png'
-}
-//Category_ClickPins -> category-blue1
-//AddCategory-01 -> category-blue2
-//AddCategory-12 -> category-red2
-//AddCategory-23 -> category-red2
-//SearchBox -> category-grey
-//button-Normal -> button-normal
-//button-ClickOn -> button-clicked
-//button-MoveOver -> button-hovered
-//ClickOn -> button-clicked2
-//ClickOn -> icon-clicked
-//findroute-ClickOn -> taskIcons-clicked
- //findroute-MoveOver -> taskIcons-hovered
- //findroute-Normal -> taskIcons-normal
-	//01 -> unlocked (blue)
-	//02 -> clock (blue)
-	//03 -> delete (red)
-	//04 -> help (red)
-	//05 -> locked (blue)
-//LogInWindow-01 -> checkmarkInCircle (green)
-//LogInWindow-02 -> xInCircle (red)
-//LogInWindow-02 -> user (blue1)
-//01 -> findRoute
-//02 -> signIn
-//03 -> addStop
-//04 -> register
-//05 -> logIn
-//06 -> go
-//4 -> star
-//5 -> map
-//07 -> radioButton (Selected / Unselected)
-//08 -> save
-//09 - zoomOut
-//10 - zoomIn
-//Delete
-//AddStop
-//AdvancedOption
-//AddCategory-34
-//Help
-//Move.png
 
 publicStuff.makeTask = function(data) {
 	return _replaceSpecifiedMembers(EMPTYTASK, data);
@@ -129,34 +122,32 @@ publicStuff.rangeToString = function(range) {
 publicStuff.locToLatLon = function(loc) {
 	return {lat: loc.lat, lon: loc.lon};
 }
-publicStuff.categoryToImg = function(cat) {
-	var s = publicStuff.categories[cat];
-	return (s==undefined) ? "AddCategory-00.png" : s;
-}
-publicStuff.imgToCategory = function(cat) {
-	for (var k in publicStuff.categories) {
-		if (publicStuff.categories[k]===cat)
-			return k;
-	}
-	return "";
-}
-publicStuff.categoryIcon_toSelected = function(url) {
-  // Assumes url is unselected url
-  var num = parseInt(url.match(/\d+/)[0]) + 11;
-  return "AddCategory-" + num + ".png";
-}
-publicStuff.categoryIcon_toUnselected = function(url) {
-  // Assumes url is selected url
-  var n = parseInt(url.match(/\d+/)[0]) - 11;
-  var num = n > 9 ? "" + n: "0" + n;
-  return "AddCategory-" + num + ".png";
-}
 
-publicStuff.replaceUrlTail = function(oldUrl, newTail) {
-	var index = oldUrl.lastIndexOf('/');
-	var prefix = index!=-1 ? oldUrl.substring(0,index) : "";
-	return (prefix + (prefix===""?"":"/") + newTail);
-}	
+publicStuff.imgStringToPieces = function(url) {
+	//example url: "assets/textButton-normal-findRoute.png";
+	var index1 = url.lastIndexOf('/');
+	var index2 = url.lastIndexOf('.');
+	if (index2==-1)		index2 = url.length;
+	var prefix = url.substring(0, index1+1);		//includes the '/'
+	var suffix = url.substring(index2, url.length);	//includes the '.'
+	var srcName = url.substring(index1+1, index2);
+	var namePieces = srcName.split('-');
+	return {
+		prefix: prefix,
+		category: namePieces[0],
+		dispMode: namePieces[1],
+		name: namePieces[2],
+		suffix: suffix
+	};
+}
+publicStuff.piecesToImgString = function(pieces) {
+	return (pieces.prefix+pieces.category+"-"+pieces.dispMode+"-"+pieces.name+pieces.suffix);
+}
+publicStuff.alterImgUrlPiece = function(url, piece, newVal) {
+	var pieces = publicStuff.imgStringToPieces(url);
+	pieces[piece] = newVal;
+	return publicStuff.piecesToImgString(pieces);
+}
 
 publicStuff.ROUTESTARTINGATCMU = publicStuff.makeRoute({tasks:[publicStuff.makeTask({label:"CMU",loc:TestData.CMULoc})]});
 

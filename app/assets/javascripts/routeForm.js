@@ -15,8 +15,32 @@ var locationOptions = {};				//map of location options for a task, from server. 
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
-	make the pins numbered
-	add task number to the front of the task's label
+	--get the correct tab to be open at startup
+	--get the blue background responsive to size changes once more
+	--least-option, distance-option become actually responsive
+	--reading and updating of tasks, favorites
+	--update or remove these (some of them later):
+		updateLocChoicesArea, updateMap, readTaskFromTaskEditWindow, readTaskFromFavoriteEditWindow,
+		hideEditTaskWindow,
+		showQuickEditTaskWindow, takeSuggestion, hideQuickEditTaskWindow, handleTaskLabelChange
+	--adding of new favorites; adding of favorites to the route
+	--saving/loading favorites from the server
+	--handle div#homeAddr and the real getting of the home address
+	--handle and display error cases when talking to backend
+	--get pins to display on map properly
+	--Make fillInRoute() !!!
+	--the popup for details that appears near pins...
+	--let the user change the chosen location...
+	--Search for violations of don't use same ID more than once (ex: favorites-edit-button)
+	--When all set, move the "<% if logged_in? %>" so that hide tab when not logged in
+
+	--kill login popup: take user to a new page instead
+	--confirm working of password change
+	--timepicker for the times ("chronic" gem recommended)
+
+	--make favorites scrollable if it gets too long
+	--make the pins numbered
+	--add task number to the front of the task's label
 */
 
 
@@ -153,12 +177,10 @@ function updateFavoritesList() {
 	var favoritesTable = $('#favorites-table').empty();
 	for (var i=0; i<myFavorites.length; i++) {
 		var favRow = favoritePrototype.clone(true).attr("id","favorite"+i).show();
-		var v1 = favRow.find('.favorite-label');
-		var v = favRow.find('.categoryTypeIcon');
-		var oldSrc = favRow.find('.categoryTypeIcon').attr("src");
-		var newIcon = RouteTools.categoryToImg(myFavorites[i].category);
-		favRow.find('.categoryTypeIcon').attr("src",RouteTools.replaceUrlTail(oldSrc, newIcon));
 		favRow.find('.favorite-label').empty().append(myFavorites[i].name);
+		var oldSrc = favRow.find('.categoryTypeIcon').attr("src");
+		var newSrc = RouteTools.alterImgUrlPiece(oldSrc, "name", myFavorites[i].category);
+		favRow.find('.categoryTypeIcon').attr("src",newSrc);
 		favoritesTable.append(favRow);
 	}
 }
@@ -170,12 +192,15 @@ function updateTaskEditWindow(task) {
 	setTimerangeDisp("taskModal_leave", task.whenToLeave);
 }
 function updateFavoriteEditWindow(fav) {
+	function strOrDashes(s) {
+		return (s==="" ? "-----" : s);
+	}
 	$('input#favoritesModal_name').val(fav.name);
-	$('input#favoritesModal_name').prev().empty().append(fav.name);
+	$('input#favoritesModal_name').prev().empty().append(strOrDashes(fav.name));
 	$('input#favoritesModal_addr').val(fav.addr);
-	$('input#favoritesModal_addr').prev().empty().append(fav.addd);
+	$('input#favoritesModal_addr').prev().empty().append(strOrDashes(fav.addr));
 	$('input#favoritesModal_notes').val(fav.notes);
-	$('input#favoritesModal_notes').prev().empty().append(fav.notes);
+	$('input#favoritesModal_notes').prev().empty().append(strOrDashes(fav.notes));
 	$('input#favoritesModal_category').val(fav.category);
 	setCategorySelected($('div#favoritesModal_category_container'), fav.category);
 }
@@ -244,21 +269,16 @@ function setTimerangeDisp(baseId, range) {
 }
 function setCategorySelected(catContainer, val) {
 	var imgs = catContainer.find('img');
-	var srcToFind = RouteTools.categoryToImg(val);
-	function endsWith(str, suffix) {
-		return str.indexOf(suffix, str.length - suffix.length) !== -1;
-	}
 	for (var i=0; i<imgs.length; i++) {
 		var found = $(imgs[i]);
 		var oldSrc = found.attr("src");
-		if (found.hasClass("selected")) {
-			found.removeClass("selected");
-			var newSrc = RouteTools.replaceUrlTail(oldSrc, RouteTools.categoryIcon_toUnselected(oldSrc));
-			found.attr("src", newSrc);
-		}
-		if (endsWith(found.attr("src"),srcToFind)) {
+		if (RouteTools.imgStringToPieces(oldSrc).name == val) {
 			found.addClass("selected");
-			var newSrc = RouteTools.replaceUrlTail(oldSrc, RouteTools.categoryIcon_toSelected(srcToFind));
+			var newSrc = RouteTools.alterImgUrlPiece(oldSrc,"dispMode","red1");
+			found.attr("src", newSrc);
+		} else {
+			found.removeClass("selected");
+			var newSrc = RouteTools.alterImgUrlPiece(oldSrc,"dispMode","blue2");
 			found.attr("src", newSrc);
 		}
 	}
@@ -291,8 +311,6 @@ function readTaskFromFavoriteEditWindow() {
 }
 
 
-
-
 /* AJAX stuff */
 function getOptionsFromServer() {
 	if (busy) return;
@@ -306,7 +324,7 @@ function getOptionsFromServer() {
 		if (loc==undefined)
 			unresolvedLabels.push(myRoute.tasks[i].label);
 		else
-			knownPoints.push(locToLatLon(loc));
+			knownPoints.push(RouteTools.locToLatLon(loc));
 	}
 	var requestBody = {
 		fixedPoints: knownPoints,
@@ -326,18 +344,19 @@ function getOptionsFromServer() {
 	}
 	var onFailure = function(err) {
 		showMessage("Failed");
+		setTimeout(function(){showMessage("")}, 2000);	//clear message
 		busy = false;
 	}
 	setTimeout(function(){onFailure("NotImplemented");}, 3000);	//pretend we're doing ajax here
-	doAjax("GET","welcome/getAllNearby.json",requestBody,onSuccess,onFailure);
+	//doAjax("GET","welcome/getAllNearby.json",requestBody,onSuccess,onFailure);
 }
 function asyncSetToHome() {
 	if (cachedHomeLoc!=undefined) {
 		myRoute.tasks[taskNo].loc = cachedHomeLoc;
 	} else {
 		var onFailure = function(err) { }
-		//setTimeout(function(){updateHome(TestData.fakeHomeLoc);}, 2000);	//pretend we're doing ajax here
-		doAjax("GET","welcome/findHome.json",{},updateHome,onFailure);
+		setTimeout(function(){updateHome(TestData.fakeHomeLoc);}, 2000);	//pretend we're doing ajax here
+		//doAjax("GET","welcome/findHome.json",{},updateHome,onFailure);
 	}
 }
 
@@ -475,12 +494,13 @@ alert("not done");
 alert(e);
 	  var target = $(e.target).children().first();
 alert(target);
-	  //target.attr("src" , '<%= image_path "tab-ClickOn-" + target.attr("name") + ".png" %>' );
-	  target.attr("src", "tab-ClickOn-" + target.attr("name") + ".png");
+alert("target name may have changed; current value: "+target.name);
+	  //target.attr("src" , '<%= image_path "tab-clicked-" + target.attr("name") + ".png" %>' );
+	  target.attr("src", "tab-clicked-" + target.attr("name") + ".png");
 	  var related = $(e.relatedTarget).children().first();
 alert(related);
-	  //target.attr("src" , '<%= image_path "tab-Normal-" + related.attr("name") + ".png" %>' );
-	  related.attr("src", "tab-Normal-" + related.attr("name") + ".png");
+	  //target.attr("src" , '<%= image_path "tab-normal-" + related.attr("name") + ".png" %>' );
+	  related.attr("src", "tab-normal-" + related.attr("name") + ".png");
 	  $('#menu-background').height($('#menu').height());
 
 	  var overlay = $(".overlay");
@@ -507,8 +527,8 @@ alert(related);
 		favoriteNoBeingEdited = fNum;
 		updateFavoriteEditWindow(myFavorites[fNum]);
 	});
-	$('#favorite-table tr').click(function() {
-		$( this ).find("input:radio[name=favToAdd]").prop('checked', true).change();
+	$('#favorites-table tr').click(function() {
+		$(this).find("input:radio[name=favToAdd]").prop('checked', true).change();
 	});
 
 	/* Task-editing Modal listeners */
@@ -532,7 +552,6 @@ alert(related);
 	makeEditableTimerange("taskModal_leave");
 	
 	/* Favorite-editing Modal listeners */ 
-	// Add listeners to "back" and "ok"
 	$('#favorite-back-button').click(function() {
 		$('#favoritesModal').modal('hide');
 	});
@@ -540,7 +559,6 @@ alert(related);
 		alert("I should do stuff here");
 		$('#favoritesModal').modal('hide');
 	});
-	// Visually changes category icon in Edit Favorite modal when selected
 	$('.favorite-category-icon').click(function() {
 		var newCat = $(this).find('input').val();
 		$('input#favoritesModal_category').val(newCat);
