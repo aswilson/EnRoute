@@ -80,6 +80,14 @@ var EMPTYROUTE = {
 	useShortestTime: true,	//else use shortest distance
 	minutesAvailiable: undefined
 };
+var EMPTYFAVORITE = {
+	name:"",
+	addr:"",
+	lat:undefined,		//should NEVER be left undefined
+	lon:undefined,		//should NEVER be left undefined
+	category:"blank",
+	notes:""
+}
 
 
 function _simpleClone(obj) {
@@ -96,34 +104,35 @@ function _simpleClone(obj) {
 
 function _replaceSpecifiedMembers(base,extender) {
 	var o = _simpleClone(base);
-	for (property in base) {
+	for (var property in base) {
 		if (extender[property] != undefined)
 			o[property] = extender[property];
 	}
 	return o;
 };
 
-var publicStuff = {};
+var RouteTools = {};
 
-publicStuff.EMPTYRANGE = EMPTYRANGE;
+RouteTools.EMPTYRANGE = EMPTYRANGE;
+RouteTools.EMPTYFAVORITE = EMPTYFAVORITE;
 
-publicStuff.makeTask = function(data) {
+RouteTools.makeTask = function(data) {
 	return _replaceSpecifiedMembers(EMPTYTASK, data);
 };
 
-publicStuff.makeRoute = function(data) {
+RouteTools.makeRoute = function(data) {
 	return _replaceSpecifiedMembers(EMPTYROUTE, data);
 };
 
-publicStuff.rangeToString = function(range) {
+RouteTools.rangeToString = function(range) {
 	return "<"+range.start+","+range.end+">";
 };
 
-publicStuff.locToLatLon = function(loc) {
+RouteTools.locToLatLon = function(loc) {
 	return {lat: loc.lat, lon: loc.lon};
 }
 
-publicStuff.imgStringToPieces = function(url) {
+RouteTools.imgStringToPieces = function(url) {
 	//example url: "assets/textButton-normal-findRoute.png";
 	var index1 = url.lastIndexOf('/');
 	var index2 = url.lastIndexOf('.');
@@ -140,16 +149,16 @@ publicStuff.imgStringToPieces = function(url) {
 		suffix: suffix
 	};
 }
-publicStuff.piecesToImgString = function(pieces) {
+RouteTools.piecesToImgString = function(pieces) {
 	return (pieces.prefix+pieces.category+"-"+pieces.dispMode+"-"+pieces.name+pieces.suffix);
 }
-publicStuff.alterImgUrlPiece = function(url, piece, newVal) {
-	var pieces = publicStuff.imgStringToPieces(url);
+RouteTools.alterImgUrlPiece = function($img, piece, newVal) {
+	var pieces = RouteTools.imgStringToPieces($img.attr("src"));
 	pieces[piece] = newVal;
-	return publicStuff.piecesToImgString(pieces);
-}
+	$img.attr("src", RouteTools.piecesToImgString(pieces));
+}	
 
-publicStuff.ROUTESTARTINGATCMU = publicStuff.makeRoute({tasks:[publicStuff.makeTask({label:"CMU",loc:TestData.CMULoc})]});
+RouteTools.ROUTESTARTINGATCMU = RouteTools.makeRoute({tasks:[RouteTools.makeTask({label:"CMU",loc:TestData.CMULoc})]});
 
-return publicStuff;
+return RouteTools;
 })();
