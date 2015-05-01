@@ -3,7 +3,7 @@ var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 
 var myUserInfo = { name:"", homeLoc:undefined, favorites:[] };
-var myRoute = initialRoute;
+var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
 var mySettings = {distInMiles: true};
 var taskNoBeingEdited = undefined;		//when saving changes, indicates which task gets the changes
 var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which favorite gets the changes
@@ -19,16 +19,16 @@ var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn 
 	--getting user info: username, homeAddr, favorites
 		--also involves altering or removing: updateHome, asyncSetToHome, $('span#username'), $('span#homeAddr'), & etc
 		--add saving capability wherever things may change (esp favorites)
-	--handle and display error cases when talking to backend
-		--also, error cases for impossible settings, etc
+	--getting location choices from the backend (includes setting task.error as needed)
 	--get pins to display on map properly: involves altering or removing updateMap()
 	--Make fillInRoute() !!!
-	--the popup for details that appears near pins...
+	--the popup for details that appears near pins on the map...
 	--let the user change the chosen location...
 		--will involve altering or removing: updateLocChoicesArea, handleTaskLabelChange, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
+	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
 	--everything in page two of the routes tab...
-	--Search for violations of don't use same ID more than once (ex: favorites-edit-button)
 	--When all set, move the "<% if logged_in? %>" stuff to the appropriate spot and uncomment the "else" part
+	--Make the images all transparent again
 
 	--kill login popup: take user to a new page instead
 	--confirm working of password change (or, better, disable it, since they'd need to go to a new page, anyhow)
@@ -104,13 +104,9 @@ function myStringToInt(s) {
 	var v = parseInt(s,10);
 	return (isNaN(v) ? undefined : v);
 }
-function showMsgMomentarily(msg,time) {
-	showMsg(msg);
-	setTimeout(function(){showMsg("")}, time);
-}
-function updateBackgroundSizes() {
-	$('#menu-background').height($('#menu').height());
-	$(".overlay").height($(".tab-content").height());
+function showMsgMomentarily(msg,type,time) {
+	showMsg(msg,type);
+	setTimeout(function(){showMsg("","info")}, time);
 }
 
 
@@ -154,8 +150,17 @@ function updateHome(newHomeLoc) {
 
 
 /* Stuff for updating the displays */
-function showMsg(msg) {
-	$('span#message').empty().append(msg);
+function showMsg(msg,type) {
+	var msgTypes = ["error", "warning", "info"];
+	$('span.statusMessage').empty().append(msg);
+	for (var i=0; i<msgTypes.length; i++)
+		$('span.statusMessage').removeClass(msgTypes[i]);
+	if (msgTypes.indexOf(type) != -1)
+		$('span.statusMessage').addClass(type);
+}
+function updateBackgroundSizes() {
+	$('#menu-background').height($('#menu').height());
+	$(".overlay").height($(".tab-content").height());
 }
 function updateRouteForm() {
 	//update task list display
@@ -163,6 +168,7 @@ function updateRouteForm() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
+		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
 	//update the rest of the form
@@ -173,6 +179,7 @@ function updateRouteForm() {
 	var distOptStr = (mySettings.distInMiles) ? "miles" : "kilometers";
 	$("#distance-option").text(distOptStr);
 	$("#distance-option").val(distOptStr);
+	updateBackgroundSizes();
 }
 function updateFavoritesList() {
 	var favoritesTable = $('#favorites-table').empty();
@@ -183,6 +190,7 @@ function updateFavoritesList() {
 		RouteTools.alterImgUrlPiece(favRow.find('.categoryTypeIcon'), "name", myUserInfo.favorites[i].category);
 		favoritesTable.append(favRow);
 	}
+	updateBackgroundSizes();
 }
 function updateTaskEditWindow(task) {
 	$('span#taskModal_label').empty().append("Task: "+task.label);
@@ -226,7 +234,7 @@ function updateMap() {
 /*		MapControls.clearMap();
 		var prevPinNum = undefined;
 		for (var i=0; i<myRoute.tasks.length; i++) {
-			var loc = myRoute.tasks.loc;
+			var loc = myRoute.tasks[i].loc;
 			if (loc!=undefined) {
 				var pinNum = MapControls.placePin(locToLatLon(loc, "pin.png"));
 				if (prevPinNum!=undefined)
@@ -267,8 +275,8 @@ function setTimerangeDisp(baseId, range) {
 	if (t==="before" || t==="between")	$("#"+l+"_before").show();
 		else							$("#"+l+"_before").hide();
 }
-function setCategorySelectedDisp(catContainer, val) {
-	var imgs = catContainer.find('img');
+function setCategorySelectedDisp($catContainer, val) {
+	var imgs = $catContainer.find('img');
 	for (var i=0; i<imgs.length; i++) {
 		var found = $(imgs[i]);
 		var oldSrc = found.attr("src");
@@ -281,6 +289,27 @@ function setCategorySelectedDisp(catContainer, val) {
 		}
 	}
 }
+function setTaskAlertIcon($statusArea, task, taskNo) {
+	var $img = $statusArea.find("img");
+	if (task.error != undefined && task.error!="") {
+		RouteTools.alterImgUrlPiece($img, "category", "taskIcons");
+		RouteTools.alterImgUrlPiece($img, "name", "alert");
+		$statusArea.attr("title",task.error);
+		$statusArea.tooltip();
+	} else if (task.loc != undefined) {
+		var pinImgName = (taskNo<8 ? ""+(taskNo+1) : "blank");
+		RouteTools.alterImgUrlPiece($img, "category", "pin");
+		RouteTools.alterImgUrlPiece($img, "name", pinImgName);
+		var imgSize = $img.attr("width");
+		$img.attr("width",imgSize/2);
+		$img.css('margin-left', function(index, curValue) {
+			return parseInt(curValue,10) + (imgSize/4) + 'px';
+		});
+	} else {
+		$img.hide();
+	}
+}
+
 
 /* Stuff for reading from the displays */
 function readTaskFromEditWindow(baseTask) {
@@ -320,7 +349,7 @@ function getTimerange(baseId) {
 function getOptionsFromServer() {
 	if (busy) return;
 	busy = true;
-	showMsg("waiting on server...");
+	showMsg("waiting on server...","info");
 	//prepare request
 	var knownPoints = [];
 	var unresolvedLabels = [];
@@ -339,7 +368,7 @@ function getOptionsFromServer() {
 	alert("About to get options from server based on this request:\n"+requestBody);
 	//prepare functions to respond to Ajax call, and execute it
 	var onSuccess = function(reply) {
-		showMsgMomentarily("Success!", 2000);
+		showMsgMomentarily("Success!","info",2000);
 		locationOptions = reply;
 		fillInRoute(myRoute, locationOptions);
 		updateRouteForm();
@@ -347,7 +376,7 @@ function getOptionsFromServer() {
 		busy = false;
 	}
 	var onFailure = function(err) {
-		showMsgMomentarily("Failed",2000);
+		showMsgMomentarily("Failed","error",2000);
 		busy = false;
 	}
 	setTimeout(function(){onFailure("NotImplemented");}, 3000);	//pretend we're doing ajax here
@@ -523,7 +552,7 @@ $(document).ready(function() {
 				loc: {name:fav.name, addr:fav.addr, lat:fav.lat, lon:fav.lon}
 			};
 			addTask(taskInfo);
-			showMsgMomentarily("added \""+fav.name+"\" to end of route",2000);
+			showMsgMomentarily("added \""+fav.name+"\" to end of route","info",2000);
 		});
 	}
 	
@@ -547,7 +576,6 @@ $(document).ready(function() {
 	makeEditableTimerange("taskModal_arrive");
 	makeEditableTimerange("taskModal_leave");
 	$('#task-save-button').click(function() {
-		alert("I should do stuff here");
 		if (taskNoBeingEdited!=undefined) {
 			myRoute.tasks[taskNoBeingEdited] = readTaskFromEditWindow(myRoute.tasks[taskNoBeingEdited]);
 			updateRouteForm();
@@ -568,7 +596,6 @@ $(document).ready(function() {
 			setCategorySelectedDisp($('div#favoritesModal_category_container'), newCat);
 		});
 		$('#favorite-save-button').click(function() {
-			alert("I should do stuff here");
 			if (favoriteNoBeingEdited!=undefined) {
 				myUserInfo.favorites[favoriteNoBeingEdited] = readFavoriteFromEditWindow();
 				updateFavoritesList();

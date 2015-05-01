@@ -154,18 +154,17 @@
             <!-- Route tab -->
             <div role="tabpanel" class="tab-pane" id="routeTab">
                 <!-- Input -->
-                <div id="route-input" class="table-container">
+                <div id="route-input" class="task-table-container">
                     <table id="tasks-table">
-                        <tr id="taskPrototype" class="text-input">
-                            <td>
-								<a class="move-button"><%= image_tag "taskIcons-normal-move.png", size:"22" %></a>
-                                <a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
-                            </td>
-                            <td>
-                                <input type="text" class="task-label input-text form-control inline"/>
-								<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
-                            </td>
-                        </tr>
+                        <tr id="taskPrototype" class="text-input"><td>
+							<a class="move-button"><%= image_tag "taskIcons-normal-move.png", size:"22" %></a>
+							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
+							<input type="text" class="task-label input-text form-control inline"/>
+							<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
+							<a class="taskStatus" data-toggle="tooltip" data-placement="right" title="">
+								<%= image_tag "taskIcons-normal-alert.png", size:"22" %>
+							</a>
+						</td></tr>
                     </table>
                     <table class="footer-table" width="100%">
                         <tr>
@@ -331,7 +330,7 @@
             </div>
 			<!-- END User tab -->
         </div>
-		<span id="message"></span>
+		<span class="statusMessage"></span>
     </div>
 
     <!-- Upper Right Toolbar: Help and Login Buttons -->
@@ -362,7 +361,7 @@
                     <span class="modal-title" id="loginModalLabel">Log in</span>
                 </div>
                 <div class="modal-body teal">
-                    <div class="table-container">
+                    <div class="login-table-container">
                         <table>
                             <!-- Input Username -->
                             <tr class="text-input">
@@ -475,6 +474,7 @@
                                 </td>
                             </tr>
                         </table>
+						<span class="statusMessage"></span>
                     </div>
                 </div>
             </div>
@@ -557,6 +557,7 @@
                                 </td>
                             </tr>
                         </table>
+						<span class="statusMessage"></span>
                     </div>
                 </div>
             </div>

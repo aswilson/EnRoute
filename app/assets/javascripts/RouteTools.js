@@ -1,5 +1,6 @@
 
 /* Image name-changing notes (not neccicarilly meaningful to anyone but me)
+	//I renamed (most of) the icons to have the format category-dispStyle-name
 //Category_ClickPins -> category-blue1
 //AddCategory-01 -> category-blue2
 //AddCategory-12 -> category-red1
@@ -39,8 +40,14 @@
 //08 -> save
 //09 - zoomOut
 //10 - zoomIn
-//USED DIRECTLY: Help, TimeSetting, checkmarkInCircle (after change),
-//NOTE DONE YET (also not searched for in .html, .js): map-,
+//NOTE DONE YET (also not searched for in .html, .js): map-
+//NOTE: there are a few used images that still don't conform to the category-dispStyle-name format
+//Pins: all get "pin" as the category.  DispTypes:
+	click -> clicked
+	fade -> faded
+	MoveOn -> hovered
+	normal -> normal
+	other_<something> -> <translation of something>2
 */
 
 

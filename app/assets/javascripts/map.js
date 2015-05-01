@@ -145,14 +145,14 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
   var icon;
   if (primary) {
     icon = {
-        url: "normal" + markerNum + ".png",
+        url: "pin-normal-" + markerNum + ".png",
         scaledSize: new google.maps.Size(22, 41),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(11, 41)
       };
   } else {
     icon = {
-        url: "other-normal" + markerNum + ".png",
+        url: "pin-normal2-" + markerNum + ".png",
         scaledSize: new google.maps.Size(16, 30),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(8,30)
@@ -162,7 +162,7 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
   var html = '<div class="pin-popover">\
     <table class="table-container">\
         <tr>\
-            <td><img id="popover-icon" src="Category_ClickPins-09.png" width="35px" height="35px"/></td>\
+            <td><img id="popover-icon" src="category-blue1-coffee.png" width="35px" height="35px"/></td>\
             <td><div id="popover-category" class="row-text">Coffee</div></td>\
         </tr>\
         <tr>\
@@ -290,14 +290,14 @@ function addLatLng(event) {
   var markerNum = 0;
   if (primary) {
     icon = {
-        url: "normal" + markerNum + ".png",
+        url: "pin-normal-" + markerNum + ".png",
         scaledSize: new google.maps.Size(22, 41),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(11, 41)
       };
   } else {
     icon = {
-        url: "other-normal" + markerNum + ".png",
+        url: "pin-normal2-" + markerNum + ".png",
         scaledSize: new google.maps.Size(16, 30),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(8,30)
@@ -307,7 +307,7 @@ function addLatLng(event) {
   var html = '<div class="pin-popover">\
     <table class="table-container">\
         <tr>\
-            <td><img id="popover-icon" src="Category_ClickPins-09.png" width="35px" height="35px"/></td>\
+            <td><img id="popover-icon" src="category-blue1-coffee.png" width="35px" height="35px"/></td>\
             <td><div id="popover-category" class="row-text">Coffee</div></td>\
         </tr>\
         <tr>\
