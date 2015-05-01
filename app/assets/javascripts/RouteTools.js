@@ -1,5 +1,6 @@
 
 /* Image name-changing notes (not neccicarilly meaningful to anyone but me)
+	//I renamed (most of) the icons to have the format category-dispStyle-name
 //Category_ClickPins -> category-blue1
 //AddCategory-01 -> category-blue2
 //AddCategory-12 -> category-red1
@@ -39,24 +40,30 @@
 //08 -> save
 //09 - zoomOut
 //10 - zoomIn
-//USED DIRECTLY: Help, TimeSetting, checkmarkInCircle (after change),
-//NOTE DONE YET (also not searched for in .html, .js): map-,
+//NOTE DONE YET (also not searched for in .html, .js): map-
+//NOTE: there are a few used images that still don't conform to the category-dispStyle-name format
+//Pins: all get "pin" as the category.  DispTypes:
+	click -> clicked
+	fade -> faded
+	MoveOn -> hovered
+	normal -> normal
+	other_<something> -> <translation of something>2
 */
 
 
 var TestData = {
-	CMULoc: { name:"CMU", addr:"500 Rorbes Avenue, Pittsburgh, PA 15213", lat:3, lon:4 },
+	CMULoc: { name:"CMU", addr:"500 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
 	fakeUserName: "Bob",
-	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:10, lon:11 },
+	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40, lon:-80 },
 	fakeFavorites: [
-		{ name:"Starbucks", addr:"456 Fake Street, Pittsburgh PA 12345", lat:10, lon:12, category:"coffee", notes:"" },
-		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:10, lon:13, category:"restaurant", notes:"Note note note" },
-		{ name:"Library", addr:"987 Fake Street, Pittsburgh PA 12345", lat:10, lon:14, category:"books", notes:"" }
+		{ name:"Starbucks", addr:"456 Fake Street, Pittsburgh PA 12345", lat:40, lon:-81, category:"coffee", notes:"" },
+		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:40, lon:-82, category:"restaurant", notes:"Note note note" },
+		{ name:"Library", addr:"987 Fake Street, Pittsburgh PA 12345", lat:40, lon:-83, category:"books", notes:"" }
 	],
 	makeFakeSuggestions: function(str) { return [
-		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:11, lon:9, notes:"" },
-		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:12, lon:9, notes:"Note note note" },
-		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:13, lon:9, notes:"" }
+		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:41, lon:-79, notes:"" },
+		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:42, lon:-79, notes:"Note note note" },
+		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:43, lon:-79, notes:"" }
 	];}
 }
 
@@ -80,6 +87,14 @@ var EMPTYROUTE = {
 	useShortestTime: true,	//else use shortest distance
 	minutesAvailiable: undefined
 };
+var EMPTYFAVORITE = {
+	name:"",
+	addr:"",
+	lat:undefined,		//should NEVER be left undefined
+	lon:undefined,		//should NEVER be left undefined
+	category:"blank",
+	notes:""
+}
 
 
 function _simpleClone(obj) {
@@ -96,34 +111,55 @@ function _simpleClone(obj) {
 
 function _replaceSpecifiedMembers(base,extender) {
 	var o = _simpleClone(base);
-	for (property in base) {
+	for (var property in base) {
 		if (extender[property] != undefined)
 			o[property] = extender[property];
 	}
 	return o;
 };
 
-var publicStuff = {};
+var RouteTools = {};
 
-publicStuff.EMPTYRANGE = EMPTYRANGE;
+RouteTools.EMPTYRANGE = EMPTYRANGE;
+RouteTools.EMPTYFAVORITE = EMPTYFAVORITE;
 
-publicStuff.makeTask = function(data) {
+RouteTools.makeTask = function(data) {
 	return _replaceSpecifiedMembers(EMPTYTASK, data);
 };
 
-publicStuff.makeRoute = function(data) {
+RouteTools.makeRoute = function(data) {
 	return _replaceSpecifiedMembers(EMPTYROUTE, data);
 };
 
-publicStuff.rangeToString = function(range) {
+RouteTools.deleteTask = function(route, number) {
+	if (route.tasks.length==1)
+		route.tasks[0] = RouteTools.makeTask({});
+	else
+		route.tasks.splice(number,1);
+}
+RouteTools.addTask = function(route, tInfo) {
+	route.tasks.push(RouteTools.makeTask(tInfo));
+}
+
+RouteTools.moveTask = function(route, oldPos, newPos) {
+	if (newPos<0) newPos = 0;
+	if (newPos>route.tasks.length) newPos = route.tasks.length-1;
+	var task = route.tasks[oldPos];
+	var insertAt = newPos + (newPos>oldPos?1:0);
+	var removeAt = oldPos + (newPos<oldPos?1:0);
+	route.tasks.splice(insertAt,0,task);
+	route.tasks.splice(removeAt,1);
+}
+
+RouteTools.rangeToString = function(range) {
 	return "<"+range.start+","+range.end+">";
 };
 
-publicStuff.locToLatLon = function(loc) {
+RouteTools.locToLatLon = function(loc) {
 	return {lat: loc.lat, lon: loc.lon};
 }
 
-publicStuff.imgStringToPieces = function(url) {
+RouteTools.imgStringToPieces = function(url) {
 	//example url: "assets/textButton-normal-findRoute.png";
 	var index1 = url.lastIndexOf('/');
 	var index2 = url.lastIndexOf('.');
@@ -140,16 +176,16 @@ publicStuff.imgStringToPieces = function(url) {
 		suffix: suffix
 	};
 }
-publicStuff.piecesToImgString = function(pieces) {
+RouteTools.piecesToImgString = function(pieces) {
 	return (pieces.prefix+pieces.category+"-"+pieces.dispMode+"-"+pieces.name+pieces.suffix);
 }
-publicStuff.alterImgUrlPiece = function(url, piece, newVal) {
-	var pieces = publicStuff.imgStringToPieces(url);
+RouteTools.alterImgUrlPiece = function($img, piece, newVal) {
+	var pieces = RouteTools.imgStringToPieces($img.attr("src"));
 	pieces[piece] = newVal;
-	return publicStuff.piecesToImgString(pieces);
-}
+	$img.attr("src", RouteTools.piecesToImgString(pieces));
+}	
 
-publicStuff.ROUTESTARTINGATCMU = publicStuff.makeRoute({tasks:[publicStuff.makeTask({label:"CMU",loc:TestData.CMULoc})]});
+RouteTools.ROUTESTARTINGATCMU = RouteTools.makeRoute({tasks:[RouteTools.makeTask({label:"CMU",loc:TestData.CMULoc})]});
 
-return publicStuff;
+return RouteTools;
 })();

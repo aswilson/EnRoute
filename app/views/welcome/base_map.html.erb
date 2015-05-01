@@ -17,6 +17,9 @@
 </head>
 
 <body>
+
+	<!-- Hidden input to detect whether logged in -->
+	<input id="hidden-username" type="hidden" value="<%= logged_in? ? current_user.username : ""%>"/>
     
     <!-- Map -->
     <div id="map-canvas"></div>
@@ -33,66 +36,69 @@
 			<li role="presentation"><a href="#saveTab" aria-controls="saveTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-save.png", size:"41" %></a></li>
 			-->
             <li role="presentation"><a href="#settingsTab" aria-controls="settingsTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-settings.png", size:"41" %></a></li>
-            <li role="presentation" class="active"><a href="#routeTab" aria-controls="routeTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-route.png", size:"41" %></a></li>
+            <li role="presentation"><a href="#routeTab" aria-controls="routeTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-route.png", size:"41" %></a></li>
             <li role="presentation"><a href="#favoritesTab" aria-controls="favoritesTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-favorites.png", size:"41" %></a></li>
             <li role="presentation"><a href="#userTab" aria-controls="userTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-user.png", size:"41" %></a></li>
         </ul>
 
         <!-- Tab panes -->
-        <div class="tab-content">
+        <div id="tab-content" class="tab-content">
 
             <!-- Save tab -->
-            <div role="tabpanel" class="tab-pane active" id="saveTab">
+            <div role="tabpanel" class="tab-pane" id="saveTab">
                 <div class="options-table-container">
-                    <table width="100%">
-                        <tr class="thick-border-bottom" data-toggle="collapse" data-target="#savedRoutesCollapse" class="accordion-toggle">
-                            <td>
-                                <div class="row-text align-left">Saved Routes</div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="6" class="hiddenRow">
-                                <div class="collapse" id="savedRoutesCollapse">
-                                    <table width="100%">
-                                        <tr class="border-bottom">
-                                            <td>
-                                                <div class="row-text align-left">To-do</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="border-bottom">
-                                            <td>
-                                                <div class="row-text align-left">Sunday Errands</div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr class="thick-border-bottom" data-toggle="collapse" data-target="#pastRoutesCollapse" class="accordion-toggle">
-                            <td>
-                                <div class="row-text align-left">Past Routes</div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="6" class="hiddenRow">
-                                <div class="collapse" id="pastRoutesCollapse">
-                                    <table width="100%">
-                                        <tr class="border-bottom">
-                                            <td>
-                                                <div class="row-text align-left">FROM x TO y</div>
-                                            </td>
-                                        </tr>
-                                        <tr class="border-bottom">
-                                            <td>
-                                                <div class="row-text align-left">FROM a TO b</div>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                </div>
-                            </td>
-                        </tr>
-                    </table>
-                </div>
+					<table width="100%">
+						<tr class="thick-border-bottom" data-toggle="collapse" data-target="#savedRoutesCollapse" class="accordion-toggle">
+							<td>
+								<div class="row-text align-left">Saved Routes</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" class="hiddenRow">
+								<div class="collapse" id="savedRoutesCollapse">
+									<table width="100%">
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">To-do</div>
+											</td>
+										</tr>
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">Sunday Errands</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr class="thick-border-bottom" data-toggle="collapse" data-target="#pastRoutesCollapse" class="accordion-toggle">
+							<td>
+								<div class="row-text align-left">Past Routes</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" class="hiddenRow">
+								<div class="collapse" id="pastRoutesCollapse">
+									<table width="100%">
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">FROM x TO y</div>
+											</td>
+										</tr>
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">FROM a TO b</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
+				</div>
+				<% if not logged_in? %>
+					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
+				<% end %>
             </div>
 			<!-- END Save tab -->
 			
@@ -142,18 +148,17 @@
             <!-- Route tab -->
             <div role="tabpanel" class="tab-pane" id="routeTab">
                 <!-- Input -->
-                <div id="route-input" class="table-container">
+                <div id="route-input" class="task-table-container">
                     <table id="tasks-table">
-                        <tr id="taskPrototype" class="text-input">
-                            <td>
-								<a class="move-button"><%= image_tag "taskIcons-normal-move.png", size:"22" %></a>
-                                <a class="edit-button" data-toggle="modal" data-target="#taskModal"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
-                            </td>
-                            <td>
-                                <input type="text" class="task-label input-text form-control inline"/>
-								<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
-                            </td>
-                        </tr>
+                        <tr id="taskPrototype" class="text-input"><td>
+							<a class="move-button"><%= image_tag "taskIcons-normal-move.png", size:"22" %></a>
+							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
+							<input type="text" class="task-label input-text form-control inline"/>
+							<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
+							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="">
+								<%= image_tag "taskIcons-normal-alert.png", size:"22" %>
+							</a>
+						</td></tr>
                     </table>
                     <table class="footer-table" width="100%">
                         <tr>
@@ -249,75 +254,73 @@
             <!-- Favorites tab -->
             <div role="tabpanel" class="tab-pane" id="favoritesTab">
                 <div class="options-table-container">
-                    <table width="100%">
-                        <tr class="thick-border-bottom">
-                            <td>
-                                <div class="row-text align-left">Favorites</div>
-                            </td>
-                        </tr>
-                    </table>
-                    <form id="favorite-form"><table width="100%" id="favorites-table">
+					<table width="100%">
+						<tr class="thick-border-bottom">
+							<td>
+								<div class="row-text align-left">Favorites</div>
+							</td>
+						</tr>
+					</table>
+					<form id="favorite-form"><table width="100%" id="favorites-table">
 						<tr id="favoritePrototype" class="border-bottom">
-                            <td><input type="radio" name="favToAdd" value="0"></td>
-                            <td><%= image_tag "category-blue1-coffee.png", size:"42", :class => "categoryTypeIcon" %></td>
-                            <td><div class="favorite-label row-text align-left">Starbucks</div></td>
-                            <td width="25%"><a class="favorite-edit-button" data-toggle="modal" data-target="#favoritesModal">
+							<td><input type="radio" name="favToAdd" value="0"></td>
+							<td><%= image_tag "category-blue1-coffee.png", size:"42", :class => "categoryTypeIcon" %></td>
+							<td><div class="favorite-label row-text align-left">Starbucks</div></td>
+							<td width="25%"><a class="favorite-edit-button">
 								<div class="row-text align-right">Edit</div>
 							</a></td>
-                        </tr>
-                    </table></form>
-                    <table class="footer-table" width="100%">
-                        <tr>
-                            <td width="34%"></td>
-                            <td><%= image_tag "textButton-normal-createNew.png", size:"93x28" %></td>
-							<td><%= image_tag "textButton-normal-addToRoute.png", size:"93x28" %></td>
-                        </tr>
-                    </table>
-					<% if logged_in? %>
-					<% else %>
-					<div id="overlay"><div style="display: table-cell; vertical-align: middle;">Please Login<br>or Register</div></div>
-					<% end %>
+						</tr>
+					</table></form>
+					<table class="footer-table" width="100%">
+						<tr>
+							<td width="34%"></td>
+							<td><%= image_tag "textButton-normal-createNew.png", size:"93x28", :id => "create-new-fav-button" %></td>
+							<td><%= image_tag "textButton-normal-addToRoute.png", size:"93x28", :id => "add-fav-to-route-button" %></td>
+						</tr>
+					</table>
                 </div>
+				<% if not logged_in? %>
+					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
+				<% end %>
             </div>
 			<!-- END Favorites tab -->
 
             <!-- User tab -->
             <div role="tabpanel" class="tab-pane" id="userTab">
                 <div class="options-table-container">
-                    <table width="100%">
-                        <tr class="border-bottom">
-                            <td>
-                                <div class="row-text align-left">Username</div>
-                            </td>
-                            <td>
-                                <div class="row-text align-right">lcorry</div>
-                            </td>
-                        </tr>
-                        <tr class="thick-border-bottom">
-                            <td>
-                                <div class="row-text align-left">Password</div>
-                            </td>
-                            <td>
-                                <a href="/change-password"><div class="row-text align-right">*****</div></a>
-                            </td>
-                        </tr>
-                    </table>
-                    <table width="100%">
-                        <tr class="thick-border-bottom">
-                            <td><%= image_tag "category-blue1-home.png", size:"42" %></td>
-                            <td><div class="row-text align-left">Home</div></td>
-                            <td><div id="homeAddr" class="row-text align-right">5000 Forbes Ave.</div></td>
-                        </tr>
-                    </table>
-					<% if logged_in? %>
-					<% else %>
-					<div id="overlay"><div style="display: table-cell; vertical-align: middle;">Please Login<br>or Register</div></div>
-					<% end %>
+					<table width="100%">
+						<tr class="border-bottom">
+							<td>
+								<div class="row-text align-left">Username</div>
+							</td>
+							<td>
+								<div class="row-text align-right"><span id="username">lcorry</span></div>
+							</td>
+						</tr>
+						<tr class="thick-border-bottom">
+							<td>
+								<div class="row-text align-left">Password</div>
+							</td>
+							<td>
+								<div class="row-text align-right"><a href="/change-password">*****</a></div>
+							</td>
+						</tr>
+					</table>
+					<table width="100%">
+						<tr class="thick-border-bottom">
+							<td><%= image_tag "category-blue1-home.png", size:"42" %></td>
+							<td><div class="row-text align-left">Home</div></td>
+							<td><div class="row-text align-right"><span id="homeAddr">5000 Forbes Ave.</span></div></td>
+						</tr>
+					</table>
                 </div>
+				<% if not logged_in? %>
+					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
+				<% end %>
             </div>
 			<!-- END User tab -->
         </div>
-		<span id="message"></span>
+		<span class="statusMessage"></span>
     </div>
 
     <!-- Upper Right Toolbar: Help and Login Buttons -->
@@ -331,9 +334,7 @@
                <hr>
                <li><a href="/feedback">Feedback</a></li>
             </ul>
-            <a id="login-button" data-toggle="modal" data-target="#loginModal">
-            <%= image_tag "textButton-normal-signIn.png", size:"99x34" %>
-        </a>
+            <a id="login-button"><%= image_tag "textButton-normal-signIn.png", size:"99x34" %></a>
         </span>
     </div>
 	<!-- END Upper Right Toolbar: Help and Login Buttons -->
@@ -350,7 +351,7 @@
                     <span class="modal-title" id="loginModalLabel">Log in</span>
                 </div>
                 <div class="modal-body teal">
-                    <div class="table-container">
+                    <div class="login-table-container">
                         <table>
                             <!-- Input Username -->
                             <tr class="text-input">
@@ -459,10 +460,11 @@
                                 <td width="34%"></td>
                                 <td>
 									<%= image_tag "textButton-normal-save.png", size:"93x28", :id => "task-save-button" %>
-									<%= image_tag "textButton-normal-cancel.png", size:"93x28", :id => "task-back-button" %>
+									<%= image_tag "textButton-normal-cancel.png", size:"93x28", :id => "task-cancel-button" %>
                                 </td>
                             </tr>
                         </table>
+						<span class="statusMessage"></span>
                     </div>
                 </div>
             </div>
@@ -512,7 +514,7 @@
                                 <td colspan="2">
                                     <div class="row-text align-left">Category</div>
                                     <div id="favoritesModal_category_container" class="category-table-container">
-										<input id="favoritesModal_category" type='text' value="blank">
+										<input id="favoritesModal_category" type='text' value="blank" hidden="true">
                                         <table>
                                             <tr>
 												<td><a class="favorite-category-icon"><input type="text" value="blank" hidden="true"/><%= image_tag "category-blue2-blank.png", size:"39" %></td>
@@ -541,10 +543,11 @@
                                 <td width="34%"></td>
                                 <td>
 									<%= image_tag "textButton-normal-save.png", size:"93x28", :id => "favorite-save-button" %>
-									<%= image_tag "textButton-normal-cancel.png", size:"93x28", :id => "favorite-back-button" %>
+									<%= image_tag "textButton-normal-cancel.png", size:"93x28", :id => "favorite-cancel-button" %>
                                 </td>
                             </tr>
                         </table>
+						<span class="statusMessage"></span>
                     </div>
                 </div>
             </div>

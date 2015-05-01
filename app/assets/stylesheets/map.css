@@ -177,7 +177,15 @@ div.category-table-container td {
     width: 346px;
 }
 
-.table-container {
+.task-table-container {
+    height: 100%;
+    padding-top: 29px;
+    padding-left: 39px;
+    padding-right: 17px; /* was 39px - changed so I could add another icon to the right */
+    padding-bottom: 20px;
+}
+
+.login-table-container {
     height: 100%;
     padding-top: 29px;
     padding-left: 39px;
@@ -282,4 +290,14 @@ div.category-table-container td {
     background-color: #DAE5E5;
     opacity: 1.0;
     text-align: center;
+}
+
+span.statusMessage.error {
+	color: #ff0000;
+}
+span.statusMessage.warning {
+	color: #ffff00;
+}
+span.statusMessage.info {
+	color: #000000;
 }
