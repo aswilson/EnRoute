@@ -19,6 +19,7 @@
 <body>
 
 	<!-- Hidden input to detect whether logged in -->
+	<input id="hidden-userID" type="hidden" value="<%= logged_in? ? current_user.id : "-1"%>"/>
 	<input id="hidden-username" type="hidden" value="<%= logged_in? ? current_user.username : ""%>"/>
     
     <!-- Map -->

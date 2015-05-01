@@ -53,12 +53,16 @@
 
 var TestData = {
 	CMULoc: { name:"CMU", addr:"500 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
+	fakeUserId: 6,
 	fakeUserName: "Bob",
 	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40, lon:-80 },
 	fakeFavorites: [
-		{ name:"Starbucks", addr:"456 Fake Street, Pittsburgh PA 12345", lat:40, lon:-81, category:"coffee", notes:"" },
-		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:40, lon:-82, category:"restaurant", notes:"Note note note" },
-		{ name:"Library", addr:"987 Fake Street, Pittsburgh PA 12345", lat:40, lon:-83, category:"books", notes:"" }
+		{ id:1234, name:"Starbucks", label:"coffee", notes:"", business_id:null, user_id:6, latitude:40, longitude:-81,
+			street_1:"456 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
+		{ id:2345, name:"Chipotle", label:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-82,
+			street_1:"789 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
+		{ id:6789, name:"Library", label:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-83,
+			street_1:"987 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" }
 	],
 	makeFakeSuggestions: function(str) { return [
 		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:41, lon:-79, notes:"" },
@@ -88,12 +92,19 @@ var EMPTYROUTE = {
 	minutesAvailiable: undefined
 };
 var EMPTYFAVORITE = {
+	id:-1,
 	name:"",
-	addr:"",
-	lat:undefined,		//should NEVER be left undefined
-	lon:undefined,		//should NEVER be left undefined
-	category:"blank",
-	notes:""
+	street_1:"",
+	street_2:"",
+	city:"",
+	sttate:"",
+	zip_code:"",
+	latitude:undefined,		//should NEVER be left undefined
+	longitude:undefined,	//should NEVER be left undefined
+	label:"blank",
+	notes:"",
+	business_id: null,
+	user_id: null			//should NEVER be left null
 }
 
 
@@ -125,6 +136,10 @@ RouteTools.EMPTYFAVORITE = EMPTYFAVORITE;
 
 RouteTools.makeTask = function(data) {
 	return _replaceSpecifiedMembers(EMPTYTASK, data);
+};
+
+RouteTools.makeFavorite = function(data) {
+	return _replaceSpecifiedMembers(EMPTYFAVORITE, data);
 };
 
 RouteTools.makeRoute = function(data) {
@@ -184,6 +199,37 @@ RouteTools.alterImgUrlPiece = function($img, piece, newVal) {
 	pieces[piece] = newVal;
 	$img.attr("src", RouteTools.piecesToImgString(pieces));
 }	
+
+RouteTools.piecesToAddrString = function(pieces) {
+	return (pieces.street_1
+		+ (pieces.street_2!="" ? ", " : "")
+		+ pieces.street_2
+		+ ", " + pieces.city
+		+ ", " + pieces.state
+		+ " " + pieces.zip_code);
+}
+RouteTools.addrStringToPieces = function(addr) {
+	var addrPieces = addr.split(',');
+	var stateAndZip = addrPieces[addrPieces.length-1].split(' ');
+	var wellFormed = stateAndZip.length==2 && (addrPieces.length==4 || addrPieces.length==3);
+	if (wellFormed) {
+		return {
+			street_1: addrPieces[0].trim(),
+			street_2: (addrPieces.length==4 ? addrPieces[1].trim() : ""),
+			city: addrPieces[addrPieces.length-2].trim(),
+			state: stateAndZip[0].trim(),
+			zip_code: stateAndZip[1].trim()
+		};
+	} else {
+		return {
+			street_1: addr,
+			street_2: "",
+			city: "",
+			state: "",
+			zip_code: ""
+		};
+	}
+}
 
 RouteTools.ROUTESTARTINGATCMU = RouteTools.makeRoute({tasks:[RouteTools.makeTask({label:"CMU",loc:TestData.CMULoc})]});
 
