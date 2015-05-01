@@ -3,9 +3,9 @@ source 'https://rubygems.org'
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '4.0.13'
 
-# Use sqlite3 as the database for Active Record
-#gem 'pg'
-gem 'sqlite3'
+# pg here for heroic use, sqlite stated below for development and test
+gem 'pg', group: :production
+
 
 # Use SCSS for stylesheets
 gem 'sass-rails', '~> 4.0.2'
@@ -63,6 +63,7 @@ group :development, :test do
   gem 'better_errors'
   gem 'binding_of_caller'
   gem 'meta_request'
+gem 'sqlite3'
 end
 
 # Gems used only in testing
@@ -73,6 +74,7 @@ group :test do
   gem 'simplecov'
   gem 'turn'
   gem 'single_test'
+gem 'sqlite3'
 end
 
 # Use ActiveModel has_secure_password
