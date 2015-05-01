@@ -19,12 +19,7 @@
 <body>
 
 	<!-- Hidden input to detect whether logged in -->
-	<!-- This is where the "if logged_in" directive should be-->
-		<input id="hidden-username" type="hidden" value="Bob"/>
-	<% if logged_in? %>
-	<% else %><!--
-		<input id="hidden-username" type="hidden" value=""/>
-	--><% end %>
+	<input id="hidden-username" type="hidden" value="<%= logged_in? ? current_user.username : ""%>"/>
     
     <!-- Map -->
     <div id="map-canvas"></div>
@@ -52,59 +47,58 @@
             <!-- Save tab -->
             <div role="tabpanel" class="tab-pane" id="saveTab">
                 <div class="options-table-container">
-					<% if logged_in? %>
-						<table width="100%">
-							<tr class="thick-border-bottom" data-toggle="collapse" data-target="#savedRoutesCollapse" class="accordion-toggle">
-								<td>
-									<div class="row-text align-left">Saved Routes</div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="6" class="hiddenRow">
-									<div class="collapse" id="savedRoutesCollapse">
-										<table width="100%">
-											<tr class="border-bottom">
-												<td>
-													<div class="row-text align-left">To-do</div>
-												</td>
-											</tr>
-											<tr class="border-bottom">
-												<td>
-													<div class="row-text align-left">Sunday Errands</div>
-												</td>
-											</tr>
-										</table>
-									</div>
-								</td>
-							</tr>
-							<tr class="thick-border-bottom" data-toggle="collapse" data-target="#pastRoutesCollapse" class="accordion-toggle">
-								<td>
-									<div class="row-text align-left">Past Routes</div>
-								</td>
-							</tr>
-							<tr>
-								<td colspan="6" class="hiddenRow">
-									<div class="collapse" id="pastRoutesCollapse">
-										<table width="100%">
-											<tr class="border-bottom">
-												<td>
-													<div class="row-text align-left">FROM x TO y</div>
-												</td>
-											</tr>
-											<tr class="border-bottom">
-												<td>
-													<div class="row-text align-left">FROM a TO b</div>
-												</td>
-											</tr>
-										</table>
-									</div>
-								</td>
-							</tr>
-						</table>
-					<% else %>
-					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
-					<% end %>
+					<table width="100%">
+						<tr class="thick-border-bottom" data-toggle="collapse" data-target="#savedRoutesCollapse" class="accordion-toggle">
+							<td>
+								<div class="row-text align-left">Saved Routes</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" class="hiddenRow">
+								<div class="collapse" id="savedRoutesCollapse">
+									<table width="100%">
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">To-do</div>
+											</td>
+										</tr>
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">Sunday Errands</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+						<tr class="thick-border-bottom" data-toggle="collapse" data-target="#pastRoutesCollapse" class="accordion-toggle">
+							<td>
+								<div class="row-text align-left">Past Routes</div>
+							</td>
+						</tr>
+						<tr>
+							<td colspan="6" class="hiddenRow">
+								<div class="collapse" id="pastRoutesCollapse">
+									<table width="100%">
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">FROM x TO y</div>
+											</td>
+										</tr>
+										<tr class="border-bottom">
+											<td>
+												<div class="row-text align-left">FROM a TO b</div>
+											</td>
+										</tr>
+									</table>
+								</div>
+							</td>
+						</tr>
+					</table>
 				</div>
+				<% if not logged_in? %>
+					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
+				<% end %>
             </div>
 			<!-- END Save tab -->
 			
@@ -161,7 +155,7 @@
 							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
 							<input type="text" class="task-label input-text form-control inline"/>
 							<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
-							<a class="taskStatus" data-toggle="tooltip" data-placement="right" title="">
+							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="">
 								<%= image_tag "taskIcons-normal-alert.png", size:"22" %>
 							</a>
 						</td></tr>
@@ -260,73 +254,69 @@
             <!-- Favorites tab -->
             <div role="tabpanel" class="tab-pane" id="favoritesTab">
                 <div class="options-table-container">
-					<!-- This is where the "if logged_in" directive should be-->
-                    	<table width="100%">
-							<tr class="thick-border-bottom">
-								<td>
-									<div class="row-text align-left">Favorites</div>
-								</td>
-							</tr>
-						</table>
-						<form id="favorite-form"><table width="100%" id="favorites-table">
-							<tr id="favoritePrototype" class="border-bottom">
-								<td><input type="radio" name="favToAdd" value="0"></td>
-								<td><%= image_tag "category-blue1-coffee.png", size:"42", :class => "categoryTypeIcon" %></td>
-								<td><div class="favorite-label row-text align-left">Starbucks</div></td>
-								<td width="25%"><a class="favorite-edit-button">
-									<div class="row-text align-right">Edit</div>
-								</a></td>
-							</tr>
-						</table></form>
-						<table class="footer-table" width="100%">
-							<tr>
-								<td width="34%"></td>
-								<td><%= image_tag "textButton-normal-createNew.png", size:"93x28", :id => "create-new-fav-button" %></td>
-								<td><%= image_tag "textButton-normal-addToRoute.png", size:"93x28", :id => "add-fav-to-route-button" %></td>
-							</tr>
-						</table>
-					<% if logged_in? %>
-					<% else %><!--
-						<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
-					--><% end %>
+					<table width="100%">
+						<tr class="thick-border-bottom">
+							<td>
+								<div class="row-text align-left">Favorites</div>
+							</td>
+						</tr>
+					</table>
+					<form id="favorite-form"><table width="100%" id="favorites-table">
+						<tr id="favoritePrototype" class="border-bottom">
+							<td><input type="radio" name="favToAdd" value="0"></td>
+							<td><%= image_tag "category-blue1-coffee.png", size:"42", :class => "categoryTypeIcon" %></td>
+							<td><div class="favorite-label row-text align-left">Starbucks</div></td>
+							<td width="25%"><a class="favorite-edit-button">
+								<div class="row-text align-right">Edit</div>
+							</a></td>
+						</tr>
+					</table></form>
+					<table class="footer-table" width="100%">
+						<tr>
+							<td width="34%"></td>
+							<td><%= image_tag "textButton-normal-createNew.png", size:"93x28", :id => "create-new-fav-button" %></td>
+							<td><%= image_tag "textButton-normal-addToRoute.png", size:"93x28", :id => "add-fav-to-route-button" %></td>
+						</tr>
+					</table>
                 </div>
+				<% if not logged_in? %>
+					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
+				<% end %>
             </div>
 			<!-- END Favorites tab -->
 
             <!-- User tab -->
             <div role="tabpanel" class="tab-pane" id="userTab">
                 <div class="options-table-container">
-					<!-- This is where the "if logged_in" directive should be-->
-						<table width="100%">
-							<tr class="border-bottom">
-								<td>
-									<div class="row-text align-left">Username</div>
-								</td>
-								<td>
-									<div class="row-text align-right"><span id="username">lcorry</span></div>
-								</td>
-							</tr>
-							<tr class="thick-border-bottom">
-								<td>
-									<div class="row-text align-left">Password</div>
-								</td>
-								<td>
-									<div class="row-text align-right"><a href="/change-password">*****</a></div>
-								</td>
-							</tr>
-						</table>
-						<table width="100%">
-							<tr class="thick-border-bottom">
-								<td><%= image_tag "category-blue1-home.png", size:"42" %></td>
-								<td><div class="row-text align-left">Home</div></td>
-								<td><div class="row-text align-right"><span id="homeAddr">5000 Forbes Ave.</span></div></td>
-							</tr>
-						</table>
-					<% if logged_in? %>
-					<% else %><!--
-						<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
-					--><% end %>
+					<table width="100%">
+						<tr class="border-bottom">
+							<td>
+								<div class="row-text align-left">Username</div>
+							</td>
+							<td>
+								<div class="row-text align-right"><span id="username">lcorry</span></div>
+							</td>
+						</tr>
+						<tr class="thick-border-bottom">
+							<td>
+								<div class="row-text align-left">Password</div>
+							</td>
+							<td>
+								<div class="row-text align-right"><a href="/change-password">*****</a></div>
+							</td>
+						</tr>
+					</table>
+					<table width="100%">
+						<tr class="thick-border-bottom">
+							<td><%= image_tag "category-blue1-home.png", size:"42" %></td>
+							<td><div class="row-text align-left">Home</div></td>
+							<td><div class="row-text align-right"><span id="homeAddr">5000 Forbes Ave.</span></div></td>
+						</tr>
+					</table>
                 </div>
+				<% if not logged_in? %>
+					<div class="overlay"><div style="display: table-cell; vertical-align: middle;"><br/>Please Login or Register<br/>to use this feature<br/><br/></div></div>
+				<% end %>
             </div>
 			<!-- END User tab -->
         </div>

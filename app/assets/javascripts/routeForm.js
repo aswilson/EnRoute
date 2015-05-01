@@ -1,4 +1,5 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
+var FAKEIT = false;	//if FAKEIT==true, fake talking to backend (lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 
@@ -9,36 +10,34 @@ var taskNoBeingEdited = undefined;		//when saving changes, indicates which task 
 var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which favorite gets the changes
 var mapReady = false;					//used to indicate whether it is safe to call the MapControls functions
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam "find route"
-var currentSuggestionNum = 0;			//tracks calls to grabSuggestions() so we ignore old responses
 var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],...}, where loc has the format given by RouteTools.EMPTYTASK.loc
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
-	--reading and updating of tasks, favorites
-		--fav.lat and fav.lon not ready, yet
-	--getting user info: username, homeAddr, favorites
-		--also involves altering or removing: updateHome, asyncSetToHome, $('span#username'), $('span#homeAddr'), & etc
-		--add saving capability wherever things may change (esp favorites)
-	--getting location choices from the backend (includes setting task.error as needed)
+	--get a successfull getFavorites() test not using FAKEIT
+	--add the ability to alter a favorite, which includes looking up lat/lon and talking to the server
+	--getting location choices from the backend
+		--decide between fixed points and unknowns
+		--set task.error as needed
 	--get pins to display on map properly: involves altering or removing updateMap()
 	--Make fillInRoute() !!!
+	--everything in page two of the routes tab...
 	--the popup for details that appears near pins on the map...
 	--let the user change the chosen location...
 		--will involve altering or removing: updateLocChoicesArea, handleTaskLabelChange, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
 	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
-	--everything in page two of the routes tab...
-	--When all set, move the "<% if logged_in? %>" stuff to the appropriate spot and uncomment the "else" part
-	--Make the images all transparent again
-
+	--timepicker for the times ("chronic" gem recommended)
 	--kill login popup: take user to a new page instead
 	--confirm working of password change (or, better, disable it, since they'd need to go to a new page, anyhow)
-	--timepicker for the times ("chronic" gem recommended)
+	--have option on the front page to NOT log in, but rather go straight to the map
+	--add pages: /about, /privacy, /feedback (or just remove the links to them)
+	
+	--Make the images all transparent again
+	--get rid of the ugly black in the background when you mouse-over an <a> tag
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
-
 	--make favorites scrollable if it gets too long
-	--make the pins numbered
-	--add task number to the front of the task's label
+	--cap the number of steps in the route
 */
 
 
@@ -54,11 +53,11 @@ function getFavoriteNumber(o) {
 	return parseInt(numAsString,10);
 }
 function doAjax(ty,action,dat,onSuccess,onFail) {
-	$.ajax({ type: ty, url: "/"+action, data: dat
+	$.ajax({ type: ty, url: action, data: dat
 	}).done( function(reply) {
 		onSuccess(reply)
 	}).fail( function( xmlHttpRequest, statusText, errorThrown ) {
-		alert("Ajax failed.\n\n"
+		console.log("Ajax failed.\n\n"
 			+ "XML Http Request: " + JSON.stringify( xmlHttpRequest )
 			+ ",\nStatus Text: " + statusText
 			+ ",\nError Thrown: " + errorThrown );
@@ -107,45 +106,6 @@ function myStringToInt(s) {
 function showMsgMomentarily(msg,type,time) {
 	showMsg(msg,type);
 	setTimeout(function(){showMsg("","info")}, time);
-}
-
-
-/* Stuff for route manipulation */
-function deleteTask(number) {
-	if (myRoute.tasks.length==1)
-		myRoute.tasks[0] = RouteTools.makeTask({});
-	else
-		myRoute.tasks.splice(number,1);
-	updateRouteForm();
-	updateMap();
-}
-function addTask(tInfo) {
-	myRoute.tasks.push(RouteTools.makeTask(tInfo));
-	updateRouteForm();
-	updateMap();
-}
-function moveTask(oldPos, newPos) {
-	if (newPos<0) newPos = 0;
-	if (newPos>myRoute.tasks.length) newPos = myRoute.tasks.length-1;
-	var task = myRoute.tasks[oldPos];
-	var insertAt = newPos + (newPos>oldPos?1:0);
-	var removeAt = oldPos + (newPos<oldPos?1:0);
-	myRoute.tasks.splice(insertAt,0,task);
-	myRoute.tasks.splice(removeAt,1);
-	updateRouteForm();
-	updateMap();
-}
-function updateHome(newHomeLoc) {
-	myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
-	$('span#homeAddr').empty().append(myUserInfo.homeLoc.addr);
-	for (var i=0; i<myRoute.tasks.length; i++) {
-		var t = myRoute.tasks[i].label;
-		if (t==="Home"||t==="HOME"||t==="home")
-			myRoute.tasks[i].loc = myUserInfo.homeLoc;
-	}
-	if ($('div#popup-task-editor').visible && taskNoBeingEdited!=undefined)
-		updateTaskEditWindow(myRoute.tasks[taskNoBeingEdited]);	//we refresh it
-	updateMap();
 }
 
 
@@ -344,9 +304,73 @@ function getTimerange(baseId) {
 }
 
 
-
-/* AJAX stuff */
+/* Server communication stuff */
+function getUsername() {
+	//we actually don't talk to the server at all: we use a hidden field
+	var onSuccess = function(newUsername) {
+		myUserInfo.name = newUsername;
+		$('span#username').empty().append(myUserInfo.name);
+	}
+	if (!FAKEIT)
+		onSuccess($("#hidden-username").val());
+	else
+		onSuccess(TestData.fakeUserName);
+}
+function getHomeLoc() {
+	showMsg("Getting home address from server...","info");
+	$('span#homeAddr').empty().append("(getting from server...)");
+	var onSuccess = function(newHomeLoc) {
+		myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
+		$('span#homeAddr').empty().append(myUserInfo.homeLoc.addr);
+		for (var i=0; i<myRoute.tasks.length; i++) {
+			var t = myRoute.tasks[i];
+			if (t.label==="Home"||t.label==="HOME"||t.label==="home") {
+				t.label = "Home";
+				t.loc = myUserInfo.homeLoc;
+				t.error = undefined;
+				if (taskNoBeingEdited==i)	//we refresh it
+					updateTaskEditWindow(t);
+			}
+		}
+		updateMap();
+		showMsgMomentarily("Successfully obtained home address from server","info",1500);
+	}
+	var onFailure = function(err) {
+		console.log("Failed to get home address from server: "+err);
+		$('span#homeAddr').empty().append("???");
+		showMsgMomentarily("Failed to get home address from server.","warning",3000);
+	}
+	if (!FAKEIT)
+		doAjax("GET","/welcome/findHome.json",{},onSuccess,onFailure);
+	else
+		setTimeout(function(){onSuccess(TestData.fakeHomeLoc);}, 1000);	//pretend we're doing ajax here
+}
+function getFavorites() {
+	showMsg("Getting favorites from server...","info");
+	var onSuccess = function(newFavorites) {
+		var currentlyEditing = (favoriteNoBeingEdited!=undefined);
+		var currentlyEditingNewOne = currentlyEditing && (favoriteNoBeingEdited>=myUserInfo.favorites.length);
+		myUserInfo.favorites = newFavorites;
+		updateFavoritesList();
+		if (currentlyEditingNewOne) {
+			favoriteNoBeingEdited = myUserInfo.favorites.length;
+		} else if (currentlyEditing) {
+			favoriteNoBeingEdited = undefined;
+			$("#favoritesModal").modal('hide');
+		}
+		showMsgMomentarily("Successfully obtained favorites from server","info",1500);
+	}
+	var onFailure = function(err) {
+		console.log("Failed to get favorites from server: "+err);
+		showMsgMomentarily("Failed to get favorites from server.","warning",3000);
+	}
+	if (!FAKEIT)
+		doAjax("GET","/favorites.json",{},onSuccess,onFailure);
+	else
+		setTimeout(function(){onSuccess(TestData.fakeFavorites);}, 3000);	//pretend we're doing ajax here
+}
 function getOptionsFromServer() {
+alert("getOptionsFromServer() isn't ready!");
 	if (busy) return;
 	busy = true;
 	showMsg("waiting on server...","info");
@@ -376,20 +400,14 @@ function getOptionsFromServer() {
 		busy = false;
 	}
 	var onFailure = function(err) {
-		showMsgMomentarily("Failed","error",2000);
+		console.log("Failed to get locations from server: "+err);
+		showMsgMomentarily("Failed to get locations from server","error",3000);
 		busy = false;
 	}
-	setTimeout(function(){onFailure("NotImplemented");}, 3000);	//pretend we're doing ajax here
-	//doAjax("GET","welcome/getAllNearby.json",requestBody,onSuccess,onFailure);
-}
-function asyncSetToHome() {
-	if (myUserInfo.homeLoc!=undefined) {
-		myRoute.tasks[taskNo].loc = myUserInfo.homeLoc;
-	} else {
-		var onFailure = function(err) { }
-		setTimeout(function(){updateHome(TestData.fakeHomeLoc);}, 2000);	//pretend we're doing ajax here
-		//doAjax("GET","welcome/findHome.json",{},updateHome,onFailure);
-	}
+	if (!FAKEIT)
+		doAjax("GET","/welcome/getAllNearby.json",requestBody,onSuccess,onFailure);
+	else
+		setTimeout(function(){onFailure("NotImplemented");}, 3000);	//pretend we're doing ajax here
 }
 
 
@@ -416,7 +434,7 @@ var handleTaskLabelChange = function(taskNo, newText) {
 	myRoute.tasks[taskNo].label = newText;
 	myRoute.tasks[taskNo].loc = undefined;
 	if (newText==="Home"||newText==="HOME"||newText==="home")
-		asyncSetToHome(taskNo);
+		myRoute.tasks[taskNo].loc = myUserInfo.homeLoc;
 }
 
 
@@ -442,11 +460,6 @@ function fillInRoute(route, locChoices) {
 	updateMap();
 });*/
 $(document).ready(function() {
-	/* Start getting user info */
-	myUserInfo.name = $("#hidden-username").val();
-	myUserInfo.homeLoc = TestData.fakeHomeLoc;
-	myUserInfo.favorites = TestData.fakeFavorites;
-	
 	/* Tab-changing listeners and general listeners */
 	$("a[data-toggle='tab']").on("shown.bs.tab", function(e) {
 		var newTargetImg = $(e.target).children().first();
@@ -493,7 +506,9 @@ $(document).ready(function() {
 				return;
 			var oldTaskNo = getTaskNumber(elem);
 			var newPos = oldTaskNo + numSpacesMoved;
-			moveTask(oldTaskNo, newPos);
+			RouteTools.moveTask(myRoute, oldTaskNo, newPos);
+			updateRouteForm();
+			updateMap();
 		}
 	}
 	setDraggable($("a.move-button"), draggingFns);
@@ -510,12 +525,19 @@ $(document).ready(function() {
 		var taskNo = getTaskNumber($(this));
 		var label = myRoute.tasks[taskNo].label;
 		if (label==="") label = "empty";
-		if (confirm("Are you sure you want to delete task #"+(taskNo+1)+" ("+label+")?"))
-			deleteTask(taskNo);
+		if (confirm("Are you sure you want to delete task #"+(taskNo+1)+" ("+label+")?")) {
+			RouteTools.deleteTask(myRoute, taskNo);
+			updateRouteForm();
+			updateMap();
+		}
 	});
-	$("#add-stop-button").click(function(){addTask({});});
+	$("#add-stop-button").click(function(){
+		RouteTools.addTask(myRoute, {});
+		updateRouteForm();
+		updateMap();
+	});
 	$("#route-find-button").click(function() {
-//		getOptionsFromServer();
+		getOptionsFromServer();
 		$("#route-input").hide();
 		$("#route-output").show();
 		updateBackgroundSizes();
@@ -527,34 +549,34 @@ $(document).ready(function() {
 	});
 
 	/* Favorites tab listeners */
-	if (myUserInfo.name != "") {
-		$('#favorites-table tr').click(function() {
-			$(this).find("input:radio[name=favToAdd]").prop('checked', true).change();
-		});
-		$('a.favorite-edit-button').click(function(){
-			var fNum = getFavoriteNumber($(this));
-			favoriteNoBeingEdited = fNum;
-			updateFavoriteEditWindow(myUserInfo.favorites[fNum]);
-			$('#favoritesModal').modal('show');
-		});
-		$('#create-new-fav-button').click(function(){
-			favoriteNoBeingEdited = myUserInfo.favorites.length;
-			updateFavoriteEditWindow(RouteTools.EMPTYFAVORITE);
-			$("#favoritesModal").modal('show');
-		});
-		$('#add-fav-to-route-button').click(function(){
-			var checkedVal = $("input[name='favToAdd']:checked").val();
-			if (checkedVal == undefined)
-				return;
-			var fav = myUserInfo.favorites[myStringToInt(checkedVal)];
-			var taskInfo = {
-				label: fav.name,
-				loc: {name:fav.name, addr:fav.addr, lat:fav.lat, lon:fav.lon}
-			};
-			addTask(taskInfo);
-			showMsgMomentarily("added \""+fav.name+"\" to end of route","info",2000);
-		});
-	}
+	$('#favorites-table tr').click(function() {
+		$(this).find("input:radio[name=favToAdd]").prop('checked', true).change();
+	});
+	$('a.favorite-edit-button').click(function(){
+		var fNum = getFavoriteNumber($(this));
+		favoriteNoBeingEdited = fNum;
+		updateFavoriteEditWindow(myUserInfo.favorites[fNum]);
+		$('#favoritesModal').modal('show');
+	});
+	$('#create-new-fav-button').click(function(){
+		favoriteNoBeingEdited = myUserInfo.favorites.length;
+		updateFavoriteEditWindow(RouteTools.EMPTYFAVORITE);
+		$("#favoritesModal").modal('show');
+	});
+	$('#add-fav-to-route-button').click(function(){
+		var checkedVal = $("input[name='favToAdd']:checked").val();
+		if (checkedVal == undefined)
+			return;
+		var fav = myUserInfo.favorites[myStringToInt(checkedVal)];
+		var taskInfo = {
+			label: fav.name,
+			loc: {name:fav.name, addr:fav.addr, lat:fav.lat, lon:fav.lon}
+		};
+		RouteTools.addTask(myRoute, taskInfo);
+		updateRouteForm();
+		updateMap();
+		showMsgMomentarily("added \""+fav.name+"\" to end of route","info",2000);
+	});
 	
 	/* Task-editing Modal listeners */
 	function makeEditableTimerange(baseId) {
@@ -589,24 +611,22 @@ $(document).ready(function() {
 	});
 	
 	/* Favorite-editing Modal listeners */ 
-	if (myUserInfo.name != "") {
-		$('.favorite-category-icon').click(function() {
-			var newCat = $(this).find('input').val();
-			$('input#favoritesModal_category').val(newCat);
-			setCategorySelectedDisp($('div#favoritesModal_category_container'), newCat);
-		});
-		$('#favorite-save-button').click(function() {
-			if (favoriteNoBeingEdited!=undefined) {
-				myUserInfo.favorites[favoriteNoBeingEdited] = readFavoriteFromEditWindow();
-				updateFavoritesList();
-			}
-			favoriteNoBeingEdited = undefined;
-			$("#favoritesModal").modal('hide');
-		});
-		$('#favorite-cancel-button').click(function() {
-			$("#favoritesModal").modal('hide');
-		});
-	}
+	$('.favorite-category-icon').click(function() {
+		var newCat = $(this).find('input').val();
+		$('input#favoritesModal_category').val(newCat);
+		setCategorySelectedDisp($('div#favoritesModal_category_container'), newCat);
+	});
+	$('#favorite-save-button').click(function() {
+		if (favoriteNoBeingEdited!=undefined) {
+			myUserInfo.favorites[favoriteNoBeingEdited] = readFavoriteFromEditWindow();
+			updateFavoritesList();
+		}
+		favoriteNoBeingEdited = undefined;
+		$("#favoritesModal").modal('hide');
+	});
+	$('#favorite-cancel-button').click(function() {
+		$("#favoritesModal").modal('hide');
+	});
 	
 	/* Set up relationship between .actually-text-field and .not-actually-text-field */
 	$('.actually-text-field').click(function() {
@@ -628,19 +648,36 @@ $(document).ready(function() {
 	
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
-	if (myUserInfo.name != "")
-		favoritePrototype = $('tr#favoritePrototype').clone(true);
+	favoritePrototype = $('tr#favoritePrototype').clone(true);
 
-	/* make HTML match the data */
-	if (myUserInfo.name != "") {
-		$('span#username').empty().append(myUserInfo.name);
-		$('span#homeAddr').empty().append(myUserInfo.homeLoc.addr);
-		updateFavoritesList();
-	}
+	/* Make HTML match the data */
+	var addr = (myUserInfo.homeLoc!=undefined) ? myUserInfo.homeLoc.addr : "???";
+	$('span#homeAddr').empty().append(addr);
+	updateFavoritesList();
 	updateRouteForm();
 	updateMap();
 //	updateLocChoicesArea([]);
 	$("a[href=#routeTab]").tab('show');
+	
+	/* Start getting user info */
+	getUsername();
+	var isLoggedIn = (myUserInfo.name != "");
+	if (myUserInfo.name != "") {
+		$("div.overlay").hide();		//needed so we can see stuff when FAKEIT==true
+		getHomeLoc();
+		getFavorites();
+	} else {
+		$("#saveTab div.options-table-container").hide();
+		$("#favoritesTab div.options-table-container").hide();
+		$("#userTab div.options-table-container").hide();
+	}
 });
 
 })("enroute-dhcs.herokuapp.com", RouteTools.ROUTESTARTINGATCMU);	//end IIAF
+
+/* What was the point in this?  I just removed it, for now
+	$('#favorite-form input').on('change', function() {
+		 $('input[name=favToAdd]', '#favorite-form').parent().parent().find("#favorites-edit-button").hide();
+		 $('input[name=favToAdd]:checked', '#favorite-form').parent().parent().find("#time-options-button").show();
+	  });
+*/

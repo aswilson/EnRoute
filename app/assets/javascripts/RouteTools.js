@@ -52,18 +52,18 @@
 
 
 var TestData = {
-	CMULoc: { name:"CMU", addr:"500 Rorbes Avenue, Pittsburgh, PA 15213", lat:3, lon:4 },
+	CMULoc: { name:"CMU", addr:"500 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
 	fakeUserName: "Bob",
-	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:10, lon:11 },
+	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40, lon:-80 },
 	fakeFavorites: [
-		{ name:"Starbucks", addr:"456 Fake Street, Pittsburgh PA 12345", lat:10, lon:12, category:"coffee", notes:"" },
-		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:10, lon:13, category:"restaurant", notes:"Note note note" },
-		{ name:"Library", addr:"987 Fake Street, Pittsburgh PA 12345", lat:10, lon:14, category:"books", notes:"" }
+		{ name:"Starbucks", addr:"456 Fake Street, Pittsburgh PA 12345", lat:40, lon:-81, category:"coffee", notes:"" },
+		{ name:"Chipotle", addr:"789 Fake Street, Pittsburgh PA 12345", lat:40, lon:-82, category:"restaurant", notes:"Note note note" },
+		{ name:"Library", addr:"987 Fake Street, Pittsburgh PA 12345", lat:40, lon:-83, category:"books", notes:"" }
 	],
 	makeFakeSuggestions: function(str) { return [
-		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:11, lon:9, notes:"" },
-		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:12, lon:9, notes:"Note note note" },
-		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:13, lon:9, notes:"" }
+		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:41, lon:-79, notes:"" },
+		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:42, lon:-79, notes:"Note note note" },
+		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:43, lon:-79, notes:"" }
 	];}
 }
 
@@ -130,6 +130,26 @@ RouteTools.makeTask = function(data) {
 RouteTools.makeRoute = function(data) {
 	return _replaceSpecifiedMembers(EMPTYROUTE, data);
 };
+
+RouteTools.deleteTask = function(route, number) {
+	if (route.tasks.length==1)
+		route.tasks[0] = RouteTools.makeTask({});
+	else
+		route.tasks.splice(number,1);
+}
+RouteTools.addTask = function(route, tInfo) {
+	route.tasks.push(RouteTools.makeTask(tInfo));
+}
+
+RouteTools.moveTask = function(route, oldPos, newPos) {
+	if (newPos<0) newPos = 0;
+	if (newPos>route.tasks.length) newPos = route.tasks.length-1;
+	var task = route.tasks[oldPos];
+	var insertAt = newPos + (newPos>oldPos?1:0);
+	var removeAt = oldPos + (newPos<oldPos?1:0);
+	route.tasks.splice(insertAt,0,task);
+	route.tasks.splice(removeAt,1);
+}
 
 RouteTools.rangeToString = function(range) {
 	return "<"+range.start+","+range.end+">";
