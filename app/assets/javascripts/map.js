@@ -8,6 +8,7 @@ var geocoder= new google.maps.Geocoder();
 var directionsService = new google.maps.DirectionsService();
 var MapControls = {}; //"object" holding everything public
 
+// non-public helper functions
 function map_recenter(latlng,offsetx,offsety) {
     var point1 = map.getProjection().fromLatLngToPoint(
         (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
@@ -21,25 +22,6 @@ function map_recenter(latlng,offsetx,offsety) {
         point1.y + point2.y
     )));
 }
-
-function addrToLatLon(addr) {
-	//NOTE: this function is currently broken (it is asynchroneous but treated as synchroneous)
-	var callback = function(results, status) {
-		if (status == google.maps.GeocoderStatus.OK) {
-			return results[0].geometry.location;
-			/*map.setCenter(results[0].geometry.location);
-			var marker = new google.maps.Marker({
-			    map: map,
-			    position: results[0].geometry.location
-			});*/
-		} else {
-			alert("Geocode was not successful for the following reason: " + status);
-		}
-	}
-	alert("Here goes:");
-	geocoder.geocode({'address': addr}, callback);
-}
-
 function getPin(pinId) {
   for (var i = 0; i < markers.length; i++) {
       if (marker[i].position.toString().equals(pinId)) {
@@ -80,17 +62,17 @@ MapControls.initialize = function(mapDivId) {
 
 // Takes an address (ex: 1600 Amphitheatre Parkway, Mountain View, CA)
 // Returns geolat (ex: {lat: 123, lon: 123})
-MapControls.getLatLon = function(addr) {
-	var loc = addrToLatLon(addr);
-	return {lat: loc.lat(), lon: loc.lng()};
-};
-
-// Uses pythagorean trm to get distance between two addresses
-// Address needs to look like : 1600 Amphitheatre Parkway, Mountain View, CA
-MapControls.getDistBetween = function(addr1, addr2) {
-  var loc1 = addrToLatLon(addr1);
-  var loc2 = addrToLatLon(addr2);
-  return Math.sqrt(Math.pow(loc1.lat - loc2.lat, 2) + Math.pow(loc1.lng - loc2.lng, 2));
+MapControls.getLatLon = function(addr, callback) {
+	console.log("Beginning geocode of address " + addr);
+	geocoder.geocode({'address': addr}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var loc = results[0].geometry.location;
+			callback({lat:loc.lat(), lon:loc.lng()});
+		} else {
+			console.log("Geocode was not successful for the following reason: " + status);
+			callback(undefined);
+		}
+	});
 };
 
 // Deletes all markers and lines on the map
