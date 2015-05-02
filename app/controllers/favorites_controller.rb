@@ -45,7 +45,7 @@ class FavoritesController < ApplicationController
     respond_to do |format|
       if @favorite.update(favorite_params)
         format.html { redirect_to @favorite, notice: 'Favorite was successfully updated.' }
-        format.json { head :no_content }
+        format.json { render action: 'show', status: :created, location: @favorite }
       else
         format.html { render action: 'edit' }
         format.json { render json: @favorite.errors, status: :unprocessable_entity }

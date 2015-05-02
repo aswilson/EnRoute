@@ -1,21 +1,23 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = false;	//if FAKEIT==true, fake talking to backend (lets us pretend we're logged in)
+var FAKEIT = true;	//if FAKEIT==true, fake talking to backend (lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 
-var myUserInfo = { name:"", homeLoc:undefined, favorites:[] };
+var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
 var mySettings = {distInMiles: true};
 var taskNoBeingEdited = undefined;		//when saving changes, indicates which task gets the changes
 var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which favorite gets the changes
+var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var mapReady = false;					//used to indicate whether it is safe to call the MapControls functions
-var busy = false;						//indicates we're busy talking to the server, so the user can't spam "find route"
 var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],...}, where loc has the format given by RouteTools.EMPTYTASK.loc
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
-	--get a successfull getFavorites() test not using FAKEIT
-	--add the ability to alter a favorite, which includes looking up lat/lon and talking to the server
+	--Allie
+		--assert that your user_id matches, or better yet add it automatically
+		--relax the requirements that the business and name not already exist: right now you can't edit it without changing that field
+		--I propose renaming favorite.label to favorite.category, since label is used elsewhere
 	--getting location choices from the backend
 		--decide between fixed points and unknowns
 		--set task.error as needed
@@ -27,11 +29,12 @@ var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn 
 		--will involve altering or removing: updateLocChoicesArea, handleTaskLabelChange, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
 	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
 	--timepicker for the times ("chronic" gem recommended)
+	--better parsing/unparsing of addresses in the favoritesModal
 	--kill login popup: take user to a new page instead
 	--confirm working of password change (or, better, disable it, since they'd need to go to a new page, anyhow)
+	
 	--have option on the front page to NOT log in, but rather go straight to the map
 	--add pages: /about, /privacy, /feedback (or just remove the links to them)
-	
 	--Make the images all transparent again
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
@@ -147,7 +150,7 @@ function updateFavoritesList() {
 		var favRow = favoritePrototype.clone(true).attr("id","favorite"+i).show();
 		favRow.find("input:radio[name=favToAdd]").val(""+i);
 		favRow.find('.favorite-label').empty().append(myUserInfo.favorites[i].name);
-		RouteTools.alterImgUrlPiece(favRow.find('.categoryTypeIcon'), "name", myUserInfo.favorites[i].category);
+		RouteTools.alterImgUrlPiece(favRow.find('.categoryTypeIcon'), "name", myUserInfo.favorites[i].label.toLowerCase());
 		favoritesTable.append(favRow);
 	}
 	updateBackgroundSizes();
@@ -163,14 +166,15 @@ function updateFavoriteEditWindow(fav) {
 	function strOrDashes(s) {
 		return (s==="" ? "-----" : s);
 	}
+	var addr = RouteTools.piecesToAddrString(fav);
 	$('input#favoritesModal_name').val(fav.name);
 	$('input#favoritesModal_name').prev().empty().append(strOrDashes(fav.name));
-	$('input#favoritesModal_addr').val(fav.addr);
-	$('input#favoritesModal_addr').prev().empty().append(strOrDashes(fav.addr));
+	$('input#favoritesModal_addr').val(addr);
+	$('input#favoritesModal_addr').prev().empty().append(strOrDashes(addr));
 	$('input#favoritesModal_notes').val(fav.notes);
 	$('input#favoritesModal_notes').prev().empty().append(strOrDashes(fav.notes));
-	$('input#favoritesModal_category').val(fav.category);
-	setCategorySelectedDisp($('div#favoritesModal_category_container'), fav.category);
+	$('input#favoritesModal_category').val(fav.label.toLowerCase());
+	setCategorySelectedDisp($('div#favoritesModal_category_container'), fav.label.toLowerCase());
 }
 function updateLocChoicesArea(locSuggestions) {
 	//update message display
@@ -274,19 +278,31 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 /* Stuff for reading from the displays */
 function readTaskFromEditWindow(baseTask) {
 	//baseTask needed since the form does not contain all fields
-	var task = RouteTools.makeTask(baseTask);
+	var fav = RouteTools.makeTask(baseTask);
 	task.flexibleOrdering = $('input#taskModal_flexibleOrdering').prop('checked');
 	task.minutesNeeded = myStringToInt($('input#taskModal_minutesNeeded').val());
 	task.whenToArrive = getTimerange("taskModal_arrive");
 	task.whenToLeave = getTimerange("taskModal_leave");
 	return task;
 }
-function readFavoriteFromEditWindow() {
-	var fav = {};
+function readFavoriteFromEditWindow(baseFav) {
+	//baseFav needed since the form does not contain all fields
+	var fav = RouteTools.makeFavorite(baseFav);
 	fav.name = $('input#favoritesModal_name').val();
-	fav.addr = $('input#favoritesModal_addr').val();
 	fav.notes = $('input#favoritesModal_notes').val();
-	fav.category = $('input#favoritesModal_category').val();
+	fav.label = $('input#favoritesModal_category').val();
+	var addrPieces = RouteTools.addrStringToPieces($('input#favoritesModal_addr').val())
+	var addrChanged = false;
+	for (var k in addrPieces) {
+		if (addrPieces[k]!=fav[k]) {
+			fav[k] = addrPieces[k];
+			addrChanged = true;
+		}
+	}
+	if (addrChanged) {
+		fav.latitude = undefined;
+		fav.longitude = undefined;
+	}
 	return fav;
 }
 function getTimerange(baseId) {
@@ -305,26 +321,29 @@ function getTimerange(baseId) {
 
 
 /* Server communication stuff */
-function getUsername() {
+function getUsernameAndId() {
 	//we actually don't talk to the server at all: we use a hidden field
-	var onSuccess = function(newUsername) {
-		myUserInfo.name = newUsername;
+	var onSuccess = function(userInfo) {
+		myUserInfo.id = userInfo.id;
+		myUserInfo.name = userInfo.username;
 		$('span#username').empty().append(myUserInfo.name);
 	}
-	if (!FAKEIT)
-		onSuccess($("#hidden-username").val());
-	else
-		onSuccess(TestData.fakeUserName);
+	if (!FAKEIT) {
+		var id = myStringToInt($("#hidden-userID").val());
+		var username = $("#hidden-username").val();
+		onSuccess({id:id, username:username});
+	} else {
+		onSuccess({id:TestData.fakeUserID, username:TestData.fakeUserName});
+	}
 }
 function getHomeLoc() {
-	showMsg("Getting home address from server...","info");
 	$('span#homeAddr').empty().append("(getting from server...)");
 	var onSuccess = function(newHomeLoc) {
 		myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
 		$('span#homeAddr').empty().append(myUserInfo.homeLoc.addr);
 		for (var i=0; i<myRoute.tasks.length; i++) {
 			var t = myRoute.tasks[i];
-			if (t.label==="Home"||t.label==="HOME"||t.label==="home") {
+			if (t.label.toLowerCase()==="home") {
 				t.label = "Home";
 				t.loc = myUserInfo.homeLoc;
 				t.error = undefined;
@@ -346,7 +365,6 @@ function getHomeLoc() {
 		setTimeout(function(){onSuccess(TestData.fakeHomeLoc);}, 1000);	//pretend we're doing ajax here
 }
 function getFavorites() {
-	showMsg("Getting favorites from server...","info");
 	var onSuccess = function(newFavorites) {
 		var currentlyEditing = (favoriteNoBeingEdited!=undefined);
 		var currentlyEditingNewOne = currentlyEditing && (favoriteNoBeingEdited>=myUserInfo.favorites.length);
@@ -362,12 +380,49 @@ function getFavorites() {
 	}
 	var onFailure = function(err) {
 		console.log("Failed to get favorites from server: "+err);
-		showMsgMomentarily("Failed to get favorites from server.","warning",3000);
+		showMsgMomentarily("Failed to get favorites from server","warning",3000);
 	}
 	if (!FAKEIT)
 		doAjax("GET","/favorites.json",{},onSuccess,onFailure);
 	else
 		setTimeout(function(){onSuccess(TestData.fakeFavorites);}, 3000);	//pretend we're doing ajax here
+}
+function saveFavorite(fav) {
+	fav.user_id = myUserInfo.id;
+	if (busy) return;
+	busy = true;
+	showMsg("waiting on server...","info");
+	var isNew = (fav.id==undefined || fav.id==-1);
+	var ajaxVerb = (isNew) ? "POST" : "PUT";
+	var ajaxPath = (isNew) ? "/favorites.json" : "/favorites/"+fav.id+".json";
+	var onSuccess = function(filledOutFav) {
+		if (isNew) {
+			myUserInfo.favorites.push(filledOutFav);
+		} else {
+			for (var i=0; i<myUserInfo.favorites.length; i++) {
+				if (myUserInfo.favorites[i].id==filledOutFav.id)
+					myUserInfo.favorites[i] = filledOutFav;
+			}
+		}
+		updateFavoritesList();
+		favoriteNoBeingEdited = undefined;
+		$("#favoritesModal").modal('hide');
+		showMsgMomentarily("Successfully saved favorite \""+filledOutFav.name+"\"","info",1500);
+		busy = false;
+	}
+	var onFailure = function(err) {
+		console.log("Failed to save favorite to server: "+err);
+		showMsgMomentarily("Failed to save favorites to server","warning",3000);
+		busy = false;
+	}
+	if (!FAKEIT) {
+		doAjax(ajaxVerb,ajaxPath,{favorite:fav},onSuccess,onFailure);
+	} else {
+		var fakeResults = RouteTools.makeFavorite(fav);
+		if (fakeResults.id==-1)
+			fakeResults.id = Math.floor((Math.random() * 100) + 1);
+		setTimeout(function(){onSuccess(fakeResults);}, 3000);	//pretend we're doing ajax here
+	}
 }
 function getOptionsFromServer() {
 alert("getOptionsFromServer() isn't ready!");
@@ -433,7 +488,7 @@ function hideQuickEditTaskWindow() {
 var handleTaskLabelChange = function(taskNo, newText) {
 	myRoute.tasks[taskNo].label = newText;
 	myRoute.tasks[taskNo].loc = undefined;
-	if (newText==="Home"||newText==="HOME"||newText==="home")
+	if (newText.toLowerCase()==="home")
 		myRoute.tasks[taskNo].loc = myUserInfo.homeLoc;
 }
 
@@ -618,13 +673,17 @@ $(document).ready(function() {
 	});
 	$('#favorite-save-button').click(function() {
 		if (favoriteNoBeingEdited!=undefined) {
-			myUserInfo.favorites[favoriteNoBeingEdited] = readFavoriteFromEditWindow();
-			updateFavoritesList();
+			var favBase = (favoriteNoBeingEdited<myUserInfo.favorites.length) ? myUserInfo.favorites[favoriteNoBeingEdited] : RouteTools.EMPTYFAVORITE;
+			var favToSave = readFavoriteFromEditWindow(favBase);
+			saveFavorite(favToSave);
+//			myUserInfo.favorites[favoriteNoBeingEdited] = favToSave;
+//			updateFavoritesList();
 		}
-		favoriteNoBeingEdited = undefined;
-		$("#favoritesModal").modal('hide');
+//		favoriteNoBeingEdited = undefined;
+//		$("#favoritesModal").modal('hide');
 	});
 	$('#favorite-cancel-button').click(function() {
+		favoriteNoBeingEdited = undefined;
 		$("#favoritesModal").modal('hide');
 	});
 	
@@ -660,10 +719,11 @@ $(document).ready(function() {
 	$("a[href=#routeTab]").tab('show');
 	
 	/* Start getting user info */
-	getUsername();
+	getUsernameAndId();
 	var isLoggedIn = (myUserInfo.name != "");
 	if (myUserInfo.name != "") {
 		$("div.overlay").hide();		//needed so we can see stuff when FAKEIT==true
+		showMsg("Getting home address and favorites from server...","info");
 		getHomeLoc();
 		getFavorites();
 	} else {
