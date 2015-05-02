@@ -15,26 +15,28 @@ var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn 
 
 /* WORK STILL NEEDED:
 	--Allie
-		--assert that your user_id matches, or better yet add it automatically
-		--relax the requirements that the business and name not already exist: right now you can't edit it without changing that field
-		--I propose renaming favorite.label to favorite.category, since label is used elsewhere
-	--getting location choices from the backend
-		--decide between fixed points and unknowns
-		--set task.error as needed
-	--get pins to display on map properly: involves altering or removing updateMap()
-	--Make fillInRoute() !!!
+		--For favorites: assert that your user_id matches, or better yet add it automatically
+		--For favorites: relax the requirements that the business and name not already exist: right now you can't edit it without changing that field
+		--For favorites: I propose renaming favorite.label to favorite.category, since label is used elsewhere
+		--have option on the front page to NOT log in, but rather go straight to the map
+		--add pages: /about, /privacy, /feedback (or just remove the links to them)
+	--Jackie
+		--timepicker for the times ("chronic" gem recommended)
+		--get pins to display on map properly: involves altering or removing updateMap()
+	--Joseph
+		--getting location choices from the backend
+			--decide between fixed points and unknowns
+			--set task.error as needed
+		--Make fillInRoute() !!!
 	--everything in page two of the routes tab...
 	--the popup for details that appears near pins on the map...
 	--let the user change the chosen location...
 		--will involve altering or removing: updateLocChoicesArea, handleTaskLabelChange, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
 	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
-	--timepicker for the times ("chronic" gem recommended)
 	--better parsing/unparsing of addresses in the favoritesModal
 	--kill login popup: take user to a new page instead
-	--confirm working of password change (or, better, disable it, since they'd need to go to a new page, anyhow)
+	--get clicking the passwords to take you to the page at edit_user_path (probably with a warning first)
 	
-	--have option on the front page to NOT log in, but rather go straight to the map
-	--add pages: /about, /privacy, /feedback (or just remove the links to them)
 	--Make the images all transparent again
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
