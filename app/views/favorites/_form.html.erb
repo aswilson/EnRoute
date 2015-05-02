@@ -15,7 +15,7 @@
 <fieldset>
  
     <%= f.input :name %><br>
-	<%= f.input :label, :collection => Favorite::LABELS_LIST %><br>
+	<%= f.input :category, :collection => Favorite::CATEGORIES_LIST %><br>
 	<h5>Pick a business from the dropdown OR fill out the address of an unincluded business<h5>
 	<%= f.input :business_id, :collection => Business.active.alphabetical %><br>
     <%= f.input :street_1 %><br>
@@ -24,7 +24,7 @@
     <%= f.input :state, :collection => Favorite::STATES_LIST.map{|a,b| b} %><br>
     <%= f.input :zip_code %><br>
     <%= f.input :notes %><br>
-	<%= f.input :user_id, :collection => User.where('id = ?', current_user.id)%>
+	<%= f.input :user_id, input_html: { value: User.where('id = ?', current_user.id), placeholder: User.where('id = ?', current_user.id).map(&:proper_name) }%>
     
   <br></br>
       <div class="form-actions">

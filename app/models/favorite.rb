@@ -3,28 +3,26 @@ class Favorite < ActiveRecord::Base
   belongs_to :user
   belongs_to :business
   
-  STATES_LIST = [['Alabama', 'AL'],['Alaska', 'AK'],['Arizona', 'AZ'],['Arkansas', 'AR'],['California', 'CA'],['Colorado', 'CO'],['Connectict', 'CT'],['Delaware', 'DE'],['District of Columbia ', 'DC'],['Florida', 'FL'],['Georgia', 'GA'],['Hawaii', 'HI'],['Idaho', 'ID'],['Illinois', 'IL'],['Indiana', 'IN'],['Iowa', 'IA'],['Kansas', 'KS'],['Kentucky', 'KY'],['Louisiana', 'LA'],['Maine', 'ME'],['Maryland', 'MD'],['Massachusetts', 'MA'],['Michigan', 'MI'],['Minnesota', 'MN'],['Mississippi', 'MS'],['Missouri', 'MO'],['Montana', 'MT'],['Nebraska', 'NE'],['Nevada', 'NV'],['New Hampshire', 'NH'],['New Jersey', 'NJ'],['New Mexico', 'NM'],['New York', 'NY'],['North Carolina','NC'],['North Dakota', 'ND'],['Ohio', 'OH'],['Oklahoma', 'OK'],['Oregon', 'OR'],['Pennsylvania', 'PA'],['Rhode Island', 'RI'],['South Carolina', 'SC'],['South Dakota', 'SD'],['Tennessee', 'TN'],['Texas', 'TX'],['Utah', 'UT'],['Vermont', 'VT'],['Virginia', 'VA'],['Washington', 'WA'],['West Virginia', 'WV'],['Wisconsin ', 'WI'],['Wyoming', 'WY']]
+  STATES_LIST = [['Alabama', 'AL'],['Alaska', 'AK'],['Arizona', 'AZ'],['Arkansas', 'AR'],['California', 'CA'],['Colorado', 'CO'],['Connecticut', 'CT'],['Delaware', 'DE'],['District of Columbia ', 'DC'],['Florida', 'FL'],['Georgia', 'GA'],['Hawaii', 'HI'],['Idaho', 'ID'],['Illinois', 'IL'],['Indiana', 'IN'],['Iowa', 'IA'],['Kansas', 'KS'],['Kentucky', 'KY'],['Louisiana', 'LA'],['Maine', 'ME'],['Maryland', 'MD'],['Massachusetts', 'MA'],['Michigan', 'MI'],['Minnesota', 'MN'],['Mississippi', 'MS'],['Missouri', 'MO'],['Montana', 'MT'],['Nebraska', 'NE'],['Nevada', 'NV'],['New Hampshire', 'NH'],['New Jersey', 'NJ'],['New Mexico', 'NM'],['New York', 'NY'],['North Carolina','NC'],['North Dakota', 'ND'],['Ohio', 'OH'],['Oklahoma', 'OK'],['Oregon', 'OR'],['Pennsylvania', 'PA'],['Rhode Island', 'RI'],['South Carolina', 'SC'],['South Dakota', 'SD'],['Tennessee', 'TN'],['Texas', 'TX'],['Utah', 'UT'],['Vermont', 'VT'],['Virginia', 'VA'],['Washington', 'WA'],['West Virginia', 'WV'],['Wisconsin ', 'WI'],['Wyoming', 'WY']]
   
-  LABELS_LIST = ["blank", "restaurant", "atm", "coffee", "bank", "groceries", "pharmacy", "books", "work", "gas", "home", "postOffice"]
+  CATEGORIES_LIST = ["blank", "restaurant", "atm", "coffee", "bank", "groceries", "pharmacy", "books", "work", "gas", "home", "post office"]
   
-  validates_presence_of :name, :label
+  validates_presence_of :name, :category
   validates :state, inclusion: { in: STATES_LIST.map{|a,b| b}, message: "is not a valid state", allow_blank: true }
   validates :zip_code, format: { with: /\A\d{5}\z/, message: "should be five digits long", allow_blank: true }
-  validates :label, inclusion: { in: LABELS_LIST, message: "is not a valid label", allow_blank: false}
+  validates :category, inclusion: { in: CATEGORIES_LIST, message: "is not a valid category", allow_blank: false}
   validate :business_is_active_in_system
-  validate :label_not_already_used
-  validate :not_already_a_favorite
-  validate :set_location_by_business
+  validate :category_not_already_used, on: :create
+  validate :not_already_a_favorite, on: :create
+  validate :set_location_by_business, :if => :business_id_changed?
   
   scope :alphabetical, -> { order('name') }
   scope :for_user, -> (user_id) {where("user_id = ?", user_id)}
   scope :by_name, -> (name) {where("name = ?", name)}
-  scope :by_label, -> (label) {where("label = ?", label)}
+  scope :by_category, -> (category) {where("category = ?", category)}
   
-  before_validation :get_location_coordinates
-  
-  #fill in address if business_id chosen and let be blank otherwise???
-  
+  after_validation :get_location_coordinates, :if => :street_1_changed?
+ 
   def already_exists?
     Favorite.where(user_id: self.user_id, business_id: self.business_id).size == 1
   end
@@ -36,8 +34,8 @@ class Favorite < ActiveRecord::Base
     end
   end
   
-  def label_not_already_used
-    if Favorite.for_user(self.user_id).map(&:label).include?(self.label)
+  def category_not_already_used
+    if Favorite.for_user(self.user_id).map(&:category).include?(self.category)
       return false
     else
       return true

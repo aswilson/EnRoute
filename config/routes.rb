@@ -30,6 +30,10 @@ EnRoute::Application.routes.draw do
   
   get 'welcome/getAllNearby', to: 'welcome#getAllNearby'
   
+  get 'about' => 'welcome#about', as: :about
+  get 'privacy' => 'welcome#privacy', as: :privacy
+  get 'feedback' => 'welcome#feedback', as: :feedback
+  
   get 'home', to: 'welcome#base_map', as: :home
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
