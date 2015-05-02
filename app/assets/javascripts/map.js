@@ -4,6 +4,7 @@ var map;
 var markers = [];
 var lines = [];
 var routes = [];
+var geocoder= new google.maps.Geocoder();
 var directionsService = new google.maps.DirectionsService();
 var MapControls = {}; //"object" holding everything public
 
@@ -22,6 +23,7 @@ function map_recenter(latlng,offsetx,offsety) {
 }
 
 function addrToLatLon(addr) {
+	//NOTE: this function is currently broken (it is asynchroneous but treated as synchroneous)
 	var callback = function(results, status) {
 		if (status == google.maps.GeocoderStatus.OK) {
 			return results[0].geometry.location;
@@ -34,7 +36,8 @@ function addrToLatLon(addr) {
 			alert("Geocode was not successful for the following reason: " + status);
 		}
 	}
-	geocoder.geocode({'addr': address}, callback);
+	alert("Here goes:");
+	geocoder.geocode({'address': addr}, callback);
 }
 
 function getPin(pinId) {

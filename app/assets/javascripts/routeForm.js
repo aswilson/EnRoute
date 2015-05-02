@@ -1,7 +1,8 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = true;	//if FAKEIT==true, fake talking to backend (lets us pretend we're logged in)
+var FAKEIT = false;	//if FAKEIT==true, fake talking to backend (lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
+var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
@@ -10,32 +11,26 @@ var taskNoBeingEdited = undefined;		//when saving changes, indicates which task 
 var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which favorite gets the changes
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var mapReady = false;					//used to indicate whether it is safe to call the MapControls functions
-var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],...}, where loc has the format given by RouteTools.EMPTYTASK.loc
+var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],label3:errorString,...}, where loc has the format given by RouteTools.EMPTYTASK.loc
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
-	--Allie
-		--For favorites: assert that your user_id matches, or better yet add it automatically
-		--For favorites: relax the requirements that the business and name not already exist: right now you can't edit it without changing that field
-		--For favorites: I propose renaming favorite.label to favorite.category, since label is used elsewhere
-		--have option on the front page to NOT log in, but rather go straight to the map
-		--add pages: /about, /privacy, /feedback (or just remove the links to them)
 	--Jackie
 		--timepicker for the times ("chronic" gem recommended)
 		--get pins to display on map properly: involves altering or removing updateMap()
+		--everything in page two of the routes tab...
+		--the popup for details that appears near pins on the map...
 	--Joseph
 		--getting location choices from the backend
-			--decide between fixed points and unknowns
+			--detect when a point is fixed
 			--set task.error as needed
 		--Make fillInRoute() !!!
-	--everything in page two of the routes tab...
-	--the popup for details that appears near pins on the map...
 	--let the user change the chosen location...
-		--will involve altering or removing: updateLocChoicesArea, handleTaskLabelChange, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
+		--will involve altering or removing: updateLocChoicesArea, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
 	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
-	--better parsing/unparsing of addresses in the favoritesModal
+	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 	--kill login popup: take user to a new page instead
-	--get clicking the passwords to take you to the page at edit_user_path (probably with a warning first)
+	--give a warning popup confirmation before taking user to password-changing screen
 	
 	--Make the images all transparent again
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
@@ -364,7 +359,7 @@ function getHomeLoc() {
 	if (!FAKEIT)
 		doAjax("GET","/welcome/findHome.json",{},onSuccess,onFailure);
 	else
-		setTimeout(function(){onSuccess(TestData.fakeHomeLoc);}, 1000);	//pretend we're doing ajax here
+		setTimeout(function(){onSuccess(TestData.fakeHomeLoc);}, 1000);
 }
 function getFavorites() {
 	var onSuccess = function(newFavorites) {
@@ -387,7 +382,7 @@ function getFavorites() {
 	if (!FAKEIT)
 		doAjax("GET","/favorites.json",{},onSuccess,onFailure);
 	else
-		setTimeout(function(){onSuccess(TestData.fakeFavorites);}, 3000);	//pretend we're doing ajax here
+		setTimeout(function(){onSuccess(TestData.fakeFavorites);}, 3000);
 }
 function saveFavorite(fav) {
 	fav.user_id = myUserInfo.id;
@@ -423,11 +418,10 @@ function saveFavorite(fav) {
 		var fakeResults = RouteTools.makeFavorite(fav);
 		if (fakeResults.id==-1)
 			fakeResults.id = Math.floor((Math.random() * 100) + 1);
-		setTimeout(function(){onSuccess(fakeResults);}, 3000);	//pretend we're doing ajax here
+		setTimeout(function(){onSuccess(fakeResults);}, 3000);
 	}
 }
-function getOptionsFromServer() {
-alert("getOptionsFromServer() isn't ready!");
+function fillInRouteWithFreshOptions() {
 	if (busy) return;
 	busy = true;
 	showMsg("waiting on server...","info");
@@ -446,11 +440,11 @@ alert("getOptionsFromServer() isn't ready!");
 		labels: unresolvedLabels,
 		n: NUMOFNEARBYPOINTSTOGET
 	};
-	alert("About to get options from server based on this request:\n"+requestBody);
 	//prepare functions to respond to Ajax call, and execute it
 	var onSuccess = function(reply) {
 		showMsgMomentarily("Success!","info",2000);
-		locationOptions = reply;
+		for (var k in reply)
+			locationOptions[k] = reply[k];
 		fillInRoute(myRoute, locationOptions);
 		updateRouteForm();
 		updateMap();
@@ -464,8 +458,47 @@ alert("getOptionsFromServer() isn't ready!");
 	if (!FAKEIT)
 		doAjax("GET","/welcome/getAllNearby.json",requestBody,onSuccess,onFailure);
 	else
-		setTimeout(function(){onFailure("NotImplemented");}, 3000);	//pretend we're doing ajax here
+		setTimeout(function(){onFailure("NotImplemented");}, 3000);
 }
+
+
+/* Processing functions */
+var getFixedLocForLabel = function(label) {
+	if (label.toLowerCase()==="home")
+		return myUserInfo.homeLoc;
+	for (var i=0; i<myUserInfo.favorites.length; i++) {
+		if (myUserInfo.favorites[i].name.toLowerCase() === label.toLowerCase())
+			return RouteTools.favToLoc(myUserInfo.favorites[i]);
+	}
+	if (mapReady && RouteTools.isAddress(label)) {
+		alert("This looks like an address.  Not done");
+		var latLon = MapControls.getLatLon(label);
+		return {
+			name: "",
+			addr: label,
+			lat: latLon.lat,
+			lon: latLon.lon
+		}
+	}
+}
+function fillInRoute(route, locChoices) {
+	//for now, this will be dead stupid: take the first choice every time.
+	for (var i=0; i<route.tasks.length; i++) {
+		var loc = route.tasks[i].loc;
+		if (route.tasks[i].loc==undefined) {
+			var res = locChoices[route.tasks[i].label];
+			if (res==undefined) {
+				route.tasks[i].error = "No suitable location found";
+			} else if ($.type(res) === "string") {
+				route.tasks[i].error = "No suitable location found: " + res;
+			} if (res.length==0) {
+				route.tasks[i].error = "No suitable location found";
+			} else {
+				route.tasks[i].loc = res[0];
+			}
+		}
+	}
+};
 
 
 /* Stuff for quick task editing */
@@ -487,35 +520,15 @@ function hideQuickEditTaskWindow() {
 	taskNoBeingEdited = undefined;
 	$('div#popup-locChoices').hide();
 }
-var handleTaskLabelChange = function(taskNo, newText) {
-	myRoute.tasks[taskNo].label = newText;
-	myRoute.tasks[taskNo].loc = undefined;
-	if (newText.toLowerCase()==="home")
-		myRoute.tasks[taskNo].loc = myUserInfo.homeLoc;
-}
-
-
-/* The main thinker function */
-function fillInRoute(route, locChoices) {
-	//for now, this will be dead stupid: take the first choice every time.
-	for (var i=0; i<route.tasks.length; i++) {
-		var loc = route.tasks[i].loc;
-		if (route.tasks[i].loc==undefined) {
-			var choices = locChoices[route.tasks[i].label];
-			if (choices!=undefined && choices.length!=0)
-				route.tasks[i].loc = choices[0];
-		}
-	}
-};
 
 
 /* Apply it all */
 //when the window loads, initialize the map
-/*google.maps.event.addDomListener(window, 'load', function() {
+google.maps.event.addDomListener(window, 'load', function() {
 	MapControls.initialize('map-canvas');
 	mapReady=true;
 	updateMap();
-});*/
+});
 $(document).ready(function() {
 	/* Tab-changing listeners and general listeners */
 	$("a[data-toggle='tab']").on("shown.bs.tab", function(e) {
@@ -530,7 +543,6 @@ $(document).ready(function() {
 	$('#login-button').click(function(){
 		$('#loginModal').modal('show');
 	});
-	
 
 	/* Settings tab listeners */
 	$("input#time-limit").change(function(){
@@ -549,7 +561,7 @@ $(document).ready(function() {
 		$("#distance-option").text($(this).text());
 		$("#distance-option").val($(this).text());
 	});
-	
+
 	/* Routes tab listeners */
 	var draggingFns = {
 		getThingToMove: function(elem) {
@@ -571,7 +583,18 @@ $(document).ready(function() {
 	setDraggable($("a.move-button"), draggingFns);
 //	$("input.task-label").focusout(function(){setTimeout(hideQuickEditTaskWindow,150);});
 //	$("input.task-label").focusin(function(){setTimeout(showQuickEditTaskWindow(getTaskNumber($(this))),250);});
-//	$("input.task-label").keyup(function(){handleTaskLabelChange(getTaskNumber($(this)),$(this).val());});
+	$("input.task-label").focusout(function(){
+		var taskNo = getTaskNumber($(this));
+		var newText = $(this).val();
+		if (myRoute.tasks[taskNo].label === newText)
+			return;
+		myRoute.tasks[taskNo].label = newText;
+		myRoute.tasks[taskNo].loc = getFixedLocForLabel(newText);
+		if (myRoute.tasks[taskNo].error != BADTIMECONSTRAINTSERROR)
+			myRoute.tasks[taskNo].error = undefined;
+		updateRouteForm();
+		updateMap();
+	});
 	$("a.edit-button").click(function(){
 		var tNum = getTaskNumber($(this));
 		taskNoBeingEdited = tNum;
@@ -594,7 +617,7 @@ $(document).ready(function() {
 		updateMap();
 	});
 	$("#route-find-button").click(function() {
-		getOptionsFromServer();
+		fillInRouteWithFreshOptions();
 		$("#route-input").hide();
 		$("#route-output").show();
 		updateBackgroundSizes();

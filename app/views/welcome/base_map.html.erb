@@ -303,7 +303,7 @@
 								<div class="row-text align-left">Password</div>
 							</td>
 							<td>
-								<div class="row-text align-right"><a href="/change-password">*****</a></div>
+								<div class="row-text align-right"><a href="/users/<%= logged_in? ? current_user.id : "-1"%>/edit">*****</a></div>
 							</td>
 						</tr>
 					</table>
