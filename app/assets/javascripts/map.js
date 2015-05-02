@@ -122,8 +122,9 @@ MapControls.recenter = function() {
 //markerNum = {0-8}
 //primary = {true, false}
 // If not primary, then secondary, eg. an alternate option
+// info-html - html to go in infobox
 // Categories - line 7
-MapControls.placePin = function(locData, markerNum, primary, category) {
+MapControls.placePin = function(locData, markerNum, primary, info-html) {
   var marker = new google.maps.Marker({
       position: new google.maps.LatLng(locData.lat,locData.lon)
   });
@@ -144,6 +145,7 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
       };
   }
   marker.setIcon(icon);
+  /*
   var html = '<div class="pin-popover">\
     <table class="table-container">\
         <tr>\
@@ -164,9 +166,9 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
         </tr>\
     </table>\
   </div>';
-
+*/
   var infoboxOptions = {
-     content: html,
+     content: info-html,
      boxStyle: { 
         width: "226px",
         height: "151px",
