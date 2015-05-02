@@ -160,6 +160,13 @@ RouteTools.moveTask = function(route, oldPos, newPos) {
 	route.tasks.splice(insertAt,0,task);
 	route.tasks.splice(removeAt,1);
 }
+RouteTools.routeIsFilledOut = function(route) {
+	for (var i=0; i<route.tasks.length; i++) {
+		if (route.tasks[i].loc==undefined || route.tasks[i].error!=undefined)
+			return false;
+	}
+	return true;
+}
 
 RouteTools.favToLoc = function(fav) {
 	return {

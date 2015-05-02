@@ -1,5 +1,5 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = false;	//if FAKEIT==true, fake talking to backend (lets us pretend we're logged in)
+var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
@@ -7,23 +7,23 @@ var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
 var mySettings = {distInMiles: true};
+var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],label3:errorString,...}, where loc has the format given by RouteTools.EMPTYTASK.loc
 var taskNoBeingEdited = undefined;		//when saving changes, indicates which task gets the changes
 var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which favorite gets the changes
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var mapReady = false;					//used to indicate whether it is safe to call the MapControls functions
-var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],label3:errorString,...}, where loc has the format given by RouteTools.EMPTYTASK.loc
+var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
+--Allie
+	--getting location choices from the backend (it works with fake data)
 --Jackie
 	--timepicker for the times ("chronic" gem recommended)
 	--get pins to display on map properly: involves altering or removing updateMap()
-	--everything in page two of the routes tab...
+	--write getAndUpdateDirections()
 	--the popup for details that appears near pins on the map...
 --Joseph
-	--getting location choices from the backend
-		--set task.error as needed
-	--Make fillInRoute() !!!
 	--let the user change the chosen location...
 		--will involve altering or removing: updateLocChoicesArea, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
 --making fillInRoute actually smart (ie, acknowledge constraints)
@@ -31,6 +31,7 @@ var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn 
 --detecting impossible conditions before talking to backend (and setting task.error accordingly)
 --kill login popup: take user to a new page instead
 --give a warning popup confirmation before taking user to password-changing screen
+--make the disk image on the direction-getting page do something, or remove it
 --Make the images all transparent again
 --get rid of the ugly black in the background when you mouse-over an <a> tag
 
@@ -103,21 +104,27 @@ function myStringToInt(s) {
 	var v = parseInt(s,10);
 	return (isNaN(v) ? undefined : v);
 }
+function showMsg(msg,type) {
+	var MSGTYPES = ["error", "warning", "info"];
+	curMsgNum++;
+	$('span.statusMessage').empty().append(msg);
+	for (var i=0; i<MSGTYPES.length; i++)
+		$('span.statusMessage').removeClass(MSGTYPES[i]);
+	if (MSGTYPES.indexOf(type) == -1)
+		type = "info";
+	$('span.statusMessage').addClass(type);
+}
 function showMsgMomentarily(msg,type,time) {
 	showMsg(msg,type);
-	setTimeout(function(){showMsg("","info")}, time);
+	var myMsgNum = curMsgNum;
+	setTimeout(function(){
+		if (curMsgNum == myMsgNum)	//only erase our message if it is the most recent
+			showMsg("","info");
+	}, time);
 }
 
 
 /* Stuff for updating the displays */
-function showMsg(msg,type) {
-	var msgTypes = ["error", "warning", "info"];
-	$('span.statusMessage').empty().append(msg);
-	for (var i=0; i<msgTypes.length; i++)
-		$('span.statusMessage').removeClass(msgTypes[i]);
-	if (msgTypes.indexOf(type) != -1)
-		$('span.statusMessage').addClass(type);
-}
 function updateBackgroundSizes() {
 	$('#menu-background').height($('#menu').height());
 	$(".overlay").height($(".tab-content").height());
@@ -393,6 +400,7 @@ function saveFavorite(fav) {
 	var ajaxVerb = (isNew) ? "POST" : "PUT";
 	var ajaxPath = (isNew) ? "/favorites.json" : "/favorites/"+fav.id+".json";
 	var onSuccess = function(filledOutFav) {
+		busy = false;
 		if (isNew) {
 			myUserInfo.favorites.push(filledOutFav);
 		} else {
@@ -405,12 +413,11 @@ function saveFavorite(fav) {
 		favoriteNoBeingEdited = undefined;
 		$("#favoritesModal").modal('hide');
 		showMsgMomentarily("Successfully saved favorite \""+filledOutFav.name+"\"","info",1500);
-		busy = false;
 	}
 	var onFailure = function(err) {
+		busy = false;
 		console.log("Failed to save favorite to server: "+err);
 		showMsgMomentarily("Failed to save favorites to server","warning",3000);
-		busy = false;
 	}
 	if (!FAKEIT) {
 		doAjax(ajaxVerb,ajaxPath,{favorite:fav},onSuccess,onFailure);
@@ -442,39 +449,52 @@ function fillInRouteWithFreshOptions() {
 	};
 	//prepare functions to respond to Ajax call, and execute it
 	var onSuccess = function(reply) {
-		showMsgMomentarily("Success!","info",2000);
+		busy = false;
 		for (var k in reply)
 			locationOptions[k] = reply[k];
 		fillInRoute(myRoute, locationOptions);
 		updateRouteForm();
 		updateMap();
-		busy = false;
+		if (RouteTools.routeIsFilledOut(myRoute)) {
+			showMsgMomentarily("Success!","info",2000);
+			getAndUpdateDirections();
+		} else {
+			showMsgMomentarily("Route could not be fully filled out","error",2000);
+		}
 	}
 	var onFailure = function(err) {
+		busy = false;
 		console.log("Failed to get locations from server: "+err);
 		showMsgMomentarily("Failed to get locations from server","error",3000);
-		busy = false;
 	}
-	if (!FAKEIT)
+	if (!FAKEIT) {
 		doAjax("GET","/welcome/getAllNearby.json",requestBody,onSuccess,onFailure);
-	else
-		setTimeout(function(){onFailure("NotImplemented");}, 3000);
+	} else {
+		var reply = {};
+		for (var i=0; i<requestBody.labels.length; i++) {
+			if (i%2 == 1)
+				reply[requestBody.labels[i]] = "Test error message";
+			else
+				reply[requestBody.labels[i]] = TestData.makeFakeSuggestions(requestBody.labels[i]);
+		}
+		setTimeout(function(){onSuccess(reply);}, 3000);
+	}
 }
 
 
 /* Processing functions */
-var updateTaskLabelAndLoc = function(taskNo, newText) {
-	if (myRoute.tasks[taskNo].label === newText)
+function updateTaskLabelAndLoc(task, newText) {
+	if (task.label === newText)
 		return;
 	//prepare wrapup function
-	myRoute.tasks[taskNo].label = newText;
-	myRoute.tasks[taskNo].loc = undefined;
-	if (myRoute.tasks[taskNo].error != BADTIMECONSTRAINTSERROR)
-		myRoute.tasks[taskNo].error = undefined;
+	task.label = newText;
+	task.loc = undefined;
+	if (task.error != BADTIMECONSTRAINTSERROR)
+		task.error = undefined;
 	if (!busy)
-		showMsg("getting new location for task #"+taskNo,"info");
+		showMsg("getting new location for task \""+task.label+"\"","info");
 	var wrapupFn = function(newLoc) {
-		myRoute.tasks[taskNo].loc = newLoc;
+		task.loc = newLoc;
 		updateRouteForm();
 		updateMap();
 		if (!busy)
@@ -523,6 +543,12 @@ function fillInRoute(route, locChoices) {
 			}
 		}
 	}
+};
+function getAndUpdateDirections() {
+	//JACKIE - fill this in
+	$("#route-input").hide();
+	$("#route-output").show();
+	updateBackgroundSizes();
 };
 
 
@@ -611,7 +637,7 @@ $(document).ready(function() {
 	$("input.task-label").focusout(function(){
 		var taskNo = getTaskNumber($(this));
 		var newText = $(this).val();
-		updateTaskLabelAndLoc(taskNo, newText);
+		updateTaskLabelAndLoc(myRoute.tasks[taskNo], newText);
 	});
 	$("a.edit-button").click(function(){
 		var tNum = getTaskNumber($(this));
@@ -635,10 +661,10 @@ $(document).ready(function() {
 		updateMap();
 	});
 	$("#route-find-button").click(function() {
-		fillInRouteWithFreshOptions();
-		$("#route-input").hide();
-		$("#route-output").show();
-		updateBackgroundSizes();
+		if (RouteTools.routeIsFilledOut(myRoute))
+			getAndUpdateDirections();
+		else
+			fillInRouteWithFreshOptions();
 	});
 	$("#route-back-button").click(function() {
 		$("#route-output").hide();
@@ -765,7 +791,7 @@ $(document).ready(function() {
 	getUsernameAndId();
 	var isLoggedIn = (myUserInfo.name != "");
 	if (myUserInfo.name != "") {
-		$("div.overlay").hide();		//needed so we can see stuff when FAKEIT==true
+		$("div.overlay").hide();		//needed so the view isn't blocked when FAKEIT==true
 		showMsg("Getting home address and favorites from server...","info");
 		getHomeLoc();
 		getFavorites();
