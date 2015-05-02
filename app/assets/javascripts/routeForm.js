@@ -21,7 +21,7 @@ var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn 
 --Jackie
 	--timepicker for the times ("chronic" gem recommended)
 	--get pins to display on map properly: involves altering or removing updateMap()
-	--write getAndUpdateDirections()
+	--write getAndUpdateDirections() and updateDirections()
 	--the popup for details that appears near pins on the map...
 --Joseph
 	--let the user change the chosen location...
@@ -212,6 +212,9 @@ function updateMap() {
 		}
 		MapControls.recenter();*/
 	}
+}
+function updateDirections(directionData) {
+	//JACKIE - fill this in however you wish
 }
 function setTimerangeDisp(baseId, range) {
 	var l = baseId;
@@ -545,7 +548,9 @@ function fillInRoute(route, locChoices) {
 	}
 };
 function getAndUpdateDirections() {
-	//JACKIE - fill this in
+	var directionData = {};
+	//JACKIE - fill this in however you wish
+	updateDirections(directionData);
 	$("#route-input").hide();
 	$("#route-output").show();
 	updateBackgroundSizes();
