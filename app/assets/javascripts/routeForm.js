@@ -15,29 +15,29 @@ var locationOptions = {};				//map of location options for a task, from server. 
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
-	--Jackie
-		--timepicker for the times ("chronic" gem recommended)
-		--get pins to display on map properly: involves altering or removing updateMap()
-		--everything in page two of the routes tab...
-		--the popup for details that appears near pins on the map...
-	--Joseph
-		--getting location choices from the backend
-			--detect when a point is fixed
-			--set task.error as needed
-		--Make fillInRoute() !!!
+--Jackie
+	--timepicker for the times ("chronic" gem recommended)
+	--get pins to display on map properly: involves altering or removing updateMap()
+	--everything in page two of the routes tab...
+	--the popup for details that appears near pins on the map...
+--Joseph
+	--getting location choices from the backend
+		--set task.error as needed
+	--Make fillInRoute() !!!
 	--let the user change the chosen location...
 		--will involve altering or removing: updateLocChoicesArea, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
-	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
-	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
-	--kill login popup: take user to a new page instead
-	--give a warning popup confirmation before taking user to password-changing screen
-	
-	--Make the images all transparent again
-	--get rid of the ugly black in the background when you mouse-over an <a> tag
-	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
-		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
-	--make favorites scrollable if it gets too long
-	--cap the number of steps in the route
+--making fillInRoute actually smart (ie, acknowledge constraints)
+--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
+--detecting impossible conditions before talking to backend (and setting task.error accordingly)
+--kill login popup: take user to a new page instead
+--give a warning popup confirmation before taking user to password-changing screen
+--Make the images all transparent again
+--get rid of the ugly black in the background when you mouse-over an <a> tag
+
+--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
+	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
+--make favorites scrollable if it gets too long
+--cap the number of steps in the route
 */
 
 
@@ -463,23 +463,48 @@ function fillInRouteWithFreshOptions() {
 
 
 /* Processing functions */
-var getFixedLocForLabel = function(label) {
-	if (label.toLowerCase()==="home")
-		return myUserInfo.homeLoc;
-	for (var i=0; i<myUserInfo.favorites.length; i++) {
-		if (myUserInfo.favorites[i].name.toLowerCase() === label.toLowerCase())
-			return RouteTools.favToLoc(myUserInfo.favorites[i]);
+var updateTaskLabelAndLoc = function(taskNo, newText) {
+	if (myRoute.tasks[taskNo].label === newText)
+		return;
+	//prepare wrapup function
+	myRoute.tasks[taskNo].label = newText;
+	myRoute.tasks[taskNo].loc = undefined;
+	if (myRoute.tasks[taskNo].error != BADTIMECONSTRAINTSERROR)
+		myRoute.tasks[taskNo].error = undefined;
+	if (!busy)
+		showMsg("getting new location for task #"+taskNo,"info");
+	var wrapupFn = function(newLoc) {
+		myRoute.tasks[taskNo].loc = newLoc;
+		updateRouteForm();
+		updateMap();
+		if (!busy)
+			showMsg("","info");
+	};
+	//find the new location then call the wrapup function.  Return once we hit a good option.
+	if (newText.toLowerCase()==="home") {
+		wrapupFn(myUserInfo.homeLoc);
+		return;
 	}
-	if (mapReady && RouteTools.isAddress(label)) {
-		alert("This looks like an address.  Not done");
-		var latLon = MapControls.getLatLon(label);
-		return {
-			name: "",
-			addr: label,
-			lat: latLon.lat,
-			lon: latLon.lon
+	for (var i=0; i<myUserInfo.favorites.length; i++) {
+		if (myUserInfo.favorites[i].name.toLowerCase() === newText.toLowerCase()) {
+			wrapupFn(RouteTools.favToLoc(myUserInfo.favorites[i]));
+			return;
 		}
 	}
+	if (mapReady && RouteTools.isAddress(newText)) {
+		alert("This looks like an address.  Not done");
+		MapControls.getLatLon(newText, function(latLon) {
+			var retVal = latLon==undefined ? undefined : {
+					name: "",
+					addr: newText,
+					lat: latLon.lat,
+					lon: latLon.lon
+				};
+			wrapupFn(retVal);
+		});
+		return;
+	}
+	wrapupFn(undefined);
 }
 function fillInRoute(route, locChoices) {
 	//for now, this will be dead stupid: take the first choice every time.
@@ -586,14 +611,7 @@ $(document).ready(function() {
 	$("input.task-label").focusout(function(){
 		var taskNo = getTaskNumber($(this));
 		var newText = $(this).val();
-		if (myRoute.tasks[taskNo].label === newText)
-			return;
-		myRoute.tasks[taskNo].label = newText;
-		myRoute.tasks[taskNo].loc = getFixedLocForLabel(newText);
-		if (myRoute.tasks[taskNo].error != BADTIMECONSTRAINTSERROR)
-			myRoute.tasks[taskNo].error = undefined;
-		updateRouteForm();
-		updateMap();
+		updateTaskLabelAndLoc(taskNo, newText);
 	});
 	$("a.edit-button").click(function(){
 		var tNum = getTaskNumber($(this));
