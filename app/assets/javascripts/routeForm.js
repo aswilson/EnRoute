@@ -14,10 +14,6 @@ var locationOptions = {};				//map of location options for a task, from server. 
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
-	--Allie
-		--assert that your user_id matches, or better yet add it automatically
-		--relax the requirements that the business and name not already exist: right now you can't edit it without changing that field
-		--I propose renaming favorite.label to favorite.category, since label is used elsewhere
 	--getting location choices from the backend
 		--decide between fixed points and unknowns
 		--set task.error as needed
@@ -150,7 +146,7 @@ function updateFavoritesList() {
 		var favRow = favoritePrototype.clone(true).attr("id","favorite"+i).show();
 		favRow.find("input:radio[name=favToAdd]").val(""+i);
 		favRow.find('.favorite-label').empty().append(myUserInfo.favorites[i].name);
-		RouteTools.alterImgUrlPiece(favRow.find('.categoryTypeIcon'), "name", myUserInfo.favorites[i].label.toLowerCase());
+		RouteTools.alterImgUrlPiece(favRow.find('.categoryTypeIcon'), "name", myUserInfo.favorites[i].category.toLowerCase());
 		favoritesTable.append(favRow);
 	}
 	updateBackgroundSizes();
@@ -173,8 +169,8 @@ function updateFavoriteEditWindow(fav) {
 	$('input#favoritesModal_addr').prev().empty().append(strOrDashes(addr));
 	$('input#favoritesModal_notes').val(fav.notes);
 	$('input#favoritesModal_notes').prev().empty().append(strOrDashes(fav.notes));
-	$('input#favoritesModal_category').val(fav.label.toLowerCase());
-	setCategorySelectedDisp($('div#favoritesModal_category_container'), fav.label.toLowerCase());
+	$('input#favoritesModal_category').val(fav.category.toLowerCase());
+	setCategorySelectedDisp($('div#favoritesModal_category_container'), fav.category.toLowerCase());
 }
 function updateLocChoicesArea(locSuggestions) {
 	//update message display
@@ -290,7 +286,7 @@ function readFavoriteFromEditWindow(baseFav) {
 	var fav = RouteTools.makeFavorite(baseFav);
 	fav.name = $('input#favoritesModal_name').val();
 	fav.notes = $('input#favoritesModal_notes').val();
-	fav.label = $('input#favoritesModal_category').val();
+	fav.category = $('input#favoritesModal_category').val();
 	var addrPieces = RouteTools.addrStringToPieces($('input#favoritesModal_addr').val())
 	var addrChanged = false;
 	for (var k in addrPieces) {

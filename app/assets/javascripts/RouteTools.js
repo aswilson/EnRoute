@@ -57,11 +57,11 @@ var TestData = {
 	fakeUserName: "Bob",
 	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40, lon:-80 },
 	fakeFavorites: [
-		{ id:1234, name:"Starbucks", label:"coffee", notes:"", business_id:null, user_id:6, latitude:40, longitude:-81,
+		{ id:1234, name:"Starbucks", category:"coffee", notes:"", business_id:null, user_id:6, latitude:40, longitude:-81,
 			street_1:"456 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
-		{ id:2345, name:"Chipotle", label:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-82,
+		{ id:2345, name:"Chipotle", category:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-82,
 			street_1:"789 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
-		{ id:6789, name:"Library", label:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-83,
+		{ id:6789, name:"Library", category:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-83,
 			street_1:"987 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" }
 	],
 	makeFakeSuggestions: function(str) { return [
@@ -97,11 +97,11 @@ var EMPTYFAVORITE = {
 	street_1:"",
 	street_2:"",
 	city:"",
-	sttate:"",
+	state:"",
 	zip_code:"",
 	latitude:undefined,		//should NEVER be left undefined
 	longitude:undefined,	//should NEVER be left undefined
-	label:"blank",
+	category:"blank",
 	notes:"",
 	business_id: null,
 	user_id: null			//should NEVER be left null
