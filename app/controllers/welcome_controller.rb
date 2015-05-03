@@ -21,29 +21,37 @@ class WelcomeController < ApplicationController
     #@current_user = User.find(10)
     @current_user ||= User.find(session[:user_id]) if session[:user_id]
     @reply = {}
-    i = 1
     l = 0
     while l < @labels.length do
       label = @labels[l]
       @favs = Favorite.for_user(@current_user.id).map(&:category)
-      @services = Service.active.map(&:name)
+      @services = Service.active.map(&:name.downcase)
       @businesses = Business.active.map(&:name)
       if @favs.include?(label)
         @lat = Favorite.by_category(label).map(&:latitude)[0]
         @lon = Favorite.by_category(label).map(&:longitude)[0]
         @addr = Favorite.by_category(label).map(&:street_1)[0] + ' ' + Favorite.by_category(label).map(&:city)[0] + ', ' + Favorite.by_category(label).map(&:state)[0] + ' ' + Favorite.by_category(label).map(&:zip_code)[0]
-        @reply.merge({i.to_s => ["lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr]})
+        @reply.merge!({label => ["lat" => @lat, "lon" => @lon, "name" => @name, "addr" => @addr]})
+        l += 1
       elsif @services.include?(label)
-        @service = Service.by_name(label)
-        for @point in @points do
-          @businesses = Business.by_service(@service.id).nearby(@point[0], @point[1], 10).limit(@num)
-          for @business in @businesses
-            @lat = @business.latitude
-            @lon = @business.longitude
-            @name = @business.name
-            @addr = @business.street_1 + ' ' + @business.city + ', ' + @business.state + ' ' + @business.zip_code
-            @reply.merge({i.to_s => ["lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr]})
+        @service = Service.by_name(label)[0]
+        p = 0
+        while p < @points.length do
+          @point = @points.fetch("0")
+          @businesses = Business.by_service(@service.id).near([@point.fetch("lat"), @point.fetch("lon")], 10).limit(@num).map(&:name)
+          b = 0
+          @options = []
+          while b < @businesses.length
+            name = @businesses[b]
+            @lat = Business.by_name(name).map(&:latitude)[0]
+            @lon = Business.by_name(name).map(&:longitude)[0]
+            @name = Business.by_name(name).map(&:name)[0]
+            @addr = Business.by_name(name).map(&:street_1)[0] + ' ' + Business.by_name(name).map(&:city)[0] + ', ' + Business.by_name(name).map(&:state)[0] + ' ' + Business.by_name(name).map(&:zip_code)[0]
+            @options += (["lat" => @lat, "lon" => @lon, "name" => @name, "addr" => @addr])
+            b += 1
           end
+          @reply.merge!({label => @options})
+          p += 1
         end
       elsif @businesses.include?(label)
         #assumes unique name
@@ -51,14 +59,13 @@ class WelcomeController < ApplicationController
         @lon = Business.by_name(label).map(&:longitude)[0]
         @name = Business.by_name(label).map(&:name)[0]
         @addr = Business.by_name(label).map(&:street_1)[0] + ' ' + Business.by_name(label).map(&:city)[0] + ', ' + Business.by_name(label).map(&:state)[0] + ' ' + Business.by_name(label).map(&:zip_code)[0]
-        @reply.merge({i.to_s => ["lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr]})
+        @reply.merge!({label => ["lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr]})
       elsif Geocoder.coordinates(label) then
         @coord = Geocoder.coordinates(label)
-        @reply.merge({i.to_s => ["lat"=>@coord[0], "lon"=>@coord[1],"name"=>"", "addr"=>@label]})
+        @reply.merge!({label => ["lat"=>@coord[0], "lon"=>@coord[1],"name"=>"", "addr"=>@label]})
       else
-        @reply = "Input is not acceptable"
+        @reply.merge!({label => "Input is not acceptable"})
       end
-      i += 1
       l += 1
     end
     respond_to do |format|
