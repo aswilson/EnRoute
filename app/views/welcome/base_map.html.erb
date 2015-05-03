@@ -8,12 +8,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <title>EnRoute - Plan your next stop</title>
-    <!-- Bootstrap Core CSS -->
-    <!-- Custom CSS -->
-    <!-- Custom JS -->
-    <!-- jQuery Version 1.11.0 -->
-    <!-- Bootstrap Core JavaScript -->
-    <!-- Custom Fonts -->
+	<!--Note: this page requires map.js, RouteTools.js, and routeForm.js-->
 </head>
 
 <body>
@@ -108,7 +103,7 @@
                 <div class="options-table-container">
                     <table width="100%">
                         <tr class="border-bottom">
-                            <td width="50%"><div class="row-text align-left">Time limit (minutes)</div></td>
+                            <td width="50%"><div class="row-text align-left">Time limit</div></td>
                             <td><div class="row-text align-right dropdown">
 								<input id="time-limit" type="text" class="input-text form-control inline"/>
 							</div></td>
@@ -189,50 +184,24 @@
                             </tr>
                         </table>
                         <!-- Stops -->
-                        <table width="100%">
-                            <tr class="border-bottom">
+                        <table id="directions-table" width="100%">
+                            <tr id="locationPrototype" class="border-bottom">
                                 <td width="50%">
-                                    <div id="location" class="row-text align-left" style="color: #202020">My Location</div>
+                                    <div class="location-label row-text align-left" style="color: #202020">My Location</div>
                                 </td>
                                 <td>
-                                    <div id="location-address" class="row-text align-right" style="color: #202020">123 Main St.</div>
+                                    <div class="location-address row-text align-right" style="color: #202020">123 Main St.</div>
                                 </td>
                             </tr>
                             <!-- Next Stop -->
-                            <tr class="border-bottom">
+                            <tr id="stepsPrototype" class="border-bottom">
                                 <td colspan='2'>
-                                    <div class="directions-table">
-                                        <table width='100%'>
-                                            <tr>
-                                                <td><%= image_tag "Map-32.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
-                                            </tr>
-                                            <tr>
-                                                <td><%= image_tag "Map-32.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Next Stop -->
-                            <tr class="border-bottom">
-                                <td colspan='2'>
-                                    <div class="directions-table">
-                                        <table width='100%'>
-                                            <tr>
-                                                <td><%= image_tag "Map-32.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
-                                            </tr>
-                                            <tr>
-                                                <td><%= image_tag "Map-33.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                            </tr>
-                                            <tr>
-                                                <td><%= image_tag "Map-34.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
+                                    <div>
+                                        <table class="steps-table" width='100%'>
+                                            <tr id="instructionPrototype">
+                                                <td><%= image_tag "Map-32.png", size:"21", :class => "instruction-icon" %></td>
+                                                <td><div class="instruction-text">Head North on asdf</div></td>
+                                                <td rowspan='10'><div class="instruction-duration align-right"> 5 min </div></td>
                                             </tr>
                                         </table>
                                     </div>
@@ -303,7 +272,7 @@
 								<div class="row-text align-left">Password</div>
 							</td>
 							<td>
-								<div class="row-text align-right"><a href="/change-password">*****</a></div>
+								<div class="row-text align-right"><a href="/users/<%= logged_in? ? current_user.id : "-1"%>/edit">*****</a></div>
 							</td>
 						</tr>
 					</table>
@@ -423,10 +392,10 @@
 									</div>
 								</div></td>
                                 <td><div class="row-text align-right">
-									<input id="taskModal_arrive_at" type="text" hidden="true"/>
-									<input id="taskModal_arrive_after" type="text" hidden="true"/>
+									<input id="taskModal_arrive_at" type="time" hidden="true"/>
+									<input id="taskModal_arrive_after" type="time" hidden="true"/>
 									<span id="taskModal_arrive_and" hidden="true">and</span>
-									<input id="taskModal_arrive_before" type="text" hidden="true"/>
+									<input id="taskModal_arrive_before" type="time" hidden="true"/>
 								</div></td>
                             </tr>
 							<tr id="taskModal_leave_container" class="border-bottom">
@@ -443,10 +412,10 @@
 									</div>
 								</div></td>
                                 <td><div class="row-text align-right">
-									<input id="taskModal_leave_at" type="text" hidden="true"/>
-									<input id="taskModal_leave_after" type="text" hidden="true"/>
+									<input id="taskModal_leave_at" type="time" hidden="true"/>
+									<input id="taskModal_leave_after" type="time" hidden="true"/>
 									<span id="taskModal_leave_and" hidden="true">and</span>
-									<input id="taskModal_leave_before" type="text" hidden="true"/>
+									<input id="taskModal_leave_before" type="time" hidden="true"/>
 								</div></td>
                             </tr>
 							<tr id="taskModal_minutesNeeded_container" class="thick-border-bottom">

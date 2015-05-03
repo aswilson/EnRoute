@@ -55,19 +55,19 @@ var TestData = {
 	CMULoc: { name:"CMU", addr:"500 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
 	fakeUserId: 6,
 	fakeUserName: "Bob",
-	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40, lon:-80 },
+	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40.42, lon:-80 },
 	fakeFavorites: [
-		{ id:1234, name:"Starbucks", category:"coffee", notes:"", business_id:null, user_id:6, latitude:40, longitude:-81,
+		{ id:1234, name:"Starbucks", category:"coffee", notes:"", business_id:null, user_id:6, latitude:40.41, longitude:-80.01,
 			street_1:"456 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
-		{ id:2345, name:"Chipotle", category:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-82,
+		{ id:2345, name:"Chipotle", category:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-80.02,
 			street_1:"789 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
-		{ id:6789, name:"Library", category:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-83,
+		{ id:6789, name:"Library", category:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-80.03,
 			street_1:"987 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" }
 	],
 	makeFakeSuggestions: function(str) { return [
-		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:41, lon:-79, notes:"" },
-		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:42, lon:-79, notes:"Note note note" },
-		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:43, lon:-79, notes:"" }
+		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:40.44, lon:-80 },
+		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:40.45, lon:-80 },
+		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:40.46, lon:-80 }
 	];}
 }
 
@@ -133,19 +133,15 @@ var RouteTools = {};
 
 RouteTools.EMPTYRANGE = EMPTYRANGE;
 RouteTools.EMPTYFAVORITE = EMPTYFAVORITE;
-
 RouteTools.makeTask = function(data) {
 	return _replaceSpecifiedMembers(EMPTYTASK, data);
 };
-
 RouteTools.makeFavorite = function(data) {
 	return _replaceSpecifiedMembers(EMPTYFAVORITE, data);
 };
-
 RouteTools.makeRoute = function(data) {
 	return _replaceSpecifiedMembers(EMPTYROUTE, data);
 };
-
 RouteTools.deleteTask = function(route, number) {
 	if (route.tasks.length==1)
 		route.tasks[0] = RouteTools.makeTask({});
@@ -155,7 +151,6 @@ RouteTools.deleteTask = function(route, number) {
 RouteTools.addTask = function(route, tInfo) {
 	route.tasks.push(RouteTools.makeTask(tInfo));
 }
-
 RouteTools.moveTask = function(route, oldPos, newPos) {
 	if (newPos<0) newPos = 0;
 	if (newPos>route.tasks.length) newPos = route.tasks.length-1;
@@ -165,11 +160,22 @@ RouteTools.moveTask = function(route, oldPos, newPos) {
 	route.tasks.splice(insertAt,0,task);
 	route.tasks.splice(removeAt,1);
 }
+RouteTools.routeIsFilledOut = function(route) {
+	for (var i=0; i<route.tasks.length; i++) {
+		if (route.tasks[i].loc==undefined || route.tasks[i].error!=undefined)
+			return false;
+	}
+	return true;
+}
 
-RouteTools.rangeToString = function(range) {
-	return "<"+range.start+","+range.end+">";
-};
-
+RouteTools.favToLoc = function(fav) {
+	return {
+		name: fav.name,
+		addr: RouteTools.piecesToAddrString(fav),
+		lat: fav.latitude,
+		lon: fav.longitude
+	};
+}
 RouteTools.locToLatLon = function(loc) {
 	return {lat: loc.lat, lon: loc.lon};
 }
@@ -200,6 +206,10 @@ RouteTools.alterImgUrlPiece = function($img, piece, newVal) {
 	$img.attr("src", RouteTools.piecesToImgString(pieces));
 }	
 
+RouteTools.isAddress = function(str) {
+	//broken
+	return (str.length > 10);
+}
 RouteTools.piecesToAddrString = function(pieces) {
 	return (pieces.street_1
 		+ (pieces.street_2!="" ? ", " : "")
