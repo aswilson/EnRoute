@@ -608,19 +608,24 @@ function getAndUpdateDirections() {
 			],
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].addr
-		}
+		};
+		// For loop waiting for all the callback functions to return
 		for (int i=1; i < myRoute.tasks.length; i++) {
-			var results = MapControls.drawRoute(myRoute.tasks[i-1], myRoute.tasks[i], '#00FF00');
-			var instructions = [];
-			var leg = results.routes[0].legs[i-1];
-			for (int j=0; j < leg.steps.length; j++) {
-				instructions.push(leg.steps[j].instructions);
-			}
-			steps[i-1].dLabel = myRoute.tasks[i].label;
-			steps[i-1].text = instructions;
-			steps[i-1].destination = leg.end_address;
-			steps[i-1].duration = leg.duration.text;
+			var task = myRoute.tasks[i-1];
+			/// DrawRoute has a callback function
+			MapControls.drawRoute(task, myRoute.tasks[i], '#00FF00', function (results) {
+				var instructions = [];
+				var leg = results.routes[0].legs[i-1];
+				for (int j=0; j < leg.steps.length; j++) {
+					instructions.push(leg.steps[j].instructions);
+				}
+				steps[i-1].dLabel = myRoute.tasks[i].label;
+				steps[i-1].text = instructions;
+				steps[i-1].destination = leg.end_address;
+				steps[i-1].duration = leg.duration.text;
+			});
 		}
+		// Code we want to do only after we're all done with the callbacks
 		updateDirections(directionData);
 		$("#route-input").hide();
 		$("#route-output").show();
@@ -718,6 +723,7 @@ $(document).ready(function() {
 		updateMap();
 	});
 	$("#route-find-button").click(function() {
+		debugger;
 		if (RouteTools.routeIsFilledOut(myRoute))
 			getAndUpdateDirections();
 		else

@@ -225,14 +225,14 @@ MapControls.drawRoute = function(loc1, loc2, color, callback) {}
       if (status == google.maps.DirectionsStatus.OK) {
           directionsDisplay.setDirections(result);
           directionsResult = result;
+          directionsDisplay.setMap(map);
+          routes.push(directionsDisplay);
+          callback(directionsResult);
       } else {
           console.log( "drawRoute failed getting directions because" + status);
           callback(undefined);
       }
     });
-    directionsDisplay.setMap(map);
-    routes.push(directionsDisplay);
-    callback(directionsResult);
 };
 
 return MapControls;
