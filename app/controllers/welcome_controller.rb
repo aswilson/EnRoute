@@ -47,12 +47,11 @@ class WelcomeController < ApplicationController
         end
       elsif @businesses.include?(label)
         #assumes unique name
-        @business = Business.by_name(label)
-        @lat = @business.latitude
-        @lon = @business.longitude
-        @name = @business.name
-        @addr = @business.street_1 + ' ' + @business.city + ', ' + @business.state + ' ' + @business.zip_code
-        @reply += ["lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr]
+        @lat = Business.by_name(label).map(&:latitude)[0]
+        @lon = Business.by_name(label).map(&:longitude)[0]
+        @name = Business.by_name(label).map(&:name)[0]
+        @addr = Business.by_name(label).map(&:street_1)[0] + ' ' + Business.by_name(label).map(&:city)[0] + ', ' + Business.by_name(label).map(&:state)[0] + ' ' + Business.by_name(label).map(&:zip_code)[0]
+        @reply.merge({i.to_s => ["lat"=>@lat, "lon"=>@lon, "name"=>@name, "addr"=>@addr]})
       elsif Geocoder.coordinates(label) then
         @coord = Geocoder.coordinates(label)
         @reply.merge({i.to_s => ["lat"=>@coord[0], "lon"=>@coord[1],"name"=>"", "addr"=>@label]})
