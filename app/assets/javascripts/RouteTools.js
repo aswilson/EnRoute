@@ -258,6 +258,26 @@ RouteTools.piecesToAddrString = function(pieces) {
 	return lines[0] + (lines[1]!="" ? ", " : "") + lines[1];
 }
 
+RouteTools.objsEqual = function(o1, o2) {
+	var k1 = Object.keys(o1).sort();
+	var k2 = Object.keys(o2).sort();
+	if (k1.length != k2.length)
+		return false;
+	for (var i=0; i<k1.length; i++) {
+		var k = k1[i];
+		if (k2[i] != k)
+			return false;
+		if ((typeof o1[k]==="object") && (typeof o2[k]==="object")) {
+			if (!RouteTools.objsEqual(o1[k], o2[k]))
+				return false;
+		} else {
+			if (o1[k] != o2[k])
+				return false;
+		}
+		return true;
+	}
+}
+
 RouteTools.ROUTESTARTINGATCMU = RouteTools.makeRoute({tasks:[RouteTools.makeTask({label:"CMU",loc:TestData.CMULoc})]});
 
 return RouteTools;

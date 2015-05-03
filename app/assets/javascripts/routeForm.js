@@ -1,28 +1,8 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = false;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
+var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
-var PINHTML = '<div class="pin-popover">\
-	<table class="table-container">\
-		<tr>\
-			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
-			<td><div id="popover-label" class="row-text">Coffee</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-		</tr>\
-	</table>\
-  </div>';
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
@@ -54,9 +34,6 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
 	--make actually-text-field and not-actually-text-field used consistently throughout the site
 --Joseph
-	--let the user change the chosen location...
-		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
-		--https://groups.google.com/forum/#!topic/google-maps-js-api-v3/pB9WwaMGNSA
 	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
 --other pages
@@ -157,11 +134,6 @@ function showMsgMomentarily(msg,type,time) {
 			showMsg("","info");
 	}, time);
 }
-function makeLoopsafeResponder(input,fn) {
-	return function() {
-		fn(input);
-	}
-}
 
 
 /* Stuff for updating the displays */
@@ -229,10 +201,7 @@ function updateMap() {
 		if (loc!=undefined) {
 			var id = "pinPopover_"+i;
 			var $popover = makeBasicPopup(id,loc,myRoute.tasks[i].label);
-			$popover.find('img.pinPopover-useMe-button').show();
-			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){
-				$("#"+id+" .pinPopover-useMe-button").click(function(){alert("hi");});
-			});
+			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){});
 			if (prevPinNum!=undefined)
 				var lineNum = MapControls.addLine(prevPinNum, pinNum, '#666600');
 			prevPinNum = pinNum;
@@ -263,17 +232,31 @@ function updateDirections(directionData) {
 	}
 }
 function showAlternatePins(taskNo) {
+	function makeInitializer(id,taskNo,optNo) {
+		return function(infobox){
+			$("#"+id+" .pinPopover-useMe-button").click(function(){
+				myRoute.tasks[taskNo].loc = altOptions[optNo];
+				updateRouteForm();
+				updateMap();
+			});
+		};
+	}
 	//clear old altPins
-	for (var i=0; i<altPins.length; i++)
-		MapControls.removePin(altPins[i]);
+	for (var j=0; j<altPins.length; j++)
+		MapControls.removePin(altPins[j]);
 	altPins = [];
 	//add new altPins
 	var task = myRoute.tasks[taskNo];
 	var altOptions = locationOptions[task.label];
 	if (altOptions==undefined || $.type(altOptions)==="string")
 		return;
-	for (var i=0; i<altOptions.length; i++) {
-		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML, function(infobox){});
+	for (var j=0; j<altOptions.length; j++) {
+		if (RouteTools.objsEqual(altOptions[j],task.loc))
+			continue;
+		var id = "pinPopover_"+taskNo+"_"+j;
+		var $popover = makeBasicPopup(id,altOptions[j],task.label);
+		$popover.find('img.pinPopover-useMe-button').show();
+		var pinNum = MapControls.placePin(altOptions[j], taskNo, false, $popover.get(0), makeInitializer(id,taskNo,j));
 		altPins.push(pinNum);
 	}
 	MapControls.recenter();
