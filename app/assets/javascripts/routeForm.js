@@ -1,5 +1,5 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
+var FAKEIT = false;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";

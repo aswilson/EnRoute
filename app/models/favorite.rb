@@ -7,7 +7,7 @@ class Favorite < ActiveRecord::Base
   
   CATEGORIES_LIST = ["blank", "restaurant", "atm", "coffee", "bank", "groceries", "pharmacy", "books", "work", "gas", "home", "post office"]
   
-  validates_presence_of :name, :category
+  validates_presence_of :name, :category, :user_id
   validates :state, inclusion: { in: STATES_LIST.map{|a,b| b}, message: "is not a valid state", allow_blank: true }
   validates :zip_code, format: { with: /\A\d{5}\z/, message: "should be five digits long", allow_blank: true }
   validates :category, inclusion: { in: CATEGORIES_LIST, message: "is not a valid category", allow_blank: false}
