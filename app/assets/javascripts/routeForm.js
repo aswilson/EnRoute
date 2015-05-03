@@ -14,26 +14,24 @@ var busy = false;						//indicates we're busy talking to the server, so the user
 var mapReady = false;					//used to indicate whether it is safe to call the MapControls functions
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
+var locationPrototype, stepsPrototype;  //helps update directions table from HTML
+var instructionPrototype;	            //helps update directions table from HTML
 
 /* WORK STILL NEEDED:
 --Allie
 	--getting location choices from the backend (it works with fake data)
 --Jackie
-	--timepicker for the times ("chronic" gem recommended)
-	--get pins to display on map properly: involves altering or removing updateMap()
-	--write getAndUpdateDirections() and updateDirections()
-	--the popup for details that appears near pins on the map...
+	--kill login popup: take user to a new page instead
+	--give a warning popup confirmation before taking user to password-changing screen
+	--make the disk image on the direction-getting page do something, or remove it
+	--Make the images all transparent again
+	--get rid of the ugly black in the background when you mouse-over an <a> tag
 --Joseph
 	--let the user change the chosen location...
 		--will involve altering or removing: updateLocChoicesArea, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
 --making fillInRoute actually smart (ie, acknowledge constraints)
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 --detecting impossible conditions before talking to backend (and setting task.error accordingly)
---kill login popup: take user to a new page instead
---give a warning popup confirmation before taking user to password-changing screen
---make the disk image on the direction-getting page do something, or remove it
---Make the images all transparent again
---get rid of the ugly black in the background when you mouse-over an <a> tag
 
 --update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -199,22 +197,42 @@ function updateLocChoicesArea(locSuggestions) {
 }
 function updateMap() {
 	if (mapReady) {
-/*		MapControls.clearMap();
+		MapControls.clearMap();
 		var prevPinNum = undefined;
 		for (var i=0; i<myRoute.tasks.length; i++) {
 			var loc = myRoute.tasks[i].loc;
 			if (loc!=undefined) {
-				var pinNum = MapControls.placePin(locToLatLon(loc, "pin.png"));
+				var html = "coffee";
+				var pinNum = MapControls.placePin(locToLatLon(loc, i, true, html);
 				if (prevPinNum!=undefined)
 					var lineNum = MapControls.addLine(prevPinNum, pinNum);
 				prevPinNum = pinNum;
 			}
 		}
-		MapControls.recenter();*/
+		MapControls.recenter();
 	}
 }
+//directionData = {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
 function updateDirections(directionData) {
-	//JACKIE - fill this in however you wish
+	var directionsTable = $('#directions-table').empty();
+	var locationRow = locationPrototype.clone(true).attr("id", "location0");
+	locationRow.find('.location-label').attr('value', directionData.sLabel);
+	locationRow.find('.location-address').attr('value', directionData.start);
+	directionsTable.append(locationRow);
+	for (var i=0; i < directionData.steps.length; i++) {
+		var steps = directionData.steps[i];
+		var stepsRow = stepsPrototype.clone(true).attr("id", "steps" + i);
+		var stepsTable = stepsRow.find('.step-table').empty();
+		for (var j=0; j < steps.text.length; j++) {
+			var instructionText = steps.text[j];
+			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+j);
+			instructionRow.find('.instruction-text').attr('value', instructionText);
+			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
+			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
+			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
+			instructionRow.find('.instruction-duration').attr('value', steps.duration);
+		}
+	}
 }
 function setTimerangeDisp(baseId, range) {
 	var l = baseId;
@@ -548,12 +566,36 @@ function fillInRoute(route, locChoices) {
 	}
 };
 function getAndUpdateDirections() {
-	var directionData = {};
-	//JACKIE - fill this in however you wish
-	updateDirections(directionData);
-	$("#route-input").hide();
-	$("#route-output").show();
-	updateBackgroundSizes();
+	if (myRoute.tasks.length > 1) {
+		var directionData = {
+			steps: [
+				{
+					text: [],
+					destination: "",
+					dLabel: "",
+					duration: ""
+				}
+			],
+			sLabel: myRoute.tasks[0].label,
+			start: myRoute.tasks[0].addr
+		}
+		for (int i=1; i < myRoute.tasks.length; i++) {
+			var results = MapControls.drawRoute(myRoute.tasks[i-1], myRoute.tasks[i], '#00FF00');
+			var instructions = [];
+			var leg = results.routes[0].legs[i-1];
+			for (int j=0; j < leg.steps.length; j++) {
+				instructions.push(leg.steps[j].instructions);
+			}
+			steps[i-1].dLabel = myRoute.tasks[i].label;
+			steps[i-1].text = instructions;
+			steps[i-1].destination = leg.end_address;
+			steps[i-1].duration = leg.duration.text;
+		}
+		updateDirections(directionData);
+		$("#route-input").hide();
+		$("#route-output").show();
+		updateBackgroundSizes();
+	}
 };
 
 
@@ -782,6 +824,9 @@ $(document).ready(function() {
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
 	favoritePrototype = $('tr#favoritePrototype').clone(true);
+	locationPrototype = $('tr#locationPrototype').clone(true);
+	stepsPrototype = $('tr#stepsPrototype').clone(true);
+	instructionPrototype = $('tr#instructionPrototype').clone(true);
 
 	/* Make HTML match the data */
 	var addr = (myUserInfo.homeLoc!=undefined) ? myUserInfo.homeLoc.addr : "???";

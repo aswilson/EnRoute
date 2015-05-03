@@ -222,11 +222,11 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 };
 
 // Color is string in hash format. ex. '#FF0000' '#666666'
-// Adds the shortest path between the two pins
-MapControls.drawRoute = function(pinId1, pinId2, color) {
+// Adds the shortest path between the two locations {name, addr, lon, lat}
+MapControls.drawRoute = function(loc1, loc2, color, callback) {
   var request = {
-      origin: getPin(pinId1).position,
-      destination: getPin(pinId2).position,
+      origin: new google.maps.LatLng(loc1.lat,loc1.lon),
+      destination: new google.maps.LatLng(loc2.lat,loc2.lon),
       travelMode: google.maps.TravelMode.DRIVING
     };
     var directionsDisplay = new google.maps.DirectionsRenderer({
@@ -234,13 +234,19 @@ MapControls.drawRoute = function(pinId1, pinId2, color) {
           strokeColor: color
       }
     });
+    var directionsResult;
     directionsService.route(request, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
           directionsDisplay.setDirections(result);
+          directionsResult = result;
+      } else {
+          console.log( "drawRoute failed getting directions because" + status);
+          callback(undefined);
       }
     });
     directionsDisplay.setMap(map);
     routes.push(directionsDisplay);
+    callback(directionsResult);
 };
 
 return MapControls;
