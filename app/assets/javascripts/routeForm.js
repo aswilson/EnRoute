@@ -3,15 +3,35 @@ var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pre
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
+var PINHTML = '<div class="pin-popover">\
+	<table class="table-container">\
+		<tr>\
+			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
+			<td><div id="popover-category" class="row-text">Coffee</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-address-1" class="row-text-2">Address</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
+		</tr>\
+	</table>\
+  </div>';
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
 var mySettings = {distInMiles: true};
 var locationOptions = {};				//map of location options for a task, from server.  Format: {label1:[loc1,loc2,...],label2:[],label3:errorString,...}, where loc has the format given by RouteTools.EMPTYTASK.loc
+var altPins = [];						//a list of all pins down as alternate locations (for easy removal)
 var taskNoBeingEdited = undefined;		//when saving changes, indicates which task gets the changes
 var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which favorite gets the changes
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
-var mapReady = false;					//used to indicate whether it is safe to call the MapControls functions
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
 var locationPrototype, stepsPrototype;  //helps update directions table from HTML
@@ -21,21 +41,33 @@ var instructionPrototype;	            //helps update directions table from HTML
 --Allie
 	--getting location choices from the backend (it works with fake data)
 --Jackie
-	--kill login popup: take user to a new page instead
+	--make the "log in" button work
+		--EITHER kill the login popup and take user to a new page instead
+		--OR make it work somehow
 	--give a warning popup confirmation before taking user to password-changing screen
 	--make the disk image on the direction-getting page do something, or remove it
+	--fix the "blank" category image
 	--Make the images all transparent again
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
+	--make actually-text-field and not-actually-text-field used consistently throughout the site
 --Joseph
 	--let the user change the chosen location...
-		--will involve altering or removing: updateLocChoicesArea, takeSuggestion, showQuickEditTaskWindow, hideQuickEditTaskWindow
+		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
+	--fix the lock/unlock/move mechanism
+	--new pin-mapping scheme for map.js
+	--add hover-over hints for what stuff means
+--other pages
+	--make the main page auto-redirect to the map after a moment
+		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
+--make the pin popups dismiss when click other pins or anywhere else
 --making fillInRoute actually smart (ie, acknowledge constraints)
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 --detecting impossible conditions before talking to backend (and setting task.error accordingly)
 
+
 --update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
---make favorites scrollable if it gets too long
+--make favorites scrollable if it gets too long (or just cap it)
 --cap the number of steps in the route
 */
 
@@ -178,39 +210,22 @@ function updateFavoriteEditWindow(fav) {
 	$('input#favoritesModal_category').val(fav.category.toLowerCase());
 	setCategorySelectedDisp($('div#favoritesModal_category_container'), fav.category.toLowerCase());
 }
-function updateLocChoicesArea(locSuggestions) {
-	//update message display
-	if (locSuggestions==undefined || locSuggestions.length==0) {
-		$('span#locChoices-message').empty().append("No suitable locations found (click \"Find Route\" to try again)");
-		$('ul#locChoices-list').empty();
-		return;
-	}
-	$('span#locChoices-message').empty().append("Location choices:");
-	var htmlLocList = $('ul#locChoices-list').empty();
-	function makeCallbackFn(num) {	//see http://stackoverflow.com/questions/7053965/when-using-callbacks-inside-a-loop-in-javascript-is-there-any-way-to-save-a-var
-		return function() { takeSuggestion(num); };
-	};
-	for (var i=0; i<locSuggestions.length; i++) {
-		var loc = $('<li>').click(makeCallbackFn(i)).append(locSuggestions[i].name+": "+locOps[i].addr);
-		htmlLocList.append(loc);
-	}
-}
 function updateMap() {
-	if (mapReady) {
-		MapControls.clearMap();
-		var prevPinNum = undefined;
-		for (var i=0; i<myRoute.tasks.length; i++) {
-			var loc = myRoute.tasks[i].loc;
-			if (loc!=undefined) {
-				var html = "coffee";
-				var pinNum = MapControls.placePin(locToLatLon(loc, i, true, html);
-				if (prevPinNum!=undefined)
-					var lineNum = MapControls.addLine(prevPinNum, pinNum);
-				prevPinNum = pinNum;
-			}
+/*
+	altPins = [];
+	MapControls.clearMap();
+	var prevPinNum = undefined;
+	for (var i=0; i<myRoute.tasks.length; i++) {
+		var loc = myRoute.tasks[i].loc;
+		if (loc!=undefined) {
+			var pinNum = MapControls.placePin(loc, i, true, PINHTML);
+			if (prevPinNum!=undefined)
+				var lineNum = MapControls.addLine(prevPinNum, pinNum);
+			prevPinNum = pinNum;
 		}
-		MapControls.recenter();
 	}
+	MapControls.recenter();
+*/
 }
 //directionData = {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
 function updateDirections(directionData) {
@@ -233,6 +248,22 @@ function updateDirections(directionData) {
 			instructionRow.find('.instruction-duration').attr('value', steps.duration);
 		}
 	}
+}
+function showAlternatePins(taskNo) {
+	//clear old altPins
+	for (var i=0; i<altPins.length; i++)
+		MapControls.removePin(altPins[i]);
+	altPins = [];
+	//add new altPins
+	var task = myRoute.tasks[taskNo];
+	var altOptions = locationOptions[task.label];
+	if (altOptions==undefined || $.type(altOptions)==="string")
+		return;
+	for (var i=0; i<altOptions.length; i++) {
+		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML);
+		altPins.push(pinNum);
+	}
+	MapControls.recenter();
 }
 function setTimerangeDisp(baseId, range) {
 	var l = baseId;
@@ -498,7 +529,7 @@ function fillInRouteWithFreshOptions() {
 			else
 				reply[requestBody.labels[i]] = TestData.makeFakeSuggestions(requestBody.labels[i]);
 		}
-		setTimeout(function(){onSuccess(reply);}, 3000);
+		setTimeout(function(){onSuccess(reply);}, 1500);
 	}
 }
 
@@ -532,8 +563,7 @@ function updateTaskLabelAndLoc(task, newText) {
 			return;
 		}
 	}
-	if (mapReady && RouteTools.isAddress(newText)) {
-		alert("This looks like an address.  Not done");
+	if (RouteTools.isAddress(newText)) {
 		MapControls.getLatLon(newText, function(latLon) {
 			var retVal = latLon==undefined ? undefined : {
 					name: "",
@@ -599,32 +629,10 @@ function getAndUpdateDirections() {
 };
 
 
-/* Stuff for quick task editing */
-function showQuickEditTaskWindow(number) {
-	taskNoBeingEdited = number;
-	updateLocChoicesArea(locationOptions[myRoute.tasks[number].label]);
-	$('div#popup-task-editor').hide();
-	$('div#popup-locChoices').show();
-}
-function takeSuggestion(suggestionNumber) {
-	if (taskNoBeingEdited==undefined) return;
-	var task = myRoute.tasks[taskNoBeingEdited];
-	var locOps = locationOptions[task.label];
-	if (locOps==undefined || locOps.length<=suggestionNumber) return;
-	task.loc = locOps[suggestionNumber];
-	hideQuickEditTaskWindow();
-}
-function hideQuickEditTaskWindow() {
-	taskNoBeingEdited = undefined;
-	$('div#popup-locChoices').hide();
-}
-
-
 /* Apply it all */
 //when the window loads, initialize the map
 google.maps.event.addDomListener(window, 'load', function() {
 	MapControls.initialize('map-canvas');
-	mapReady=true;
 	updateMap();
 });
 $(document).ready(function() {
@@ -679,8 +687,6 @@ $(document).ready(function() {
 		}
 	}
 	setDraggable($("a.move-button"), draggingFns);
-//	$("input.task-label").focusout(function(){setTimeout(hideQuickEditTaskWindow,150);});
-//	$("input.task-label").focusin(function(){setTimeout(showQuickEditTaskWindow(getTaskNumber($(this))),250);});
 	$("input.task-label").focusout(function(){
 		var taskNo = getTaskNumber($(this));
 		var newText = $(this).val();
@@ -701,6 +707,10 @@ $(document).ready(function() {
 			updateRouteForm();
 			updateMap();
 		}
+	});
+	$("a.taskStatus").click(function(){
+		var taskNo = getTaskNumber($(this));
+		showAlternatePins(taskNo);
 	});
 	$("#add-stop-button").click(function(){
 		RouteTools.addTask(myRoute, {});
@@ -746,6 +756,7 @@ $(document).ready(function() {
 		RouteTools.addTask(myRoute, taskInfo);
 		updateRouteForm();
 		updateMap();
+		$("a[href=#routeTab]").tab('show');
 		showMsgMomentarily("added \""+fav.name+"\" to end of route","info",2000);
 	});
 	
@@ -834,7 +845,6 @@ $(document).ready(function() {
 	updateFavoritesList();
 	updateRouteForm();
 	updateMap();
-//	updateLocChoicesArea([]);
 	$("a[href=#routeTab]").tab('show');
 	
 	/* Start getting user info */
@@ -854,9 +864,45 @@ $(document).ready(function() {
 
 })("enroute-dhcs.herokuapp.com", RouteTools.ROUTESTARTINGATCMU);	//end IIAF
 
-/* What was the point in this?  I just removed it, for now
-	$('#favorite-form input').on('change', function() {
-		 $('input[name=favToAdd]', '#favorite-form').parent().parent().find("#favorites-edit-button").hide();
-		 $('input[name=favToAdd]:checked', '#favorite-form').parent().parent().find("#time-options-button").show();
-	  });
+
+/* Old functions no longer in use:
+
+function updateLocChoicesArea(locSuggestions) {
+	//update message display
+	if (locSuggestions==undefined || locSuggestions.length==0) {
+		$('span#locChoices-message').empty().append("No suitable locations found (click \"Find Route\" to try again)");
+		$('ul#locChoices-list').empty();
+		return;
+	}
+	$('span#locChoices-message').empty().append("Location choices:");
+	var htmlLocList = $('ul#locChoices-list').empty();
+	function makeCallbackFn(num) {	//see http://stackoverflow.com/questions/7053965/when-using-callbacks-inside-a-loop-in-javascript-is-there-any-way-to-save-a-var
+		return function() { takeSuggestion(num); };
+	};
+	for (var i=0; i<locSuggestions.length; i++) {
+		var loc = $('<li>').click(makeCallbackFn(i)).append(locSuggestions[i].name+": "+locOps[i].addr);
+		htmlLocList.append(loc);
+	}
+}
+function showQuickEditTaskWindow(number) {
+	taskNoBeingEdited = number;
+	updateLocChoicesArea(locationOptions[myRoute.tasks[number].label]);
+	$('div#popup-task-editor').hide();
+	$('div#popup-locChoices').show();
+}
+function takeSuggestion(suggestionNumber) {
+	if (taskNoBeingEdited==undefined) return;
+	var task = myRoute.tasks[taskNoBeingEdited];
+	var locOps = locationOptions[task.label];
+	if (locOps==undefined || locOps.length<=suggestionNumber) return;
+	task.loc = locOps[suggestionNumber];
+	hideQuickEditTaskWindow();
+}
+function hideQuickEditTaskWindow() {
+	taskNoBeingEdited = undefined;
+	$('div#popup-locChoices').hide();
+}
+//	$("input.task-label").focusout(function(){setTimeout(hideQuickEditTaskWindow,150);});
+//	$("input.task-label").focusin(function(){setTimeout(showQuickEditTaskWindow(getTaskNumber($(this))),250);});
+
 */
