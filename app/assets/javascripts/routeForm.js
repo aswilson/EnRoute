@@ -34,16 +34,28 @@ var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which fa
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
+var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
 --Allie
 	--getting location choices from the backend (it works with fake data)
 --Jackie
 	--timepicker for the times ("chronic" gem recommended)
+		-> sounds like it's done, but can you tell me just how to get and use the value?
 	--write getAndUpdateDirections() and updateDirections()
+		-> sounds like it's not quite done yet.
+	--make the "log in" button work
+		--EITHER kill the login popup and take user to a new page instead
+		--OR make it work somehow
+	--give a warning popup confirmation before taking user to password-changing screen
+	--make the disk image on the direction-getting page do something, or remove it
+	--Make the images all transparent again
+	--get rid of the ugly black in the background when you mouse-over an <a> tag
+	--make actually-text-field and not-actually-text-field used consistently throughout the site
 --Joseph
 	--let the user change the chosen location...
 		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
+	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
 	--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 --other pages
@@ -51,16 +63,7 @@ var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn 
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
 --making fillInRoute actually smart (ie, acknowledge constraints)
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
---detecting impossible conditions before talking to backend (and setting task.error accordingly)
---make the "log in" button work
-	--EITHER kill the login popup and take user to a new page instead
-	--OR make it work somehow
---give a warning popup confirmation before taking user to password-changing screen
---make the disk image on the direction-getting page do something, or remove it
---fix the "blank" category image
---Make the images all transparent again
---get rid of the ugly black in the background when you mouse-over an <a> tag
---make actually-text-field and not-actually-text-field used consistently throughout the site
+--detecting impossible conditions before talking to backend (and setting task.error accordingly
 
 --update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -223,7 +226,25 @@ function updateMap() {
 	MapControls.recenter();
 }
 function updateDirections(directionData) {
-	//JACKIE - fill this in however you wish
+	//directionData takes the form {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}able = $('#directions-table').empty();
+	var locationRow = locationPrototype.clone(true).attr("id", "location0");
+	locationRow.find('.location-label').attr('value', directionData.sLabel);
+	locationRow.find('.location-address').attr('value', directionData.start);
+	directionsTable.append(locationRow);
+	for (var i=0; i < directionData.steps.length; i++) {
+		var steps = directionData.steps[i];
+		var stepsRow = stepsPrototype.clone(true).attr("id", "steps" + i);
+		var stepsTable = stepsRow.find('.step-table').empty();
+		for (var j=0; j < steps.text.length; j++) {
+			var instructionText = steps.text[j];
+			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+j);
+			instructionRow.find('.instruction-text').attr('value', instructionText);
+			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
+			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
+			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
+			instructionRow.find('.instruction-duration').attr('value', steps.duration);
+		}
+	}
 }
 function showAlternatePins(taskNo) {
 	//clear old altPins
@@ -575,12 +596,34 @@ function fillInRoute(route, locChoices) {
 	}
 };
 function getAndUpdateDirections() {
-	var directionData = {};
-	//JACKIE - fill this in however you wish
-	updateDirections(directionData);
-	$("#route-input").hide();
-	$("#route-output").show();
-	updateBackgroundSizes();
+	if (myRoute.tasks.length > 1) {
+		var directionData = {
+			steps: [ {
+				text: [],
+				destination: "",
+				dLabel: "",
+				duration: ""
+			} ],
+			sLabel: myRoute.tasks[0].label,
+			start: myRoute.tasks[0].addr
+		}
+		for (var i=1; i<myRoute.tasks.length; i++) {
+			var results = MapControls.drawRoute(myRoute.tasks[i-1], myRoute.tasks[i], '#00FF00');
+			var instructions = [];
+			var leg = results.routes[0].legs[i-1];
+			for (var j=0; j < leg.steps.length; j++) {
+				instructions.push(leg.steps[j].instructions);
+			}
+			steps[i-1].dLabel = myRoute.tasks[i].label;
+			steps[i-1].text = instructions;
+			steps[i-1].destination = leg.end_address;
+			steps[i-1].duration = leg.duration.text;
+		}
+		updateDirections(directionData);
+		$("#route-input").hide();
+		$("#route-output").show();
+		updateBackgroundSizes();
+	}
 };
 
 
@@ -789,6 +832,9 @@ $(document).ready(function() {
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
 	favoritePrototype = $('tr#favoritePrototype').clone(true);
+	locationPrototype = $('tr#locationPrototype').clone(true);
+	stepsPrototype = $('tr#stepsPrototype').clone(true);
+	instructionPrototype = $('tr#instructionPrototype').clone(true);
 
 	/* Make HTML match the data */
 	var addr = (myUserInfo.homeLoc!=undefined) ? myUserInfo.homeLoc.addr : "???";
