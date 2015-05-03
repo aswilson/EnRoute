@@ -208,31 +208,42 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds the shortest path between the two locations {name, addr, lon, lat}
-MapControls.drawRoute = function(loc1, loc2, color, callback) {}
+MapControls.drawRoute = function(myRoute, color) {
   if (map==undefined) { console.log("MapControls not initialized"); return; }
-  var request = {
-      origin: new google.maps.LatLng(loc1.lat,loc1.lon),
-      destination: new google.maps.LatLng(loc2.lat,loc2.lon),
-      travelMode: google.maps.TravelMode.DRIVING
-    };
+  if (tasks.length > 1) {
+    var tasks = myRoute.tasks;
+    var waypts = [];
+    if (tasks.length > 2) {
+      for (var i = 1; i < tasks.length-1; i++) {
+        waypts.push({
+          location:tasks[i].addr,
+          stopover:true});
+      }
+    }
+    var request = {
+        origin: new google.maps.LatLng(tasks[0].lat, tasks[0].lon),
+        destination: new google.maps.LatLng(tasks[tasks.length-1].lat, tasks[tasks.length-1].lon),
+        travelMode: google.maps.TravelMode.DRIVING
+      };
     var directionsDisplay = new google.maps.DirectionsRenderer({
-      polylineOptions: {
-          strokeColor: color
-      }
+        polylineOptions: {
+            strokeColor: color
+        }
     });
-    var directionsResult;
-    directionsService.route(request, function(result, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-          directionsDisplay.setDirections(result);
-          directionsResult = result;
-          directionsDisplay.setMap(map);
-          routes.push(directionsDisplay);
-          callback(directionsResult);
-      } else {
-          console.log( "drawRoute failed getting directions because" + status);
-          callback(undefined);
-      }
-    });
+      var directionsResult;
+      directionsService.route(request, function(result, status) {
+        if (status == google.maps.DirectionsStatus.OK) {
+            directionsDisplay.setDirections(result);
+            directionsResult = result;
+            directionsDisplay.setMap(map);
+            routes.push(directionsDisplay);
+            callback(directionsResult);
+        } else {
+            console.log( "drawRoute failed getting directions because" + status);
+            callback(undefined);
+        }
+      });
+    }
 };
 
 return MapControls;
