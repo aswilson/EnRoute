@@ -25,14 +25,18 @@ class WelcomeController < ApplicationController
     while l < @labels.length do
       label = @labels[l]
       @favs = Favorite.for_user(@current_user.id).map(&:category)
-      @services = Service.active.map(&:name.downcase)
+      @services = Service.active.map(&:name)
       @businesses = Business.active.map(&:name)
       if @favs.include?(label)
         @lat = Favorite.by_category(label).map(&:latitude)[0]
         @lon = Favorite.by_category(label).map(&:longitude)[0]
         @addr = Favorite.by_category(label).map(&:street_1)[0] + ' ' + Favorite.by_category(label).map(&:city)[0] + ', ' + Favorite.by_category(label).map(&:state)[0] + ' ' + Favorite.by_category(label).map(&:zip_code)[0]
         @reply.merge!({label => ["lat" => @lat, "lon" => @lon, "name" => @name, "addr" => @addr]})
-        l += 1
+      elsif @favs.include?(label.downcase)
+        @lat = Favorite.by_category(label.downcase).map(&:latitude)[0]
+        @lon = Favorite.by_category(label.downcase).map(&:longitude)[0]
+        @addr = Favorite.by_category(label.downcase).map(&:street_1)[0] + ' ' + Favorite.by_category(label.downcase).map(&:city)[0] + ', ' + Favorite.by_category(label.downcase).map(&:state)[0] + ' ' + Favorite.by_category(label.downcase).map(&:zip_code)[0]
+        @reply.merge!({label => ["lat" => @lat, "lon" => @lon, "name" => @name, "addr" => @addr]})
       elsif @services.include?(label)
         @service = Service.by_name(label)[0]
         p = 0
@@ -53,7 +57,27 @@ class WelcomeController < ApplicationController
           @reply.merge!({label => @options})
           p += 1
         end
-      elsif @businesses.include?(label)
+      elsif @services.include?(label.capitalize)
+        @service = Service.by_name(label.capitalize)[0]
+        p = 0
+        while p < @points.length do
+          @point = @points.fetch("0")
+          @businesses = Business.by_service(@service.id).near([@point.fetch("lat"), @point.fetch("lon")], 10).limit(@num).map(&:name)
+          b = 0
+          @options = []
+          while b < @businesses.length
+            name = @businesses[b]
+            @lat = Business.by_name(name).map(&:latitude)[0]
+            @lon = Business.by_name(name).map(&:longitude)[0]
+            @name = Business.by_name(name).map(&:name)[0]
+            @addr = Business.by_name(name).map(&:street_1)[0] + ' ' + Business.by_name(name).map(&:city)[0] + ', ' + Business.by_name(name).map(&:state)[0] + ' ' + Business.by_name(name).map(&:zip_code)[0]
+            @options += (["lat" => @lat, "lon" => @lon, "name" => @name, "addr" => @addr])
+            b += 1
+          end
+          @reply.merge!({label => @options})
+          p += 1
+        end
+      elsif @businesses.include?(label) or @businesses.include?(label.capitalize)
         #assumes unique name
         @lat = Business.by_name(label).map(&:latitude)[0]
         @lon = Business.by_name(label).map(&:longitude)[0]
