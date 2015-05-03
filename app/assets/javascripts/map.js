@@ -126,24 +126,14 @@ MapControls.recenter = function() {
 	//map_recenter(map.getCenter(), 100, 0);
 };
 
-// Puts a marker with image at the latlng location on the map. I'm just going to use latlon as the id.
+// Puts a marker with image at the latlng location on the map
 //locData = {lat, lon, name, address}
 //markerNum = {0-8}
-//primary = {true, false}
+//primary = {true, false} - indicates whether to show a faded or dark pin
 // If not primary, then secondary, eg. an alternate option
-// Categories - line 7
-MapControls.placePin = function(locData, markerNum, primary, category) {
+// popupContents - html to go in infobox
+MapControls.placePin = function(locData, markerNum, primary, popupContents) {
   if (!initialized) { console.log("MapControls not initialized"); return; }
-  
-/*  var pp = new google.maps.LatLng(locData.lat,locData.lon);
-  var marker = new google.maps.Marker({ map: map, position: pp, icon: {
-        url: "/assets/pin-normal-1.png",
-        scaledSize: new google.maps.Size(22, 41),
-        origin: new google.maps.Point(0,0),
-        anchor: new google.maps.Point(11, 41)
-  }});
-  return;*/
-  
   var marker = new google.maps.Marker({
       position: new google.maps.LatLng(locData.lat,locData.lon)
   });
@@ -165,29 +155,8 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
       };
   }
   marker.setIcon(icon);
-  var html = '<div class="pin-popover">\
-    <table class="table-container">\
-        <tr>\
-            <td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
-            <td><div id="popover-category" class="row-text">Coffee</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-        </tr>\
-    </table>\
-  </div>';
-
   var infoboxOptions = {
-     content: html,
+     content: popupContents,
      boxStyle: { 
         width: "226px",
         height: "151px",

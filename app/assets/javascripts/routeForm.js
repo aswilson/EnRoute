@@ -3,6 +3,26 @@ var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pre
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
+var PINHTML = '<div class="pin-popover">\
+	<table class="table-container">\
+		<tr>\
+			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
+			<td><div id="popover-category" class="row-text">Coffee</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-address-1" class="row-text-2">Address</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
+		</tr>\
+	</table>\
+  </div>';
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
@@ -222,8 +242,7 @@ function showAlternatePins(taskNo) {
 	if (altOptions==undefined || $.type(altOptions)==="string")
 		return;
 	for (var i=0; i<altOptions.length; i++) {
-		var pinImgName = (taskNo<8 ? ""+(taskNo+1) : "blank");
-		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, "blank");
+		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML);
 		altPins.push(pinNum);
 	}
 	MapControls.recenter();
