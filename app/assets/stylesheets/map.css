@@ -25,6 +25,11 @@ img {
     vertical-align: top;
 }
 
+.nav-tabs>li.active>a {
+    background-color: #DAE5E5;
+    opacity: 0.8;
+}
+
 input[type=text] {
     width: 165.823px;
     height: 21.545px;
@@ -64,6 +69,21 @@ div.category-table-container td {
     padding-left: 8px;
     padding-bottom: 8px;
     padding-top: 0px;
+}
+
+#tabs li {
+    width:25%;
+}
+
+#tabs img {
+    display: block;
+    margin: auto;
+}
+
+.nav-tabs > li > a {
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
 }
 
 .actually-text-field {
@@ -116,7 +136,8 @@ div.category-table-container td {
 }
 
 .gray {
-    background-color: gray;
+    background-color: #616667;
+    opacity: 0.92;
 }
 
 .inline {
@@ -228,7 +249,7 @@ div.category-table-container td {
 }
 
 .teal {
-    background-color: #DAE5E5;
+    background-color: #CADAE1;
 }
 
 .transparant {
@@ -300,9 +321,13 @@ div.category-table-container td {
     margin-left: 15px;
 }
 
+#tabs {
+    padding-left: 0px;
+}
+
 .overlay {
     position: absolute;
-    display: table;
+    display: tabsle;
     top: 43px;
     left: 0px;
     width: 346px;
