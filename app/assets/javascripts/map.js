@@ -173,14 +173,20 @@ MapControls.placePin = function(locData, markerNum, primary, popupContents, init
         scaledSize: new google.maps.Size(22, 41),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(11, 41)
-      };
+    };
   } else {
-    icon = {
+	icon = {
+        url: "/assets/pin-faded-" + pinImgName + ".png",
+        scaledSize: new google.maps.Size(22, 41),
+        origin: new google.maps.Point(0,0),
+        anchor: new google.maps.Point(11, 41)
+    };
+    /*icon = {
         url: "/assets/pin-faded2-" + pinImgName + ".png",
         scaledSize: new google.maps.Size(16, 30),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(8,30)
-      };
+    };*/
   }
   var marker = new google.maps.Marker({
 	  map: map,
@@ -192,7 +198,7 @@ MapControls.placePin = function(locData, markerNum, primary, popupContents, init
      content: popupContents,
      boxStyle: { 
         width: "226px",
-        height: "151px",
+        height: (primary ? "121px" : "151px"),
         backgroundColor: "#808080"
      },
      infoBoxClearance: new google.maps.Size(1,1)

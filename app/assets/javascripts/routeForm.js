@@ -3,26 +3,6 @@ var FAKEIT = false;		//if FAKEIT==true, fake talking to backend (also lets us pr
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
-var PINHTML = '<div class="pin-popover">\
-	<table class="table-container">\
-		<tr>\
-			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
-			<td><div id="popover-label" class="row-text">Coffee</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-		</tr>\
-	</table>\
-  </div>';
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
@@ -38,42 +18,33 @@ var pinPopoverPrototype;				//helps create popovers for pins
 var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
---Allie
-	--getting location choices from the backend (it works with fake data)
---Jackie
-	--timepicker for the times ("chronic" gem recommended)
-		-> sounds like it's done, but can you tell me just how to get and use the value?
-	--write getAndUpdateDirections() and updateDirections()
-		-> sounds like it's not quite done yet.
-	--make the "log in" button work
-		--EITHER kill the login popup and take user to a new page instead
-		--OR make it work somehow
-	--give a warning popup confirmation before taking user to password-changing screen
-	--make the disk image on the direction-getting page do something, or remove it
-	--Make the images all transparent again
-	--get rid of the ugly black in the background when you mouse-over an <a> tag
-	--make actually-text-field and not-actually-text-field used consistently throughout the site
---Joseph
-	--let the user change the chosen location...
-		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
-		--https://groups.google.com/forum/#!topic/google-maps-js-api-v3/pB9WwaMGNSA
-	--stop the "too much recursion" error that happens when adding a favorite
-	--fix the lock/unlock/move mechanism
---other pages
+-- <Jackie> re-point enroute-map.com
+-- large cosmetic issues (like making images transparent)
+	-- <Jackie> Make the images all transparent again
+	-- <Jackie> Make actually-text-field and not-actually-text-field used consistently throughout the site
+	-- The main page logo is WAY too big
+	-- Fix problems with RouteTools address stuff (isAddress(),addrStringToPieces(),piecesToAddrString(), etc)
+	-- Get google to stop adding extra pins when it draws a route
+-- <Allie> getting actual locations from the backend
+-- make route planning actually intelligent rather than taking the first suggestion we hear about and ignorming constraints (will be a lot easier once we have actual info from the backend)
+	-- <Jackie> making the timepicker actually yield info for our tasks
+	-- actually making it smart
+	-- <Joseph> detecting impossible conditions before talking to backend (and setting task.error accordingly)
+-- <Jackie> displaying directions after you plan the route
+-- <Joseph> changing the lock/unlock/move mechanism
+-- <Joseph> fixing a bug with "Add to Route" on the Favorites tab (if there's not a lot of time, the button can just be removed, and we can demo the feature by typing the Favorite's name; it will find and add it correctly)
+-- more minor cosmetic issues
+	-- <Jackie> make the "log in" button work or kill it
 	--make the main page auto-redirect to the map after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
---making fillInRoute actually smart (ie, acknowledge constraints)
---Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
---fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
-	--probably involves changing the lookup system in map.js
---get google to stop adding extra pins when it draws a route
---detecting impossible conditions before talking to backend (and setting task.error accordingly)
---add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
-
---update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
-	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
---make favorites scrollable if it gets too long (or just cap it)
---cap the number of steps in the route
+	--fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
+		--probably involves changing the lookup system in map.js
+--super minor changes
+	--add hover-over hints (tooltips) for what stuff means.  See a#taskStatus for an example of how.
+	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
+		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
+	--cap the number of steps in the route
+	--make favorites scrollable if it gets too long (or just cap it)
 */
 
 
@@ -92,9 +63,9 @@ function doAjax(ty,action,dat,onSuccess,onFail) {
 	$.ajax({ type: ty, url: action, data: dat
 	}).done( function(reply) {
 		onSuccess(reply)
-	}).fail( function( xmlHttpRequest, statusText, errorThrown ) {
-		console.log("Ajax failed.\n\n"
-			+ "XML Http Request: " + JSON.stringify( xmlHttpRequest )
+	}).fail( function( xmlHttpReply, statusText, errorThrown ) {
+		console.log("Ajax failed.\n"
+			+ "XML Http Reply: " + JSON.stringify( xmlHttpReply )
 			+ ",\nStatus Text: " + statusText
 			+ ",\nError Thrown: " + errorThrown );
 		onFail(errorThrown);
@@ -156,11 +127,6 @@ function showMsgMomentarily(msg,type,time) {
 		if (curMsgNum == myMsgNum)	//only erase our message if it is the most recent
 			showMsg("","info");
 	}, time);
-}
-function makeLoopsafeResponder(input,fn) {
-	return function() {
-		fn(input);
-	}
 }
 
 
@@ -229,10 +195,7 @@ function updateMap() {
 		if (loc!=undefined) {
 			var id = "pinPopover_"+i;
 			var $popover = makeBasicPopup(id,loc,myRoute.tasks[i].label);
-			$popover.find('img.pinPopover-useMe-button').show();
-			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){
-				$("#"+id+" .pinPopover-useMe-button").click(function(){alert("hi");});
-			});
+			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){});
 			if (prevPinNum!=undefined)
 				var lineNum = MapControls.addLine(prevPinNum, pinNum, '#666600');
 			prevPinNum = pinNum;
@@ -263,17 +226,31 @@ function updateDirections(directionData) {
 	}
 }
 function showAlternatePins(taskNo) {
+	function makeInitializer(id,taskNo,optNo) {
+		return function(infobox){
+			$("#"+id+" .pinPopover-useMe-button").click(function(){
+				myRoute.tasks[taskNo].loc = altOptions[optNo];
+				updateRouteForm();
+				updateMap();
+			});
+		};
+	}
 	//clear old altPins
-	for (var i=0; i<altPins.length; i++)
-		MapControls.removePin(altPins[i]);
+	for (var j=0; j<altPins.length; j++)
+		MapControls.removePin(altPins[j]);
 	altPins = [];
 	//add new altPins
 	var task = myRoute.tasks[taskNo];
 	var altOptions = locationOptions[task.label];
 	if (altOptions==undefined || $.type(altOptions)==="string")
 		return;
-	for (var i=0; i<altOptions.length; i++) {
-		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML, function(infobox){});
+	for (var j=0; j<altOptions.length; j++) {
+		if (RouteTools.objsEqual(altOptions[j],task.loc))
+			continue;
+		var id = "pinPopover_"+taskNo+"_"+j;
+		var $popover = makeBasicPopup(id,altOptions[j],task.label);
+		$popover.find('img.pinPopover-useMe-button').show();
+		var pinNum = MapControls.placePin(altOptions[j], taskNo, false, $popover.get(0), makeInitializer(id,taskNo,j));
 		altPins.push(pinNum);
 	}
 	MapControls.recenter();
