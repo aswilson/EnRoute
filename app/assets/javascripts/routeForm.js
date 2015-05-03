@@ -64,6 +64,7 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 --fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
 	--probably involves changing the lookup system in map.js
+--get google to stop adding extra pins when it draws a route
 --detecting impossible conditions before talking to backend (and setting task.error accordingly)
 --add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 
@@ -228,7 +229,7 @@ function updateMap() {
 	MapControls.recenter();
 }
 function updateDirections(directionData) {
-	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
+	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }], sLabel: string, start: string (address) }
 	var directionsTable = $('#directions-table').empty();
 	var locationRow = locationPrototype.clone(true).attr("id", "location0");
 	locationRow.find('.location-label').attr('value', directionData.sLabel);
@@ -239,12 +240,12 @@ function updateDirections(directionData) {
 		var stepsRow = stepsPrototype.clone(true).attr("id", "steps" + i);
 		var stepsTable = stepsRow.find('.step-table').empty();
 		for (var j=0; j < steps.text.length; j++) {
-			var instructionText = steps.text[j];
-			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+j);
-			instructionRow.find('.instruction-text').attr('value', instructionText);
-			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
-			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
-			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
+			var s = steps.text[j];
+			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+"_"+j);
+			instructionRow.find('.instruction-text').attr('value', s);
+			if (s.indexOf("left") > -1) instructionRow.find('.instruction-icon').attr('value', "L");
+			else if (s.indexOf("right") > -1) instructionRow.find('.instruction-icon').attr('value', "R");
+			else if (s.indexOf("continue") > -1) instructionRow.find('.instruction-icon').attr('value', "C");
 			instructionRow.find('.instruction-duration').attr('value', steps.duration);
 		}
 	}
@@ -599,40 +600,48 @@ function fillInRoute(route, locChoices) {
 	}
 };
 function getAndUpdateDirections() {
-	if (myRoute.tasks.length > 1) {
-		var directionData = {
-			steps: [ {
-				text: [],
-				destination: "",
-				dLabel: "",
-				duration: ""
-			} ],
+	if (myRoute.tasks.length < 2)
+		return;
+	showMsg("Getting directions...","info");
+	//prepare helper function
+	function translateDirections(googleDirections) {
+		var dirRoute = googleDirections.routes[0];
+		var output = {
+			steps: [],	//one step per stop, plus this blank one at the start
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].addr
 		};
-		MapControls.drawRoute(myRoute, '#00FF00', function (results) {
-			if (results != undefined) {
-				var route = results.routes[0];
-				for (var i=1; i < route.legs.length; i++) {
-					var leg = route.legs[i-1];
-					var instructions = [];
-					for (var j=0; j < leg.steps.length; j++) {
-						instructions.push(leg.steps[j].instructions);
-					}
-					steps[i-1].dLabel = myRoute.tasks[i].label;
-					steps[i-1].text = instructions;
-					steps[i-1].destination = leg.end_address;
-					steps[i-1].duration = leg.duration.text;
-				}
-				updateDirections(directionData);
-				$("#route-input").hide();
-				$("#route-output").show();
-				updateBackgroundSizes();
-			} else {
-				console.log("MapControls.drawRoute returned undefined results");
-			}
-		});
+		for (var i=0; i<dirRoute.legs.length; i++) {
+			var leg = dirRoute.legs[i];
+			var instructions = [];
+			for (var j=0; j < leg.steps.length; j++)
+				instructions.push(leg.steps[j].instructions);
+			output.steps.push({
+				text: instructions,
+				destination: leg.end_location,
+				dLabel: leg.end_address,
+				duration: leg.duration
+			});
+		}
+		return output;
 	}
+	//request the directions
+	MapControls.getDirections(myRoute, function(googleDirections) {
+		if (googleDirections==undefined) {
+			showMsgMomentarily("Failed to get directions from google","error",2000);
+		} else if (googleDirections.status != google.maps.DirectionsStatus.OK) {
+			showMsgMomentarily("Failed to get directions from google: "+googleDirections.status,"error",2000);
+		} else {
+			showMsg("","info");
+			MapControls.clearLines();
+			MapControls.drawRoute(googleDirections, '#00FF00');
+			var directionData = translateDirections(googleDirections);
+			updateDirections(directionData);
+			$("#route-input").hide();
+			$("#route-output").show();
+			updateBackgroundSizes();
+		}
+	});
 };
 
 
