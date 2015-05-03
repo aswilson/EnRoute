@@ -81,6 +81,38 @@ MapControls.getLatLon = function(addr, callback) {
 	});
 };
 
+// Takes a list of stops (in the form {lat,lon}) and, asynchroneously, returns the directions to follow
+// Input is supposed to match routes as given in RouteTools.js
+// Return result is of the type given here: https://developers.google.com/maps/documentation/javascript/directions#DirectionsRequests#DirectionsResults
+MapControls.getDirections = function(route, callback) {
+	//build request
+	var tasks = route.tasks;
+	if (tasks.length < 2) {
+		callback(undefined);
+		return;
+	}
+    var waypts = [];
+    if (tasks.length > 2) {
+      for (var i=1; i<tasks.length-1; i++)
+        waypts.push({ location:tasks[i].loc.addr, stopover:true, });
+    }
+    var request = {
+        origin: new google.maps.LatLng(tasks[0].loc.lat, tasks[0].loc.lon),
+		waypoints: waypts,
+        destination: new google.maps.LatLng(tasks[tasks.length-1].loc.lat, tasks[tasks.length-1].loc.lon),
+        travelMode: google.maps.TravelMode.DRIVING
+    };
+	//request the directions
+	directionsService.route(request, function(result, status) {
+		if (status == google.maps.DirectionsStatus.OK) {
+			callback(result);
+		} else {
+			console.log( "MapControls.getDirections() failed: " + status);
+			callback(undefined);
+		}
+	});
+};
+
 // Deletes all markers and lines on the map
 MapControls.clearMap = function() {
 	if (map==undefined) { console.log("MapControls not initialized"); return; }
@@ -183,8 +215,8 @@ MapControls.removePin = function(pinId) {
 	}
 };
 
-// Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds a straight line between the pins
+//   Color is string in hash format. ex. '#FF0000' '#666666'
 MapControls.addLine = function(pinId1, pinId2, color) {
   if (map==undefined) { console.log("MapControls not initialized"); return; }
   var pathCoordinates = [
@@ -204,135 +236,17 @@ MapControls.addLine = function(pinId1, pinId2, color) {
     return path; //Who knows what this would end up being :/ hope it's an id tho.
 };
 
-// Color is string in hash format. ex. '#FF0000' '#666666'
-// Adds the shortest path between the two locations {name, addr, lon, lat}
-MapControls.drawRoute = function(myRoute, color, callback) {
-  if (map==undefined) { console.log("MapControls not initialized"); return; }
-  var tasks = myRoute.tasks;
-  if (tasks.length > 1) {
-    var waypts = [];
-    if (tasks.length > 2) {
-      for (var i = 1; i < tasks.length-1; i++) {
-        waypts.push({
-          location:tasks[i].loc.addr,
-          stopover:true});
-      }
-    }
-    var request = {
-        origin: new google.maps.LatLng(tasks[0].loc.lat, tasks[0].loc.lon),
-        destination: new google.maps.LatLng(tasks[tasks.length-1].loc.lat, tasks[tasks.length-1].loc.lon),
-        travelMode: google.maps.TravelMode.DRIVING
-      };
-    var directionsDisplay = new google.maps.DirectionsRenderer({
-        polylineOptions: {
-            strokeColor: color
-        }
-    });
-      var directionsResult;
-      directionsService.route(request, function (result, status) {
-        if (status == google.maps.DirectionsStatus.OK) {
-            directionsDisplay.setDirections(result);
-            directionsResult = result;
-            directionsDisplay.setMap(map);
-            routes.push(directionsDisplay);
-            callback(directionsResult);
-        } else {
-            console.log( "drawRoute failed getting directions because" + status);
-            callback(undefined);
-        }
-      });
-    }
+// Draws the line given by "directions", which takes the form given here: https://developers.google.com/maps/documentation/javascript/directions#DirectionsRequests#DirectionsResults
+//   Color is string in hash format. ex. '#FF0000' '#666666'
+MapControls.drawRoute = function(directions, color) {
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
+	var drawnRoute = new google.maps.DirectionsRenderer({
+		map: map,
+		directions: directions,
+		polylineOptions: { strokeColor: color }
+	});
+	routes.push(drawnRoute);
 };
 
 return MapControls;
 })();
-
- /*    USED FOR TESTING MARKERS AND INFOWINDOWS
-//Handles click events on a map, and adds a new point to the Polyline.
-//  @param {google.maps.MouseEvent} event
-function addLatLng(event) {
-  var poly;
-  if (lines.length == 0) {
-    poly = new google.maps.Polyline({
-      geodesic: true,
-      strokeColor: '#00FF00',
-      strokeOpacity: 1.0,
-      strokeWeight: 2
-    });
-    lines.push(poly);
-  } else {
-    poly = lines[0];
-  }
-  var path = poly.getPath();
-
-  // Because path is an MVCArray, we can simply append a new coordinate
-  // and it will automatically appear.
-  path.push(event.latLng);
-  poly.setMap(map);
-
-  var marker = new google.maps.Marker({
-      position: event.latLng
-  });
-  var icon;
-  var primary = true;
-  var markerNum = 0;
-  if (primary) {
-    icon = {
-        url: "pin-normal-" + markerNum + ".png",
-        scaledSize: new google.maps.Size(22, 41),
-        origin: new google.maps.Point(0,0),
-        anchor: new google.maps.Point(11, 41)
-      };
-  } else {
-    icon = {
-        url: "pin-normal2-" + markerNum + ".png",
-        scaledSize: new google.maps.Size(16, 30),
-        origin: new google.maps.Point(0,0),
-        anchor: new google.maps.Point(8,30)
-      };
-  }
-  marker.setIcon(icon);
-  var html = '<div class="pin-popover">\
-    <table class="table-container">\
-        <tr>\
-            <td><img id="popover-icon" src="category-blue1-coffee.png" width="35px" height="35px"/></td>\
-            <td><div id="popover-category" class="row-text">Coffee</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-        </tr>\
-    </table>\
-  </div>';
-
-  var infoboxOptions = {
-     content: html,
-     boxStyle: { 
-        width: "226px",
-        height: "131px",
-        backgroundColor: "#808080"
-     },
-     infoBoxClearance: new google.maps.Size(1, 1)
-  };
-  var infobox = new InfoBox(infoboxOptions);
-  marker.setMap(map);
-  markers.push(marker);
-  google.maps.event.addListener(map, 'click', function() {
-       infobox.setMap(null);
-  });
-  google.maps.event.addListener(marker, 'click', function() {
-    infobox.open(map,marker);
-  });
-  google.maps.event.addListener(map, "click", function(event) {
-    infobox.close();
-  });
-}
-*/
