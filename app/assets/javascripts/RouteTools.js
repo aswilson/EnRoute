@@ -133,19 +133,15 @@ var RouteTools = {};
 
 RouteTools.EMPTYRANGE = EMPTYRANGE;
 RouteTools.EMPTYFAVORITE = EMPTYFAVORITE;
-
 RouteTools.makeTask = function(data) {
 	return _replaceSpecifiedMembers(EMPTYTASK, data);
 };
-
 RouteTools.makeFavorite = function(data) {
 	return _replaceSpecifiedMembers(EMPTYFAVORITE, data);
 };
-
 RouteTools.makeRoute = function(data) {
 	return _replaceSpecifiedMembers(EMPTYROUTE, data);
 };
-
 RouteTools.deleteTask = function(route, number) {
 	if (route.tasks.length==1)
 		route.tasks[0] = RouteTools.makeTask({});
@@ -155,7 +151,6 @@ RouteTools.deleteTask = function(route, number) {
 RouteTools.addTask = function(route, tInfo) {
 	route.tasks.push(RouteTools.makeTask(tInfo));
 }
-
 RouteTools.moveTask = function(route, oldPos, newPos) {
 	if (newPos<0) newPos = 0;
 	if (newPos>route.tasks.length) newPos = route.tasks.length-1;
@@ -165,11 +160,22 @@ RouteTools.moveTask = function(route, oldPos, newPos) {
 	route.tasks.splice(insertAt,0,task);
 	route.tasks.splice(removeAt,1);
 }
+RouteTools.routeIsFilledOut = function(route) {
+	for (var i=0; i<route.tasks.length; i++) {
+		if (route.tasks[i].loc==undefined || route.tasks[i].error!=undefined)
+			return false;
+	}
+	return true;
+}
 
-RouteTools.rangeToString = function(range) {
-	return "<"+range.start+","+range.end+">";
-};
-
+RouteTools.favToLoc = function(fav) {
+	return {
+		name: fav.name,
+		addr: RouteTools.piecesToAddrString(fav),
+		lat: fav.latitude,
+		lon: fav.longitude
+	};
+}
 RouteTools.locToLatLon = function(loc) {
 	return {lat: loc.lat, lon: loc.lon};
 }
@@ -200,6 +206,10 @@ RouteTools.alterImgUrlPiece = function($img, piece, newVal) {
 	$img.attr("src", RouteTools.piecesToImgString(pieces));
 }	
 
+RouteTools.isAddress = function(str) {
+	//broken
+	return (str.length > 10);
+}
 RouteTools.piecesToAddrString = function(pieces) {
 	return (pieces.street_1
 		+ (pieces.street_2!="" ? ", " : "")

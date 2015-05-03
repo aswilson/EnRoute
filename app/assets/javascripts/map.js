@@ -5,7 +5,7 @@ var directionsService = new google.maps.DirectionsService();
 var markers = [];
 var lines = [];
 var routes = [];
-var curInfoBox = undefined;
+var curInfoBox = undefined;		//if one is open, this tracks it so we can close it
 
 // non-public helper functions
 function map_recenter(latlng,offsetx,offsety) {
@@ -83,16 +83,14 @@ MapControls.getLatLon = function(addr, callback) {
 
 // Deletes all markers and lines on the map
 MapControls.clearMap = function() {
-  if (map==undefined) { console.log("MapControls not initialized"); return; }
-  for (var i = 0; i < markers.length; i++) {
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
+	closeInfoboxes();
+	for (var i = 0; i < markers.length; i++)
       markers[i].setMap(null);
-    }
-    for (var j = 0; j < lines.length; j++) {
+    for (var j = 0; j < lines.length; j++)
       lines[j].setMap(null);
-    }
-    for (var k = 0; k < routes.length; j++) {
+    for (var k = 0; k < routes.length; k++)
       routes[k].setMap(null);
-    }
     markers = [];
     lines = [];
     routes = [];
@@ -101,18 +99,16 @@ MapControls.clearMap = function() {
 // Deletes all lines on the map
 MapControls.clearLines = function() {
     if (map==undefined) { console.log("MapControls not initialized"); return; }
-	for (var j = 0; j < lines.length; j++) {
+	for (var j = 0; j < lines.length; j++)
       lines[j].setMap(null);
-    }
     lines = [];
 };
 
 // Deletes all routes on the map
 MapControls.clearRoutes = function() {
     if (map==undefined) { console.log("MapControls not initialized"); return; }
-	for (var k = 0; k < routes.length; j++) {
+	for (var k = 0; k < routes.length; j++)
       routes[k].setMap(null);
-    }
     routes = [];
 };
 
@@ -179,9 +175,11 @@ MapControls.placePin = function(locData, markerNum, primary, popupContents) {
 // Inefficient - use sparingly
 MapControls.removePin = function(pinId) {
 	if (map==undefined) { console.log("MapControls not initialized"); return; }
-	for (var i = 0; i < markers.length; i++) {
-		if (markers[i].position.toString() === pinId)
+	for (var i=0; i<markers.length; i++) {
+		if (markers[i].position.toString() === pinId) {
+			markers[i].setMap(null);
 			markers.splice(i, 1);
+		}
 	}
 };
 
@@ -208,7 +206,11 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds the shortest path between the two locations {name, addr, lon, lat}
+<<<<<<< HEAD
 MapControls.drawRoute = function(myRoute, color) {
+=======
+MapControls.drawRoute = function(loc1, loc2, color, callback) {
+>>>>>>> e36ae41cb565db442e525b7462099ebe6b5b7093
   if (map==undefined) { console.log("MapControls not initialized"); return; }
   if (tasks.length > 1) {
     var tasks = myRoute.tasks;

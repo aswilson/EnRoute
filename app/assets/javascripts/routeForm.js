@@ -34,36 +34,38 @@ var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which fa
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
-var locationPrototype, stepsPrototype;  //helps update directions table from HTML
-var instructionPrototype;	            //helps update directions table from HTML
+var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
 --Allie
 	--getting location choices from the backend (it works with fake data)
 --Jackie
+	--timepicker for the times ("chronic" gem recommended)
+		-> sounds like it's done, but can you tell me just how to get and use the value?
+	--write getAndUpdateDirections() and updateDirections()
+		-> sounds like it's not quite done yet.
 	--make the "log in" button work
 		--EITHER kill the login popup and take user to a new page instead
 		--OR make it work somehow
 	--give a warning popup confirmation before taking user to password-changing screen
 	--make the disk image on the direction-getting page do something, or remove it
-	--fix the "blank" category image
 	--Make the images all transparent again
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
 	--make actually-text-field and not-actually-text-field used consistently throughout the site
 --Joseph
 	--let the user change the chosen location...
 		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
+	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
-	--new pin-mapping scheme for map.js
-	--add hover-over hints for what stuff means
 --other pages
 	--make the main page auto-redirect to the map after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
---make the pin popups dismiss when click other pins or anywhere else
 --making fillInRoute actually smart (ie, acknowledge constraints)
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
+--fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
+	--probably involves changing the lookup system in map.js
 --detecting impossible conditions before talking to backend (and setting task.error accordingly)
-
+--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 
 --update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -211,7 +213,6 @@ function updateFavoriteEditWindow(fav) {
 	setCategorySelectedDisp($('div#favoritesModal_category_container'), fav.category.toLowerCase());
 }
 function updateMap() {
-/*
 	altPins = [];
 	MapControls.clearMap();
 	var prevPinNum = undefined;
@@ -220,15 +221,14 @@ function updateMap() {
 		if (loc!=undefined) {
 			var pinNum = MapControls.placePin(loc, i, true, PINHTML);
 			if (prevPinNum!=undefined)
-				var lineNum = MapControls.addLine(prevPinNum, pinNum);
+				var lineNum = MapControls.addLine(prevPinNum, pinNum, '#666600');
 			prevPinNum = pinNum;
 		}
 	}
 	MapControls.recenter();
-*/
 }
-//directionData = {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
 function updateDirections(directionData) {
+	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
 	var directionsTable = $('#directions-table').empty();
 	var locationRow = locationPrototype.clone(true).attr("id", "location0");
 	locationRow.find('.location-label').attr('value', directionData.sLabel);
@@ -397,9 +397,11 @@ function getHomeLoc() {
 	var onSuccess = function(newHomeLoc) {
 		myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
 		$('span#homeAddr').empty().append(myUserInfo.homeLoc.addr);
+		var needsRedraw = false;
 		for (var i=0; i<myRoute.tasks.length; i++) {
 			var t = myRoute.tasks[i];
 			if (t.label.toLowerCase()==="home") {
+				needsRedraw = true;
 				t.label = "Home";
 				t.loc = myUserInfo.homeLoc;
 				t.error = undefined;
@@ -407,7 +409,8 @@ function getHomeLoc() {
 					updateTaskEditWindow(t);
 			}
 		}
-		updateMap();
+		if (needsRedraw)
+			updateMap();
 		showMsgMomentarily("Successfully obtained home address from server","info",1500);
 	}
 	var onFailure = function(err) {
@@ -587,7 +590,7 @@ function fillInRoute(route, locChoices) {
 				route.tasks[i].error = "No suitable location found";
 			} else if ($.type(res) === "string") {
 				route.tasks[i].error = "No suitable location found: " + res;
-			} if (res.length==0) {
+			} else if (res.length==0) {
 				route.tasks[i].error = "No suitable location found";
 			} else {
 				route.tasks[i].loc = res[0];
@@ -598,14 +601,12 @@ function fillInRoute(route, locChoices) {
 function getAndUpdateDirections() {
 	if (myRoute.tasks.length > 1) {
 		var directionData = {
-			steps: [
-				{
-					text: [],
-					destination: "",
-					dLabel: "",
-					duration: ""
-				}
-			],
+			steps: [ {
+				text: [],
+				destination: "",
+				dLabel: "",
+				duration: ""
+			} ],
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].addr
 		};
@@ -627,6 +628,8 @@ function getAndUpdateDirections() {
 				$("#route-input").hide();
 				$("#route-output").show();
 				updateBackgroundSizes();
+			} else {
+				console.log("MapControls.drawRoute returned undefined results");
 			}
 		});
 	}
@@ -719,7 +722,6 @@ $(document).ready(function() {
 	$("#add-stop-button").click(function(){
 		RouteTools.addTask(myRoute, {});
 		updateRouteForm();
-		updateMap();
 	});
 	$("#route-find-button").click(function() {
 		if (RouteTools.routeIsFilledOut(myRoute))
@@ -786,8 +788,8 @@ $(document).ready(function() {
 	$('#task-save-button').click(function() {
 		if (taskNoBeingEdited!=undefined) {
 			myRoute.tasks[taskNoBeingEdited] = readTaskFromEditWindow(myRoute.tasks[taskNoBeingEdited]);
-			updateRouteForm();
-			updateMap();
+			if (myRoute.tasks[taskNoBeingEdited].error != undefined)
+				updateRouteForm();
 		}
 		taskNoBeingEdited = undefined;
 		$("#taskModal").modal('hide');
@@ -848,7 +850,6 @@ $(document).ready(function() {
 	$('span#homeAddr').empty().append(addr);
 	updateFavoritesList();
 	updateRouteForm();
-	updateMap();
 	$("a[href=#routeTab]").tab('show');
 	
 	/* Start getting user info */
