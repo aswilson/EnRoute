@@ -206,25 +206,21 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds the shortest path between the two locations {name, addr, lon, lat}
-<<<<<<< HEAD
-MapControls.drawRoute = function(myRoute, color) {
-=======
-MapControls.drawRoute = function(loc1, loc2, color, callback) {
->>>>>>> e36ae41cb565db442e525b7462099ebe6b5b7093
+MapControls.drawRoute = function(myRoute, color, callback) {
   if (map==undefined) { console.log("MapControls not initialized"); return; }
+  var tasks = myRoute.tasks;
   if (tasks.length > 1) {
-    var tasks = myRoute.tasks;
     var waypts = [];
     if (tasks.length > 2) {
       for (var i = 1; i < tasks.length-1; i++) {
         waypts.push({
-          location:tasks[i].addr,
+          location:tasks[i].loc.addr,
           stopover:true});
       }
     }
     var request = {
-        origin: new google.maps.LatLng(tasks[0].lat, tasks[0].lon),
-        destination: new google.maps.LatLng(tasks[tasks.length-1].lat, tasks[tasks.length-1].lon),
+        origin: new google.maps.LatLng(tasks[0].loc.lat, tasks[0].loc.lon),
+        destination: new google.maps.LatLng(tasks[tasks.length-1].loc.lat, tasks[tasks.length-1].loc.lon),
         travelMode: google.maps.TravelMode.DRIVING
       };
     var directionsDisplay = new google.maps.DirectionsRenderer({
@@ -233,7 +229,7 @@ MapControls.drawRoute = function(loc1, loc2, color, callback) {
         }
     });
       var directionsResult;
-      directionsService.route(request, function(result, status) {
+      directionsService.route(request, function (result, status) {
         if (status == google.maps.DirectionsStatus.OK) {
             directionsDisplay.setDirections(result);
             directionsResult = result;
