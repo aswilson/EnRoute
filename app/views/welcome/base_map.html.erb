@@ -19,6 +19,18 @@
     
     <!-- Map -->
     <div id="map-canvas"></div>
+	<div id="pinPopover_Prototype" class="pinPopover" hidden="true">
+		<table class="table-container">
+			<tr><td><img class="pinPopover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>
+				<td><div class="pinPopover-label" class="row-text">Coffee</div></td></tr>
+			<tr><td></td><td><div class="pinPopover-name" class="row-text-2">Starbucks</div></td></tr>
+			<tr><td></td><td><div class="pinPopover-address-1" class="row-text-2">Address</div></td></tr>
+			<tr><td></td><td><div class="pinPopover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td></tr>
+			<tr><td colspan="2"><div align="center">
+				<%= image_tag "textButton-normal-useThis.png", size:"93x28", :class => "pinPopover-useMe-button" %>
+			</div></td></tr>
+		</table>
+	</div>
 
     <!-- Transparant Background -->
     <div id="menu-background" class="teal transparant menu"></div>

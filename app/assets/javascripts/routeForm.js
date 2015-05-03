@@ -7,7 +7,7 @@ var PINHTML = '<div class="pin-popover">\
 	<table class="table-container">\
 		<tr>\
 			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
-			<td><div id="popover-category" class="row-text">Coffee</div></td>\
+			<td><div id="popover-label" class="row-text">Coffee</div></td>\
 		</tr>\
 		<tr>\
 			<td></td>\
@@ -34,6 +34,7 @@ var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which fa
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
+var pinPopoverPrototype;				//helps create popovers for pins
 var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
@@ -55,6 +56,7 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --Joseph
 	--let the user change the chosen location...
 		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
+		--https://groups.google.com/forum/#!topic/google-maps-js-api-v3/pB9WwaMGNSA
 	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
 --other pages
@@ -155,6 +157,11 @@ function showMsgMomentarily(msg,type,time) {
 			showMsg("","info");
 	}, time);
 }
+function makeLoopsafeResponder(input,fn) {
+	return function() {
+		fn(input);
+	}
+}
 
 
 /* Stuff for updating the displays */
@@ -220,7 +227,12 @@ function updateMap() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var loc = myRoute.tasks[i].loc;
 		if (loc!=undefined) {
-			var pinNum = MapControls.placePin(loc, i, true, PINHTML);
+			var id = "pinPopover_"+i;
+			var $popover = makeBasicPopup(id,loc,myRoute.tasks[i].label);
+			$popover.find('img.pinPopover-useMe-button').show();
+			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){
+				$("#"+id+" .pinPopover-useMe-button").click(function(){alert("hi");});
+			});
 			if (prevPinNum!=undefined)
 				var lineNum = MapControls.addLine(prevPinNum, pinNum, '#666600');
 			prevPinNum = pinNum;
@@ -261,7 +273,7 @@ function showAlternatePins(taskNo) {
 	if (altOptions==undefined || $.type(altOptions)==="string")
 		return;
 	for (var i=0; i<altOptions.length; i++) {
-		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML);
+		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML, function(infobox){});
 		altPins.push(pinNum);
 	}
 	MapControls.recenter();
@@ -329,6 +341,18 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 	} else {
 		$img.hide();
 	}
+}
+function makeBasicPopup(id,loc,label) {
+	var $popover = pinPopoverPrototype.clone(true).attr("id",id).show();
+	var catName = RouteTools.coaxToCategory(label);
+	var addrLines = RouteTools.addrStringToTwoLines(loc.addr);
+	RouteTools.alterImgUrlPiece($popover.find("img.pinPopover-icon"), "name", catName);
+	$popover.find("div.pinPopover-label").empty().append(label);
+	$popover.find("div.pinPopover-name").empty().append(loc.name);
+	$popover.find("div.pinPopover-address-1").empty().append(addrLines[0]);
+	$popover.find("div.pinPopover-address-2").empty().append(addrLines[1]);
+	$popover.find('img.pinPopover-useMe-button').hide();
+	return $popover;
 }
 
 
@@ -850,6 +874,7 @@ $(document).ready(function() {
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
 	favoritePrototype = $('tr#favoritePrototype').clone(true);
+	pinPopoverPrototype = $('div#pinPopover_Prototype').clone(true);
 	locationPrototype = $('tr#locationPrototype').clone(true);
 	stepsPrototype = $('tr#stepsPrototype').clone(true);
 	instructionPrototype = $('tr#instructionPrototype').clone(true);

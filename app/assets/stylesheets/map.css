@@ -244,17 +244,17 @@ div.category-table-container td {
     right: 30px;
     top: 16px;
 }
-.pin-popover {
+.pinPopover {
     left: 22px;
     top: 16px;
     color: #00B4E3;
 }
 
-#popover-address-1 {
+.pinPopover-address-1 {
     color: #e0dede;
 }
 
-#popover-address-2 {
+.pinPopover-address-2 {
     color: #e0dede;
 }
 
@@ -296,7 +296,7 @@ div.category-table-container td {
     padding-top: 0px;
 }
 
-#popover-icon {
+.pinPopover-icon {
     margin-left: 15px;
 }
 

@@ -160,11 +160,11 @@ MapControls.recenter = function() {
 //primary = {true, false} - indicates whether to show a faded or dark pin
 // If not primary, then secondary, eg. an alternate option
 // popupContents - html to go in infobox
-MapControls.placePin = function(locData, markerNum, primary, popupContents) {
+//initializer = a function, taking the popup's DOM object as an input, to react to the popup appearing for the first time
+MapControls.placePin = function(locData, markerNum, primary, popupContents, initializer) {
   if (map==undefined) { console.log("MapControls not initialized"); return; }
-  var marker = new google.maps.Marker({
-      position: new google.maps.LatLng(locData.lat,locData.lon)
-  });
+  //prep the marker
+  var loc = new google.maps.LatLng(locData.lat,locData.lon);
   var pinImgName = (markerNum<8 ? ""+(markerNum+1) : "blank");
   var icon;
   if (primary) {
@@ -182,24 +182,35 @@ MapControls.placePin = function(locData, markerNum, primary, popupContents) {
         anchor: new google.maps.Point(8,30)
       };
   }
-  marker.setIcon(icon);
-  var infoboxOptions = {
+  var marker = new google.maps.Marker({
+	  map: map,
+      position: loc,
+	  icon: icon
+  });
+  //prep the infobox
+  var infobox = new InfoBox({
      content: popupContents,
      boxStyle: { 
         width: "226px",
         height: "151px",
         backgroundColor: "#808080"
      },
-     infoBoxClearance: new google.maps.Size(1, 1)
-  };
-  var infobox = new InfoBox(infoboxOptions);
-  marker.setMap(map);
-  markers.push(marker);
+     infoBoxClearance: new google.maps.Size(1,1)
+  });
+  var alreadySeen = false;
+  google.maps.event.addListener(infobox, 'domready', function(){
+	if (!alreadySeen) {
+		initializer(infobox);
+		alreadySeen = true;
+	}
+  });
   google.maps.event.addListener(marker, 'click', function() {
 	closeInfoboxes();
     curInfoBox = infobox;
     infobox.open(map, marker);
   });
+  //remember the marker, and return
+  markers.push(marker);
   return marker.position.toString();
 };
 
