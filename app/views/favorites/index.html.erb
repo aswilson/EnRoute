@@ -19,6 +19,7 @@
 
   <tbody>
     <% @favorites.each do |favorite| %>
+	<br>
       <tr>
         <td><%= favorite.name %></td>
         <td><%= favorite.street_1 %></td>
@@ -40,6 +41,6 @@
 <%= will_paginate @favorites, :previous_label => "Previous&nbsp;", :next_label => "&nbsp;Next" %>
 </span>
 
-<br>
+<br></br>
 
 <%= link_to 'New Favorite', new_favorite_path %>

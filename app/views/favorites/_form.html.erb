@@ -24,7 +24,7 @@
     <%= f.input :state, :collection => Favorite::STATES_LIST.map{|a,b| b} %><br>
     <%= f.input :zip_code %><br>
     <%= f.input :notes %><br>
-	<%= f.input :user_id, input_html: { value: User.where('id = ?', current_user.id), placeholder: User.where('id = ?', current_user.id).map(&:proper_name) }%>
+	<%= f.input :user_id, :collection => User.where('id = ?', current_user.id)%>
     
   <br></br>
       <div class="form-actions">
