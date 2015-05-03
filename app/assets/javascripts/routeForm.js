@@ -837,6 +837,9 @@ $(document).ready(function() {
 			text.html(value);
 		}
 	});
+	$('#password').click(function() {
+		return confirm("Are you sure you want to change your password?");
+	});
 	
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
