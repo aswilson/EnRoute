@@ -313,11 +313,11 @@ div.category-table-container td {
 }
 
 span.statusMessage.error {
-	color: #ff0000;
+    color: #ff0000;
 }
 span.statusMessage.warning {
-	color: #ffff00;
+    color: #ffff00;
 }
 span.statusMessage.info {
-	color: #000000;
+    color: #000000;
 }

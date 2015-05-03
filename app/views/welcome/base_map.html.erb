@@ -159,11 +159,11 @@
                 <div id="route-input" class="task-table-container">
                     <table id="tasks-table">
                         <tr id="taskPrototype" class="text-input"><td>
-							<a class="move-button"><%= image_tag "taskIcons-normal-move.png", size:"22" %></a>
+							<a class="move-button"><%= image_tag "taskIcons-normal-unlocked.png", size:"22" %></a>
 							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
 							<input type="text" class="task-label input-text form-control inline"/>
 							<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
-							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="">
+							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="" hidden="true">
 								<%= image_tag "taskIcons-normal-alert.png", size:"22" %>
 							</a>
 						</td></tr>
@@ -188,11 +188,7 @@
                                 <td width="50%">
                                     <div class="row-text align-left bebasNeue">Least Time Route</div>
                                 </td>
-                                <td>
-                                    <div class="align-right">
-										<%= image_tag "icon-normal-save.png", size:"41" %>
-									</div>
-                                </td>
+                                <td></td>
                             </tr>
                         </table>
                         <!-- Stops -->
@@ -284,7 +280,7 @@
 								<div class="row-text align-left">Password</div>
 							</td>
 							<td>
-								<div class="row-text align-right"><a href="/users/<%= logged_in? ? current_user.id : "-1"%>/edit">*****</a></div>
+								<div class="row-text align-right"><a id="password" href="/users/<%= logged_in? ? current_user.id : "-1"%>/edit">*****</a></div>
 							</td>
 						</tr>
 					</table>
@@ -370,7 +366,7 @@
     <!-- END Modal for Login -->
 
     <!-- Modal for Task Editing -->
-    <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModal_label" aria-hidden="true">
+    <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog transparant">
             <div class="modal-content">
                 <div class="modal-header">
