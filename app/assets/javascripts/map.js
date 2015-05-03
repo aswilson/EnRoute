@@ -1,19 +1,15 @@
 var MapControls = (function() {
-
-var initialized = false;
-var map;
+var map = undefined;
+var geocoder= new google.maps.Geocoder();
+var directionsService = new google.maps.DirectionsService();
 var markers = [];
 var lines = [];
 var routes = [];
-var geocoder= new google.maps.Geocoder();
-var directionsService = new google.maps.DirectionsService();
-var MapControls = {}; //"object" holding everything public
-
-
+var curInfoBox = undefined;
 
 // non-public helper functions
 function map_recenter(latlng,offsetx,offsety) {
-	if (!initialized) { console.log("MapControls not initialized"); return; }
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
     var point1 = map.getProjection().fromLatLngToPoint(
         (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
     );
@@ -27,26 +23,30 @@ function map_recenter(latlng,offsetx,offsety) {
     )));
 }
 function getPin(pinId) {
-  if (!initialized) { console.log("MapControls not initialized"); return; }
-  for (var i = 0; i < markers.length; i++) {
-      if (markers[i].position.toString().equals(pinId)) {
-        return markers[i];
-      }
-    }
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
+	for (var i = 0; i < markers.length; i++) {
+		if (markers[i].position.toString() === pinId)
+		return markers[i];
+	}
 }
+function closeInfoboxes() {
+	if (curInfoBox != undefined)
+		curInfoBox.close();
+}
+
+
+var MapControls = {}; //"object" holding everything public
 
 
 //initializes the map
 MapControls.initialize = function(mapDivId) {
-  var mapStyle =[
-    {
+  var mapStyle =[ {
         featureType: "poi",
         elementType: "labels",
         stylers: [
               { visibility: "off" }
         ]
-    }
-  ];
+    } ];
   var mapOptions = {
       zoom: 13,
       center: new google.maps.LatLng(40.4397, -79.9764),
@@ -60,10 +60,10 @@ MapControls.initialize = function(mapDivId) {
       styles: mapStyle
     };
     map = new google.maps.Map(document.getElementById(mapDivId), mapOptions);
-    //map_recenter(map.getCenter(), 200, 0);
-	initialized = true;
+	google.maps.event.addListener(map, "click", function(event) {
+		closeInfoboxes();
+	});
     console.log("initialized map");
-  //google.maps.event.addListener(map, 'click', addLatLng);
 }
 
 // Takes an address (ex: 1600 Amphitheatre Parkway, Mountain View, CA)
@@ -83,7 +83,7 @@ MapControls.getLatLon = function(addr, callback) {
 
 // Deletes all markers and lines on the map
 MapControls.clearMap = function() {
-  if (!initialized) { console.log("MapControls not initialized"); return; }
+  if (map==undefined) { console.log("MapControls not initialized"); return; }
   for (var i = 0; i < markers.length; i++) {
       markers[i].setMap(null);
     }
@@ -100,7 +100,7 @@ MapControls.clearMap = function() {
 
 // Deletes all lines on the map
 MapControls.clearLines = function() {
-    if (!initialized) { console.log("MapControls not initialized"); return; }
+    if (map==undefined) { console.log("MapControls not initialized"); return; }
 	for (var j = 0; j < lines.length; j++) {
       lines[j].setMap(null);
     }
@@ -109,7 +109,7 @@ MapControls.clearLines = function() {
 
 // Deletes all routes on the map
 MapControls.clearRoutes = function() {
-    if (!initialized) { console.log("MapControls not initialized"); return; }
+    if (map==undefined) { console.log("MapControls not initialized"); return; }
 	for (var k = 0; k < routes.length; j++) {
       routes[k].setMap(null);
     }
@@ -118,7 +118,7 @@ MapControls.clearRoutes = function() {
 
 // Uses all markers on the map so far to center the map
 MapControls.recenter = function() {
-	if (!initialized) { console.log("MapControls not initialized"); return; }
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
 	var bounds = new google.maps.LatLngBounds();
 	for (var i = 0; i < markers.length; i++)
 		bounds.extend(markers[i].position);
@@ -133,7 +133,7 @@ MapControls.recenter = function() {
 // If not primary, then secondary, eg. an alternate option
 // popupContents - html to go in infobox
 MapControls.placePin = function(locData, markerNum, primary, popupContents) {
-  if (!initialized) { console.log("MapControls not initialized"); return; }
+  if (map==undefined) { console.log("MapControls not initialized"); return; }
   var marker = new google.maps.Marker({
       position: new google.maps.LatLng(locData.lat,locData.lon)
   });
@@ -167,14 +167,10 @@ MapControls.placePin = function(locData, markerNum, primary, popupContents) {
   var infobox = new InfoBox(infoboxOptions);
   marker.setMap(map);
   markers.push(marker);
-  google.maps.event.addListener(map, 'click', function() {
-       infobox.setMap(null);
-  });
   google.maps.event.addListener(marker, 'click', function() {
-    infobox.open(map,marker);
-  });
-  google.maps.event.addListener(map, "click", function(event) {
-    infobox.close();
+	closeInfoboxes();
+    curInfoBox = infobox;
+    infobox.open(map, marker);
   });
   return marker.position.toString();
 };
@@ -182,9 +178,9 @@ MapControls.placePin = function(locData, markerNum, primary, popupContents) {
 // Iterates through pins to find the one we're deleting
 // Inefficient - use sparingly
 MapControls.removePin = function(pinId) {
-	if (!initialized) { console.log("MapControls not initialized"); return; }
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
 	for (var i = 0; i < markers.length; i++) {
-		if (markers[i].position.toString().equals(pinId))
+		if (markers[i].position.toString() === pinId)
 			markers.splice(i, 1);
 	}
 };
@@ -192,7 +188,7 @@ MapControls.removePin = function(pinId) {
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds a straight line between the pins
 MapControls.addLine = function(pinId1, pinId2, color) {
-  if (!initialized) { console.log("MapControls not initialized"); return; }
+  if (map==undefined) { console.log("MapControls not initialized"); return; }
   var pathCoordinates = [
       getPin(pinId1).position,
       getPin(pinId2).position
@@ -213,7 +209,7 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds the shortest path between the two pins
 MapControls.drawRoute = function(pinId1, pinId2, color) {
-  if (!initialized) { console.log("MapControls not initialized"); return; }
+  if (map==undefined) { console.log("MapControls not initialized"); return; }
   var request = {
       origin: getPin(pinId1).position,
       destination: getPin(pinId2).position,

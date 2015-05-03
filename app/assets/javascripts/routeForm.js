@@ -213,13 +213,13 @@ function updateFavoriteEditWindow(fav) {
 }
 function updateMap() {
 /*
+	altPins = [];
 	MapControls.clearMap();
 	var prevPinNum = undefined;
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var loc = myRoute.tasks[i].loc;
 		if (loc!=undefined) {
-			var pinImgName = (taskNo<8 ? ""+(taskNo+1) : "blank");
-			var pinNum = MapControls.placePin(locToLatLon(loc), "pin-normal-"+pinImgName+".png""));
+			var pinNum = MapControls.placePin(loc, i, true, PINHTML);
 			if (prevPinNum!=undefined)
 				var lineNum = MapControls.addLine(prevPinNum, pinNum);
 			prevPinNum = pinNum;
@@ -818,29 +818,6 @@ $(document).ready(function() {
 });
 
 })("enroute-dhcs.herokuapp.com", RouteTools.ROUTESTARTINGATCMU);	//end IIAF
-
-/* PIN html:
-var html = '<div class="pin-popover">\
-    <table class="table-container">\
-        <tr>\
-            <td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
-            <td><div id="popover-category" class="row-text">Coffee</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-        </tr>\
-    </table>\
-  </div>';
-*/
 
 
 /* Old functions no longer in use:
