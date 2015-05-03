@@ -1,5 +1,6 @@
 var MapControls = (function() {
 
+var initialized = false;
 var map;
 var markers = [];
 var lines = [];
@@ -8,8 +9,11 @@ var geocoder= new google.maps.Geocoder();
 var directionsService = new google.maps.DirectionsService();
 var MapControls = {}; //"object" holding everything public
 
+
+
 // non-public helper functions
 function map_recenter(latlng,offsetx,offsety) {
+	if (!initialized) { console.log("MapControls not initialized"); return; }
     var point1 = map.getProjection().fromLatLngToPoint(
         (latlng instanceof google.maps.LatLng) ? latlng : map.getCenter()
     );
@@ -23,9 +27,10 @@ function map_recenter(latlng,offsetx,offsety) {
     )));
 }
 function getPin(pinId) {
+  if (!initialized) { console.log("MapControls not initialized"); return; }
   for (var i = 0; i < markers.length; i++) {
-      if (marker[i].position.toString().equals(pinId)) {
-        return marker[i];
+      if (markers[i].position.toString().equals(pinId)) {
+        return markers[i];
       }
     }
 }
@@ -56,6 +61,7 @@ MapControls.initialize = function(mapDivId) {
     };
     map = new google.maps.Map(document.getElementById(mapDivId), mapOptions);
     //map_recenter(map.getCenter(), 200, 0);
+	initialized = true;
     console.log("initialized map");
   //google.maps.event.addListener(map, 'click', addLatLng);
 }
@@ -77,6 +83,7 @@ MapControls.getLatLon = function(addr, callback) {
 
 // Deletes all markers and lines on the map
 MapControls.clearMap = function() {
+  if (!initialized) { console.log("MapControls not initialized"); return; }
   for (var i = 0; i < markers.length; i++) {
       markers[i].setMap(null);
     }
@@ -93,7 +100,8 @@ MapControls.clearMap = function() {
 
 // Deletes all lines on the map
 MapControls.clearLines = function() {
-    for (var j = 0; j < lines.length; j++) {
+    if (!initialized) { console.log("MapControls not initialized"); return; }
+	for (var j = 0; j < lines.length; j++) {
       lines[j].setMap(null);
     }
     lines = [];
@@ -101,7 +109,8 @@ MapControls.clearLines = function() {
 
 // Deletes all routes on the map
 MapControls.clearRoutes = function() {
-    for (var k = 0; k < routes.length; j++) {
+    if (!initialized) { console.log("MapControls not initialized"); return; }
+	for (var k = 0; k < routes.length; j++) {
       routes[k].setMap(null);
     }
     routes = [];
@@ -109,12 +118,12 @@ MapControls.clearRoutes = function() {
 
 // Uses all markers on the map so far to center the map
 MapControls.recenter = function() {
-  var bounds = new google.maps.LatLngBounds();
-  for (var i = 0; i < markers.length; i++) {
-      bounds.extend(marker[i].position);
-    }
-    map.fitBounds(bounds);
-    //map_recenter(map.getCenter(), 100, 0);
+	if (!initialized) { console.log("MapControls not initialized"); return; }
+	var bounds = new google.maps.LatLngBounds();
+	for (var i = 0; i < markers.length; i++)
+		bounds.extend(markers[i].position);
+	map.fitBounds(bounds);
+	//map_recenter(map.getCenter(), 100, 0);
 };
 
 // Puts a marker with image at the latlng location on the map. I'm just going to use latlon as the id.
@@ -124,20 +133,32 @@ MapControls.recenter = function() {
 // If not primary, then secondary, eg. an alternate option
 // Categories - line 7
 MapControls.placePin = function(locData, markerNum, primary, category) {
+  if (!initialized) { console.log("MapControls not initialized"); return; }
+  
+/*  var pp = new google.maps.LatLng(locData.lat,locData.lon);
+  var marker = new google.maps.Marker({ map: map, position: pp, icon: {
+        url: "/assets/pin-normal-1.png",
+        scaledSize: new google.maps.Size(22, 41),
+        origin: new google.maps.Point(0,0),
+        anchor: new google.maps.Point(11, 41)
+  }});
+  return;*/
+  
   var marker = new google.maps.Marker({
       position: new google.maps.LatLng(locData.lat,locData.lon)
   });
+  var pinImgName = (markerNum<8 ? ""+(markerNum+1) : "blank");
   var icon;
   if (primary) {
     icon = {
-        url: "pin-normal-" + markerNum + ".png",
+        url: "/assets/pin-normal-" + pinImgName + ".png",
         scaledSize: new google.maps.Size(22, 41),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(11, 41)
       };
   } else {
     icon = {
-        url: "pin-normal2-" + markerNum + ".png",
+        url: "/assets/pin-faded2-" + pinImgName + ".png",
         scaledSize: new google.maps.Size(16, 30),
         origin: new google.maps.Point(0,0),
         anchor: new google.maps.Point(8,30)
@@ -147,7 +168,7 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
   var html = '<div class="pin-popover">\
     <table class="table-container">\
         <tr>\
-            <td><img id="popover-icon" src="category-blue1-coffee.png" width="35px" height="35px"/></td>\
+            <td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
             <td><div id="popover-category" class="row-text">Coffee</div></td>\
         </tr>\
         <tr>\
@@ -192,16 +213,17 @@ MapControls.placePin = function(locData, markerNum, primary, category) {
 // Iterates through pins to find the one we're deleting
 // Inefficient - use sparingly
 MapControls.removePin = function(pinId) {
-  for (var i = 0; i < markers.length; i++) {
-      if (marker[i].position.toString().equals(pinId)) {
-        markers.splice(i, 1);
-      }
-    }
+	if (!initialized) { console.log("MapControls not initialized"); return; }
+	for (var i = 0; i < markers.length; i++) {
+		if (markers[i].position.toString().equals(pinId))
+			markers.splice(i, 1);
+	}
 };
 
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds a straight line between the pins
 MapControls.addLine = function(pinId1, pinId2, color) {
+  if (!initialized) { console.log("MapControls not initialized"); return; }
   var pathCoordinates = [
       getPin(pinId1).position,
       getPin(pinId2).position
@@ -222,6 +244,7 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 // Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds the shortest path between the two pins
 MapControls.drawRoute = function(pinId1, pinId2, color) {
+  if (!initialized) { console.log("MapControls not initialized"); return; }
   var request = {
       origin: getPin(pinId1).position,
       destination: getPin(pinId2).position,

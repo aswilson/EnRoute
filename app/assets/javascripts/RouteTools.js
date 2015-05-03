@@ -55,19 +55,19 @@ var TestData = {
 	CMULoc: { name:"CMU", addr:"500 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
 	fakeUserId: 6,
 	fakeUserName: "Bob",
-	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40, lon:-80 },
+	fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh PA 12345", lat:40.42, lon:-80 },
 	fakeFavorites: [
-		{ id:1234, name:"Starbucks", category:"coffee", notes:"", business_id:null, user_id:6, latitude:40, longitude:-81,
+		{ id:1234, name:"Starbucks", category:"coffee", notes:"", business_id:null, user_id:6, latitude:40.41, longitude:-80.01,
 			street_1:"456 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
-		{ id:2345, name:"Chipotle", category:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-82,
+		{ id:2345, name:"Chipotle", category:"restaurant", notes:"Note note note", business_id:null, user_id:6, latitude:40, longitude:-80.02,
 			street_1:"789 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" },
-		{ id:6789, name:"Library", category:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-83,
+		{ id:6789, name:"Library", category:"books", notes:"", business_id:null, user_id:6, latitude:40, longitude:-80.03,
 			street_1:"987 Fake Street", street_2:"", city:"Pittsburgh", state:"PA", zip_code:"12345" }
 	],
 	makeFakeSuggestions: function(str) { return [
-		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:41, lon:-79, notes:"" },
-		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:42, lon:-79, notes:"Note note note" },
-		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:43, lon:-79, notes:"" }
+		{ name:str+"_1", addr:"AAA 1st Street, Pittsburgh PA 12345", lat:40.44, lon:-80 },
+		{ name:str+"_2", addr:"BBB 2nd Street, Pittsburgh PA 12345", lat:40.45, lon:-80 },
+		{ name:str+"_3", addr:"CCC 3rd Street, Pittsburgh PA 12345", lat:40.46, lon:-80 }
 	];}
 }
 
