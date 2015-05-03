@@ -228,7 +228,7 @@ function updateMap() {
 	MapControls.recenter();
 }
 function updateDirections(directionData) {
-	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
+	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }], sLabel: string, start: string (address) }
 	var directionsTable = $('#directions-table').empty();
 	var locationRow = locationPrototype.clone(true).attr("id", "location0");
 	locationRow.find('.location-label').attr('value', directionData.sLabel);
@@ -600,6 +600,7 @@ function fillInRoute(route, locChoices) {
 };
 function getAndUpdateDirections() {
 	if (myRoute.tasks.length > 1) {
+		//we define the datatype that the various callbacks will fill in
 		var directionData = {
 			steps: [ {
 				text: [],
@@ -618,9 +619,8 @@ function getAndUpdateDirections() {
 				//// THIS NEEDS WORK: results may be undefined, which will kick off an error unless we change this part
 				var instructions = [];
 				var leg = results.routes[0].legs[i-1];
-				for (var j=0; j < leg.steps.length; j++) {
+				for (var j=0; j < leg.steps.length; j++)
 					instructions.push(leg.steps[j].instructions);
-				}
 				steps[i-1].dLabel = myRoute.tasks[i].label;
 				steps[i-1].text = instructions;
 				steps[i-1].destination = leg.end_address;

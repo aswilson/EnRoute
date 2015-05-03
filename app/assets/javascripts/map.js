@@ -81,6 +81,34 @@ MapControls.getLatLon = function(addr, callback) {
 	});
 };
 
+// Takes a list of stops (in the form {lat,lon}) and, asynchroneously, returns the directions to follow
+// Return result is of the given here: https://developers.google.com/maps/documentation/directions/#DirectionsResponses
+MapControls.getDirections = function(stops, callback) {
+	//build request
+	var request = {
+	  waypoints: [],
+	  travelMode: google.maps.TravelMode.DRIVING
+	};
+	for (var i=0; i<stops.length; i++) {
+		var loc = new google.maps.LatLng(stops[i].lat,stops[i].lon);
+		if (i==0)
+			request.origin = loc;
+		else if (i==(stops.length-1))
+			request.destination = loc;
+		else
+			request.waypoints.push({location:loc, stopover:true});
+	}
+	//request the directions
+	directionsService.route(request, function(result, status) {
+		if (status == google.maps.DirectionsStatus.OK) {
+			callback(result);
+		} else {
+			console.log( "MapControls.getDirections() failed: " + status);
+			callback(undefined);
+		}
+	});
+};
+
 // Deletes all markers and lines on the map
 MapControls.clearMap = function() {
 	if (map==undefined) { console.log("MapControls not initialized"); return; }
@@ -183,8 +211,8 @@ MapControls.removePin = function(pinId) {
 	}
 };
 
-// Color is string in hash format. ex. '#FF0000' '#666666'
 // Adds a straight line between the pins
+//   Color is string in hash format. ex. '#FF0000' '#666666'
 MapControls.addLine = function(pinId1, pinId2, color) {
   if (map==undefined) { console.log("MapControls not initialized"); return; }
   var pathCoordinates = [
@@ -208,26 +236,22 @@ MapControls.addLine = function(pinId1, pinId2, color) {
 // Adds the shortest path between the two locations {name, addr, lon, lat}
 MapControls.drawRoute = function(loc1, loc2, color, callback) {
   if (map==undefined) { console.log("MapControls not initialized"); return; }
-  var request = {
+    var request = {
       origin: new google.maps.LatLng(loc1.lat,loc1.lon),
       destination: new google.maps.LatLng(loc2.lat,loc2.lon),
       travelMode: google.maps.TravelMode.DRIVING
     };
-    var directionsDisplay = new google.maps.DirectionsRenderer({
-      polylineOptions: {
-          strokeColor: color
-      }
-    });
-    var directionsResult;
     directionsService.route(request, function(result, status) {
       if (status == google.maps.DirectionsStatus.OK) {
+		  var directionsDisplay = new google.maps.DirectionsRenderer({
+			  polylineOptions: { strokeColor: color }
+		  });
           directionsDisplay.setDirections(result);
-          directionsResult = result;
           directionsDisplay.setMap(map);
           routes.push(directionsDisplay);
-          callback(directionsResult);
+          callback(result);
       } else {
-          console.log( "drawRoute failed getting directions because" + status);
+          console.log( "drawRoute failed getting directions: " + status);
           callback(undefined);
       }
     });
@@ -235,93 +259,3 @@ MapControls.drawRoute = function(loc1, loc2, color, callback) {
 
 return MapControls;
 })();
-
- /*    USED FOR TESTING MARKERS AND INFOWINDOWS
-//Handles click events on a map, and adds a new point to the Polyline.
-//  @param {google.maps.MouseEvent} event
-function addLatLng(event) {
-  var poly;
-  if (lines.length == 0) {
-    poly = new google.maps.Polyline({
-      geodesic: true,
-      strokeColor: '#00FF00',
-      strokeOpacity: 1.0,
-      strokeWeight: 2
-    });
-    lines.push(poly);
-  } else {
-    poly = lines[0];
-  }
-  var path = poly.getPath();
-
-  // Because path is an MVCArray, we can simply append a new coordinate
-  // and it will automatically appear.
-  path.push(event.latLng);
-  poly.setMap(map);
-
-  var marker = new google.maps.Marker({
-      position: event.latLng
-  });
-  var icon;
-  var primary = true;
-  var markerNum = 0;
-  if (primary) {
-    icon = {
-        url: "pin-normal-" + markerNum + ".png",
-        scaledSize: new google.maps.Size(22, 41),
-        origin: new google.maps.Point(0,0),
-        anchor: new google.maps.Point(11, 41)
-      };
-  } else {
-    icon = {
-        url: "pin-normal2-" + markerNum + ".png",
-        scaledSize: new google.maps.Size(16, 30),
-        origin: new google.maps.Point(0,0),
-        anchor: new google.maps.Point(8,30)
-      };
-  }
-  marker.setIcon(icon);
-  var html = '<div class="pin-popover">\
-    <table class="table-container">\
-        <tr>\
-            <td><img id="popover-icon" src="category-blue1-coffee.png" width="35px" height="35px"/></td>\
-            <td><div id="popover-category" class="row-text">Coffee</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-        </tr>\
-        <tr>\
-            <td></td>\
-            <td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-        </tr>\
-    </table>\
-  </div>';
-
-  var infoboxOptions = {
-     content: html,
-     boxStyle: { 
-        width: "226px",
-        height: "131px",
-        backgroundColor: "#808080"
-     },
-     infoBoxClearance: new google.maps.Size(1, 1)
-  };
-  var infobox = new InfoBox(infoboxOptions);
-  marker.setMap(map);
-  markers.push(marker);
-  google.maps.event.addListener(map, 'click', function() {
-       infobox.setMap(null);
-  });
-  google.maps.event.addListener(marker, 'click', function() {
-    infobox.open(map,marker);
-  });
-  google.maps.event.addListener(map, "click", function(event) {
-    infobox.close();
-  });
-}
-*/
