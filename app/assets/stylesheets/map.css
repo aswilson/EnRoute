@@ -7,6 +7,7 @@ body {
     overflow: hidden;
     font-family: 'Open Sans', serif;
     font-size: 12px;
+    font-weight: 400;
     color: #202020;
     line-height: 0px;
 }
@@ -120,6 +121,14 @@ div.category-table-container td {
 
 .inline {
     display: inline;
+}
+
+.input-group-addon {
+    font-family: 'Open Sans', serif;
+    font-size: 12px;
+    font-weight: 300;
+    background-color: transparent;
+    border-radius: 0;
 }
 
 .modal .modal-dialog { width: 346px; }
