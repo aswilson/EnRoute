@@ -184,50 +184,24 @@
                             </tr>
                         </table>
                         <!-- Stops -->
-                        <table width="100%">
-                            <tr class="border-bottom">
+                        <table id="directions-table" width="100%">
+                            <tr id="locationPrototype" class="border-bottom">
                                 <td width="50%">
-                                    <div id="location" class="row-text align-left" style="color: #202020">My Location</div>
+                                    <div class="location-label row-text align-left" style="color: #202020">My Location</div>
                                 </td>
                                 <td>
-                                    <div id="location-address" class="row-text align-right" style="color: #202020">123 Main St.</div>
+                                    <div class="location-address row-text align-right" style="color: #202020">123 Main St.</div>
                                 </td>
                             </tr>
                             <!-- Next Stop -->
-                            <tr class="border-bottom">
+                            <tr id="stepsPrototype" class="border-bottom">
                                 <td colspan='2'>
-                                    <div class="directions-table">
-                                        <table width='100%'>
-                                            <tr>
-                                                <td><%= image_tag "Map-32.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
-                                            </tr>
-                                            <tr>
-                                                <td><%= image_tag "Map-32.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                            </tr>
-                                        </table>
-                                    </div>
-                                </td>
-                            </tr>
-                            <!-- Next Stop -->
-                            <tr class="border-bottom">
-                                <td colspan='2'>
-                                    <div class="directions-table">
-                                        <table width='100%'>
-                                            <tr>
-                                                <td><%= image_tag "Map-32.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                                <td rowspan='10'><div class="align-right"> 5 min </div></td>
-                                            </tr>
-                                            <tr>
-                                                <td><%= image_tag "Map-33.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
-                                            </tr>
-                                            <tr>
-                                                <td><%= image_tag "Map-34.png", size:"21" %></td>
-                                                <td><div>Head North on asdf</div></td>
+                                    <div>
+                                        <table class="steps-table" width='100%'>
+                                            <tr id="instructionPrototype">
+                                                <td><%= image_tag "Map-32.png", size:"21", :class => "instruction-icon" %></td>
+                                                <td><div class="instruction-text">Head North on asdf</div></td>
+                                                <td rowspan='10'><div class="instruction-duration align-right"> 5 min </div></td>
                                             </tr>
                                         </table>
                                     </div>

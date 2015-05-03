@@ -57,13 +57,15 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
 	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
-	--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 --other pages
 	--make the main page auto-redirect to the map after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
 --making fillInRoute actually smart (ie, acknowledge constraints)
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
---detecting impossible conditions before talking to backend (and setting task.error accordingly
+--fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
+	--probably involves changing the lookup system in map.js
+--detecting impossible conditions before talking to backend (and setting task.error accordingly)
+--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 
 --update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -226,7 +228,8 @@ function updateMap() {
 	MapControls.recenter();
 }
 function updateDirections(directionData) {
-	//directionData takes the form {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}able = $('#directions-table').empty();
+	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
+	var directionsTable = $('#directions-table').empty();
 	var locationRow = locationPrototype.clone(true).attr("id", "location0");
 	locationRow.find('.location-label').attr('value', directionData.sLabel);
 	locationRow.find('.location-address').attr('value', directionData.start);
@@ -606,19 +609,25 @@ function getAndUpdateDirections() {
 			} ],
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].addr
+		};
+		// For loop waiting for all the callback functions to return
+		for (var i=1; i < myRoute.tasks.length; i++) {
+			var task = myRoute.tasks[i-1];
+			/// DrawRoute has a callback function
+			MapControls.drawRoute(task, myRoute.tasks[i], '#00FF00', function (results) {
+				//// THIS NEEDS WORK: results may be undefined, which will kick off an error unless we change this part
+				var instructions = [];
+				var leg = results.routes[0].legs[i-1];
+				for (var j=0; j < leg.steps.length; j++) {
+					instructions.push(leg.steps[j].instructions);
+				}
+				steps[i-1].dLabel = myRoute.tasks[i].label;
+				steps[i-1].text = instructions;
+				steps[i-1].destination = leg.end_address;
+				steps[i-1].duration = leg.duration.text;
+			});
 		}
-		for (var i=1; i<myRoute.tasks.length; i++) {
-			var results = MapControls.drawRoute(myRoute.tasks[i-1], myRoute.tasks[i], '#00FF00');
-			var instructions = [];
-			var leg = results.routes[0].legs[i-1];
-			for (var j=0; j < leg.steps.length; j++) {
-				instructions.push(leg.steps[j].instructions);
-			}
-			steps[i-1].dLabel = myRoute.tasks[i].label;
-			steps[i-1].text = instructions;
-			steps[i-1].destination = leg.end_address;
-			steps[i-1].duration = leg.duration.text;
-		}
+		// Code we want to do only after we're all done with the callbacks
 		updateDirections(directionData);
 		$("#route-input").hide();
 		$("#route-output").show();
