@@ -180,6 +180,13 @@ RouteTools.locToLatLon = function(loc) {
 	return {lat: loc.lat, lon: loc.lon};
 }
 
+RouteTools.coaxToCategory = function(str) {
+	var CATEGORIES = [ "atm", "bank", "books", "coffee", "gas", "groceries", "home", "pharmacy", "postOffice", "restaurant", "work" ];
+	if (CATEGORIES.indexOf(str.toLowerCase()) != -1)
+		return str.toLowerCase();
+	return "blank";
+}
+
 RouteTools.imgStringToPieces = function(url) {
 	//example url: "assets/textButton-normal-findRoute.png";
 	var index1 = url.lastIndexOf('/');
@@ -210,14 +217,6 @@ RouteTools.isAddress = function(str) {
 	//broken
 	return (str.length > 10);
 }
-RouteTools.piecesToAddrString = function(pieces) {
-	return (pieces.street_1
-		+ (pieces.street_2!="" ? ", " : "")
-		+ pieces.street_2
-		+ ", " + pieces.city
-		+ ", " + pieces.state
-		+ " " + pieces.zip_code);
-}
 RouteTools.addrStringToPieces = function(addr) {
 	var addrPieces = addr.split(',');
 	var stateAndZip = addrPieces[addrPieces.length-1].split(' ');
@@ -239,6 +238,24 @@ RouteTools.addrStringToPieces = function(addr) {
 			zip_code: ""
 		};
 	}
+}
+function addrPiecesToTwoLines(pieces) {
+	var line1 = pieces.street_1
+		+ (pieces.street_2!="" ? ", " : "")
+		+ pieces.street_2;
+	var line2 = pieces.city
+		+ ((pieces.city!="" && pieces.state!="") ? ", " : "")
+		+ pieces.state
+		+ ((pieces.state!="" && pieces.zip_code!="") ? " " : "");
+		+ pieces.zip_code;
+	return [ line1, line2 ];
+}
+RouteTools.addrStringToTwoLines = function(addr) {
+	return addrPiecesToTwoLines(RouteTools.addrStringToPieces(addr));
+}
+RouteTools.piecesToAddrString = function(pieces) {
+	var lines = addrPiecesToTwoLines(pieces);
+	return lines[0] + (lines[1]!="" ? ", " : "") + lines[1];
 }
 
 RouteTools.ROUTESTARTINGATCMU = RouteTools.makeRoute({tasks:[RouteTools.makeTask({label:"CMU",loc:TestData.CMULoc})]});

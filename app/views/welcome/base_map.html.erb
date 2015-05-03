@@ -19,9 +19,21 @@
     
     <!-- Map -->
     <div id="map-canvas"></div>
+	<div id="pinPopover_Prototype" class="pinPopover" hidden="true">
+		<table class="table-container">
+			<tr><td><img class="pinPopover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>
+				<td><div class="pinPopover-label" class="row-text">Coffee</div></td></tr>
+			<tr><td></td><td><div class="pinPopover-name" class="row-text-2">Starbucks</div></td></tr>
+			<tr><td></td><td><div class="pinPopover-address-1" class="row-text-2">Address</div></td></tr>
+			<tr><td></td><td><div class="pinPopover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td></tr>
+			<tr><td colspan="2"><div align="center">
+				<%= image_tag "textButton-normal-useThis.png", size:"93x28", :class => "pinPopover-useMe-button" %>
+			</div></td></tr>
+		</table>
+	</div>
 
     <!-- Transparant Background -->
-    <div id="menu-background" class="teal transparant menu"></div>
+    <div id="menu-background" class="teal1 transparant menu"></div>
 
     <!-- Menu -->
     <div id="menu" role="tabpanel" class="menu">
@@ -31,10 +43,10 @@
             <!-- Commenting out the settings tab
 			<li role="presentation"><a href="#saveTab" aria-controls="saveTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-save.png", size:"41" %></a></li>
 			-->
-            <li role="presentation"><a href="#settingsTab" aria-controls="settingsTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-settings.png", size:"41" %></a></li>
             <li role="presentation"><a href="#routeTab" aria-controls="routeTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-route.png", size:"41" %></a></li>
             <li role="presentation"><a href="#favoritesTab" aria-controls="favoritesTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-favorites.png", size:"41" %></a></li>
             <li role="presentation"><a href="#userTab" aria-controls="userTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-user.png", size:"41" %></a></li>
+            <li role="presentation"><a href="#settingsTab" aria-controls="settingsTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-settings.png", size:"41" %></a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -147,11 +159,11 @@
                 <div id="route-input" class="task-table-container">
                     <table id="tasks-table">
                         <tr id="taskPrototype" class="text-input"><td>
-							<a class="move-button"><%= image_tag "taskIcons-normal-move.png", size:"22" %></a>
+							<a class="move-button"><%= image_tag "taskIcons-normal-unlocked.png", size:"22" %></a>
 							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
 							<input type="text" class="task-label input-text form-control inline"/>
 							<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
-							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="">
+							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="" hidden="true">
 								<%= image_tag "taskIcons-normal-alert.png", size:"22" %>
 							</a>
 						</td></tr>
@@ -176,11 +188,7 @@
                                 <td width="50%">
                                     <div class="row-text align-left bebasNeue">Least Time Route</div>
                                 </td>
-                                <td>
-                                    <div class="align-right">
-										<%= image_tag "icon-normal-save.png", size:"41" %>
-									</div>
-                                </td>
+                                <td></td>
                             </tr>
                         </table>
                         <!-- Stops -->
@@ -272,7 +280,7 @@
 								<div class="row-text align-left">Password</div>
 							</td>
 							<td>
-								<div class="row-text align-right"><a href="/users/<%= logged_in? ? current_user.id : "-1"%>/edit">*****</a></div>
+								<div class="row-text align-right"><a id="password" href="/users/<%= logged_in? ? current_user.id : "-1"%>/edit">*****</a></div>
 							</td>
 						</tr>
 					</table>
@@ -320,7 +328,7 @@
                     <%= image_tag "tab-normal2-user.png", size:"39" %>
                     <span class="modal-title" id="loginModalLabel">Log in</span>
                 </div>
-                <div class="modal-body teal">
+                <div class="modal-body teal1">
                     <div class="login-table-container">
                         <table>
                             <!-- Input Username -->
@@ -358,14 +366,14 @@
     <!-- END Modal for Login -->
 
     <!-- Modal for Task Editing -->
-    <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="taskModal_label" aria-hidden="true">
+    <div class="modal fade" id="taskModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog transparant">
             <div class="modal-content">
                 <div class="modal-header">
                     <%= image_tag "TimeSetting.png", size:"39" %>
                     <span class="modal-title" id="taskModal_label">Task #1 - Coffee</span>
                 </div>
-                <div class="modal-body teal">
+                <div class="modal-body teal1">
                     <div class="options-table-container">
                         <table width="100%">
                             <!--<tr class="border-bottom">
@@ -450,7 +458,7 @@
                     <%= image_tag "tab-normal-favorites.png", size:"39" %>
                     <span class="modal-title" id="favoritesModal_label">Edit Favorite</span>
                 </div>
-                <div class="modal-body teal">
+                <div class="modal-body teal1">
                     <div class="options-table-container">
                         <table width="100%">
                             <tr class="border-bottom">
