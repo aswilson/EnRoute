@@ -82,22 +82,26 @@ MapControls.getLatLon = function(addr, callback) {
 };
 
 // Takes a list of stops (in the form {lat,lon}) and, asynchroneously, returns the directions to follow
-// Return result is of the given here: https://developers.google.com/maps/documentation/directions/#DirectionsResponses
-MapControls.getDirections = function(stops, callback) {
+// Input is supposed to match routes as given in RouteTools.js
+// Return result is of the type given here: https://developers.google.com/maps/documentation/javascript/directions#DirectionsRequests#DirectionsResults
+MapControls.getDirections = function(route, callback) {
 	//build request
-	var request = {
-	  waypoints: [],
-	  travelMode: google.maps.TravelMode.DRIVING
-	};
-	for (var i=0; i<stops.length; i++) {
-		var loc = new google.maps.LatLng(stops[i].lat,stops[i].lon);
-		if (i==0)
-			request.origin = loc;
-		else if (i==(stops.length-1))
-			request.destination = loc;
-		else
-			request.waypoints.push({location:loc, stopover:true});
+	var tasks = route.tasks;
+	if (tasks.length < 2) {
+		callback(undefined);
+		return;
 	}
+    var waypts = [];
+    if (tasks.length > 2) {
+      for (var i=1; i<tasks.length-1; i++)
+        waypts.push({ location:tasks[i].loc.addr, stopover:true, });
+    }
+    var request = {
+        origin: new google.maps.LatLng(tasks[0].loc.lat, tasks[0].loc.lon),
+		waypoints: waypts,
+        destination: new google.maps.LatLng(tasks[tasks.length-1].loc.lat, tasks[tasks.length-1].loc.lon),
+        travelMode: google.maps.TravelMode.DRIVING
+    };
 	//request the directions
 	directionsService.route(request, function(result, status) {
 		if (status == google.maps.DirectionsStatus.OK) {
@@ -232,29 +236,16 @@ MapControls.addLine = function(pinId1, pinId2, color) {
     return path; //Who knows what this would end up being :/ hope it's an id tho.
 };
 
-// Color is string in hash format. ex. '#FF0000' '#666666'
-// Adds the shortest path between the two locations {name, addr, lon, lat}
-MapControls.drawRoute = function(loc1, loc2, color, callback) {
-  if (map==undefined) { console.log("MapControls not initialized"); return; }
-    var request = {
-      origin: new google.maps.LatLng(loc1.lat,loc1.lon),
-      destination: new google.maps.LatLng(loc2.lat,loc2.lon),
-      travelMode: google.maps.TravelMode.DRIVING
-    };
-    directionsService.route(request, function(result, status) {
-      if (status == google.maps.DirectionsStatus.OK) {
-		  var directionsDisplay = new google.maps.DirectionsRenderer({
-			  polylineOptions: { strokeColor: color }
-		  });
-          directionsDisplay.setDirections(result);
-          directionsDisplay.setMap(map);
-          routes.push(directionsDisplay);
-          callback(result);
-      } else {
-          console.log( "drawRoute failed getting directions: " + status);
-          callback(undefined);
-      }
-    });
+// Draws the line given by "directions", which takes the form given here: https://developers.google.com/maps/documentation/javascript/directions#DirectionsRequests#DirectionsResults
+//   Color is string in hash format. ex. '#FF0000' '#666666'
+MapControls.drawRoute = function(directions, color) {
+	if (map==undefined) { console.log("MapControls not initialized"); return; }
+	var drawnRoute = new google.maps.DirectionsRenderer({
+		map: map,
+		directions: directions,
+		polylineOptions: { strokeColor: color }
+	});
+	routes.push(drawnRoute);
 };
 
 return MapControls;
