@@ -32,8 +32,10 @@
 </p>
 
 <%= link_to 'Edit', edit_user_path(@user) %> |
-<% if logged_in? && current_user.role?(:admin)%>
-<%= link_to 'Back', users_path %>
+<% if logged_in? and current_user.role? :admin %>
+<%= link_to 'Back', users_path %> |
+<%= link_to 'Go to Map', home_path %>
 <% else %>
-<%= link_to 'Back', home_path %>
+<%= link_to 'Back', front_path %> |
+<%= link_to 'Go to Map', home_path %>
 <%end%>
