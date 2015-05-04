@@ -148,6 +148,7 @@ function updateRouteForm() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
+		taskRow.find('span#taskId').html(i);
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
