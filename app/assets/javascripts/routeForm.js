@@ -132,6 +132,10 @@ function updateRouteForm() {
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
 		RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", (myRoute.tasks[i].flexibleOrdering?"unlocked":"locked"));
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
+		taskRow.hover(function(){
+			var taskNo = getTaskNumber($(this));
+			showAlternatePins(taskNo);
+		});
 		tasksTable.append(taskRow);
 	}
 	//update the rest of the form
@@ -741,10 +745,10 @@ $(document).ready(function() {
 			$("#add-stop-button").show();
 		}
 	});
-	$(".taskStatus").hover(function(){
+/*	$(".taskStatus").hover(function(){
 		var taskNo = getTaskNumber($(this));
 		showAlternatePins(taskNo);
-	});
+	});*/
 	$("#add-stop-button").click(function(){
 		RouteTools.addTask(myRoute, {});
 		updateRouteForm();
