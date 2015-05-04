@@ -19,11 +19,10 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 
 /* WORK STILL NEEDED:
 --Major visual things
-	--<Jackie?> Make the images all transparent again (especially the blank category images)
+	--Make the images all transparent again (especially the blank category images)
 	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 	--Fixing the front page: make the logo smaller and make it auto-redirect to the main page after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
-	--Make unlocked look more different from locked
 --making fillInRoute actually smart (ie, acknowledge constraints)
 	--<Jackie> read the values off the timepicker
 	--make it smart
@@ -36,7 +35,7 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
 	--make favorites scrollable if it gets too long (or just cap it)
--cap the number of steps in the route
+--cap the number of steps in the route
 */
 
 
@@ -215,9 +214,10 @@ function updateDirections(directionData) {
 			var s = steps.text[j];
 			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+"_"+j);
 			instructionRow.find('div.instruction-text').empty().append(s);
-			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
-			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
-			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
+			var instrIcon = instructionRow.find('.instruction-icon');
+			if (s.indexOf("left") > -1) instrIcon.attr("src","/assets/map-left.png");
+			else if (s.indexOf("right") > -1) instrIcon.attr("src","/assets/map-right.png");
+			else if (s.indexOf("continue") > -1) instrIcon.attr("src","/assets/map-continue.png");
 			var durationCell = instructionRow.find('.instruction-duration').closest('td');
 			if (j==0) {
 				durationCell.find('.instruction-duration').empty().append(steps.duration.text);
@@ -316,15 +316,8 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 		RouteTools.alterImgUrlPiece($img, "name", "alert");
 		$statusArea.attr("title",task.error);
 		$statusArea.tooltip();
+<<<<<<< HEAD
 	} else if (task.loc != undefined) {
-		var pinImgName = (taskNo<8 ? ""+(taskNo+1) : "blank");
-		RouteTools.alterImgUrlPiece($img, "category", "pin");
-		RouteTools.alterImgUrlPiece($img, "name", pinImgName);
-		var imgSize = $img.attr("width");
-		$img.attr("width",imgSize/2);
-		$img.css('margin-left', function(index, curValue) {
-			return parseInt(curValue,10) + (imgSize/4) + 'px';
-		});
 	} else {
 		$img.hide();
 	}
