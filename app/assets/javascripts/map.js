@@ -260,7 +260,8 @@ MapControls.drawRoute = function(directions, color) {
 	var drawnRoute = new google.maps.DirectionsRenderer({
 		map: map,
 		directions: directions,
-    suppressMarkers: true, 
+    suppressMarkers: true,
+    optimizeWaypoints: true,
 		polylineOptions: { strokeColor: '#F17B5B' }
 	});
 	routes.push(drawnRoute);

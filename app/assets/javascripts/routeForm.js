@@ -130,7 +130,11 @@ function updateRouteForm() {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('span#taskId').html(i+1);
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
-		RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", (myRoute.tasks[i].flexibleOrdering?"unlocked":"locked"));
+		if (i==0 || i==(myRoute.tasks.length-1)) {
+			RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", "locked");
+		} else {
+			RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", "unlocked");
+		}
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
@@ -616,6 +620,7 @@ function getAndUpdateDirections() {
 	//prepare helper function
 	function translateDirections(googleDirections) {
 		var dirRoute = googleDirections.routes[0];
+		console.log(dirRoute);
 		var output = {
 			steps: [],	//one step per stop, plus this blank one at the start
 			sLabel: myRoute.tasks[0].label,
