@@ -35,6 +35,8 @@ EnRoute::Application.routes.draw do
   get 'feedback' => 'welcome#feedback', as: :feedback
   
   get 'home', to: 'welcome#base_map', as: :home
+  
+  get 'welcome/index', to: 'welcome#index', as: :front
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
 

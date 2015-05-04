@@ -130,7 +130,11 @@ function updateRouteForm() {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('span#taskId').html(i+1);
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
-		RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", (myRoute.tasks[i].flexibleOrdering?"unlocked":"locked"));
+		if (i==0 || i==(myRoute.tasks.length-1)) {
+			RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", "locked");
+		} else {
+			RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", "unlocked");
+		}
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		taskRow.hover(function(){
 			var taskNo = getTaskNumber($(this));
@@ -618,22 +622,31 @@ function getAndUpdateDirections() {
 		return;
 	showMsg("Getting directions...","info");
 	//prepare helper function
+	function indexForWaypoint(waypoint_order, i) {
+		// Takes an index of myRoute and translates it to the index we want to use
+		if (i == 0 || i == (myRoute.tasks.length-1)) return i;
+		return waypoint_order[i-1]+1;
+	}
+	//prepare helper function
 	function translateDirections(googleDirections) {
 		var dirRoute = googleDirections.routes[0];
+		var waypoint_order = dirRoute.waypoint_order;
 		var output = {
 			steps: [],	//one step per stop, plus this blank one at the start
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].loc.addr
 		};
 		for (var i=0; i<dirRoute.legs.length; i++) {
-			var leg = dirRoute.legs[i];
+			var index = indexForWaypoint(waypoint_order, i);
+			var next = indexForWaypoint(waypoint_order, i+1);
+			var leg = dirRoute.legs[index];
 			var instructions = [];
 			for (var j=0; j < leg.steps.length; j++)
 				instructions.push(leg.steps[j].instructions);
-			output.steps.push({
+				output.steps.push({
 				text: instructions,
-				dLabel: myRoute.tasks[i+1].label,
-				dAddr: myRoute.tasks[i+1].loc.addr,
+				dLabel: myRoute.tasks[next].label,
+				dAddr: myRoute.tasks[next].loc.addr,
 				duration: leg.duration
 			});
 		}

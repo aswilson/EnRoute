@@ -98,7 +98,8 @@ MapControls.getDirections = function(route, callback) {
     }
     var request = {
         origin: new google.maps.LatLng(tasks[0].loc.lat, tasks[0].loc.lon),
-		waypoints: waypts,
+		    waypoints: waypts,
+        optimizeWaypoints: true,
         destination: new google.maps.LatLng(tasks[tasks.length-1].loc.lat, tasks[tasks.length-1].loc.lon),
         travelMode: google.maps.TravelMode.DRIVING
     };
@@ -260,7 +261,7 @@ MapControls.drawRoute = function(directions, color) {
 	var drawnRoute = new google.maps.DirectionsRenderer({
 		map: map,
 		directions: directions,
-    suppressMarkers: true, 
+    suppressMarkers: true,
 		polylineOptions: { strokeColor: '#F17B5B' }
 	});
 	routes.push(drawnRoute);
