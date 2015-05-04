@@ -46,6 +46,10 @@ div#content {
     height: 10px;
 }
 
+.input {
+    padding: 12px 15px;
+}
+
 body {
     overflow: hidden;
     font-family: 'Open Sans', serif;
