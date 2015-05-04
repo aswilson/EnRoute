@@ -618,23 +618,30 @@ function getAndUpdateDirections() {
 		return;
 	showMsg("Getting directions...","info");
 	//prepare helper function
+	function indexForWaypoint(waypoint_order, i) {
+		// Takes an index of myRoute and translates it to the index we want to use
+		if (i == 0 || i == (myRoute.tasks.length-1)) return i;
+		return waypoint_order[i-1]+1;
+	}
+	//prepare helper function
 	function translateDirections(googleDirections) {
 		var dirRoute = googleDirections.routes[0];
-		console.log(dirRoute);
+		var waypoint_order = dirRoute.waypoint_order;
 		var output = {
 			steps: [],	//one step per stop, plus this blank one at the start
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].loc.addr
 		};
 		for (var i=0; i<dirRoute.legs.length; i++) {
-			var leg = dirRoute.legs[i];
+			var index = indexForWaypoint(waypoint_order, i);
+			var leg = dirRoute.legs[index];
 			var instructions = [];
 			for (var j=0; j < leg.steps.length; j++)
 				instructions.push(leg.steps[j].instructions);
-			output.steps.push({
+				output.steps.push({
 				text: instructions,
-				dLabel: myRoute.tasks[i+1].label,
-				dAddr: myRoute.tasks[i+1].loc.addr,
+				dLabel: myRoute.tasks[index+1].label,
+				dAddr: myRoute.tasks[index+1].loc.addr,
 				duration: leg.duration
 			});
 		}
