@@ -137,6 +137,7 @@ function updateRouteForm() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
+		taskRow.find('span#taskId').html(i);
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
@@ -398,11 +399,11 @@ function getUsernameAndId() {
 	}
 }
 function getHomeLoc() {
-	$('span#homeAddr').empty().append("(getting from server...)");
+	$('div#homeAddr').empty().append("(getting from server...)");
 	var onSuccess = function(newHomeLoc) {
 		myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
 		var addr = RouteTools.addrStringToPieces(myUserInfo.homeLoc.addr);
-		$('span#homeAddr').empty().append(addr.street_1);
+		$('div#homeAddr').empty().append(addr.street_1);
 		var needsRedraw = false;
 		for (var i=0; i<myRoute.tasks.length; i++) {
 			var t = myRoute.tasks[i];
@@ -421,7 +422,7 @@ function getHomeLoc() {
 	}
 	var onFailure = function(err) {
 		console.log("Failed to get home address from server: "+err);
-		$('span#homeAddr').empty().append("???");
+		$('div#homeAddr').empty().append("???");
 		showMsgMomentarily("Failed to get home address from server.","warning",3000);
 	}
 	if (!FAKEIT)
@@ -877,7 +878,7 @@ $(document).ready(function() {
 
 	/* Make HTML match the data */
 	var addr = (myUserInfo.homeLoc!=undefined) ? myUserInfo.homeLoc.addr : "???";
-	$('span#homeAddr').empty().append(addr);
+	$('div#homeAddr').empty().append(addr);
 	updateFavoritesList();
 	updateRouteForm();
 	$("a[href=#routeTab]").tab('show');

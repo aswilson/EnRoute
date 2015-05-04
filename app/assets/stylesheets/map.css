@@ -80,6 +80,8 @@ span {
     -webkit-border-radius: 0;
     -moz-border-radius: 0;
     border-radius: 0;
+    background-color: #616667;
+    opacity: 0.92;
 }
 
 .actually-text-field {
@@ -323,6 +325,11 @@ span {
 #find-route {
     background-color: #F37046;
     color: #ffffff;
+}
+
+#route-find-button {
+    float: right;
+    margin-right:19px;
 }
 
 #list-of-places {
