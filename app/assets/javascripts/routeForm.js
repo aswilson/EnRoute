@@ -34,8 +34,6 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 	--get rid of the ugly black in the background when you mouse-over an <a> tag
 	--make actually-text-field and not-actually-text-field used consistently throughout the site
 --Joseph
-	--let the user change the chosen location...
-		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
 	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
 --other pages
@@ -770,13 +768,13 @@ $(document).ready(function() {
 		var fav = myUserInfo.favorites[myStringToInt(checkedVal)];
 		var taskInfo = {
 			label: fav.name,
-			loc: {name:fav.name, addr:fav.addr, lat:fav.lat, lon:fav.lon}
+			loc: {name:fav.name, addr:RouteTools.piecesToAddrString(fav), lat:fav.latitude, lon:fav.longitude}
 		};
 		RouteTools.addTask(myRoute, taskInfo);
 		updateRouteForm();
-		updateMap();
 		$("a[href=#routeTab]").tab('show');
 		showMsgMomentarily("added \""+fav.name+"\" to end of route","info",2000);
+		updateMap();
 	});
 	
 	/* Task-editing Modal listeners */
