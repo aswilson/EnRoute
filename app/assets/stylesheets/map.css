@@ -119,6 +119,11 @@ span {
     height: 41px;
 }
 
+.category-icon {
+    width: 25px;
+    height: 25px;
+}
+
 .inrow {
     margin-left: -14px;
 }
