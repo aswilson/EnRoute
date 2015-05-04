@@ -634,14 +634,15 @@ function getAndUpdateDirections() {
 		};
 		for (var i=0; i<dirRoute.legs.length; i++) {
 			var index = indexForWaypoint(waypoint_order, i);
+			var next = indexForWaypoint(waypoint_order, i+1);
 			var leg = dirRoute.legs[index];
 			var instructions = [];
 			for (var j=0; j < leg.steps.length; j++)
 				instructions.push(leg.steps[j].instructions);
 				output.steps.push({
 				text: instructions,
-				dLabel: myRoute.tasks[index+1].label,
-				dAddr: myRoute.tasks[index+1].loc.addr,
+				dLabel: myRoute.tasks[next].label,
+				dAddr: myRoute.tasks[next].loc.addr,
 				duration: leg.duration
 			});
 		}
