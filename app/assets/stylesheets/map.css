@@ -27,8 +27,8 @@ hr {
 }
 
 input[type=text] {
-    width: 165.823px;
-    height: 21.545px;
+    width: 166px;
+    height: 22px;
     color: #0082A4;
     border: 1px solid gray;
     border-radius: 0px;
@@ -38,8 +38,8 @@ input[type=text] {
 }
 
 input[type=time] {
-    width: 165.823px;
-    height: 21.545px;
+    width: 166px;
+    height: 22px;
     color: #0082A4;
     border: 1px solid gray;
     border-radius: 0px;
@@ -150,11 +150,15 @@ div.category-table-container td {
 }
 
 .input-group-addon {
+    height: 22px;
+    padding: 0px 8px;
+    margin: auto;
     font-family: 'Open Sans', serif;
     font-size: 12px;
     font-weight: 300;
-    background-color: transparent;
+    background-color: #ffffff;
     border-radius: 0;
+    border: 1px solid gray;
 }
 
 .modal .modal-dialog { width: 346px; }
@@ -274,10 +278,7 @@ div.category-table-container td {
     top: 16px;
     color: #00B4E3;
 }
-#alert {
-    height: 35px;
-    width: 35px;
-}
+
 #popover-address-1 {
     color: #e0dede;
 }

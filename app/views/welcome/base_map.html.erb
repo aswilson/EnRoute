@@ -160,14 +160,29 @@
                 <div id="route-input" class="task-table-container">
                     <table id="tasks-table">
                         <tr id="taskPrototype" class="text-input"><td>
-							<a class="move-button"><%= image_tag "taskIcons-normal-unlocked.png", :class => "inrow icons", :style => "margin-bottom: 4px;" %></a>
-							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", :class => "inrow icons" %></a>
-							<input type="text" class="task-label input-text form-control inline"/>
-							<a class="delete-button">
-                                <%= image_tag "taskIcons-normal-delete.png", :class => "icons" %></a>
-							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="" hidden="true">
-								<%= image_tag "taskIcons-normal-alert.png", :class => "inrow", :id => "alert" %>
-							</a>
+
+                        <form class="form-inline">
+                            <div class="form-group">
+                                <a class="move-button">
+                                <%= image_tag "taskIcons-normal-unlocked.png", :class => "inrow icons", :style => "margin-bottom: 4px;" %></a>
+                                <a class="edit-button">
+                                    <%= image_tag "taskIcons-normal-clock.png", :class => "inrow icons" %></a>
+                            </div>
+                            <div class="form-group">
+                                <div class="input-group task-label" style="margin-top:11px">
+                                    <span id="taskId" class="input-group-addon">1</span>
+                                    <input type="text" class="task-label input-text form-control inline" />
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <a class="delete-button">
+                                    <%= image_tag "taskIcons-normal-delete.png", :class => "icons" %>
+                                <a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="" hidden="true">
+                                    <%= image_tag "taskIcons-normal-alert.png", :class => "inrow", :id => "alert", size:"35", :style => "margin-top: 4px;" %>
+                                </a>
+                            </div>
+                        </form>
+
 						</td></tr>
                     </table>
                     <table class="footer-table" width="100%">
