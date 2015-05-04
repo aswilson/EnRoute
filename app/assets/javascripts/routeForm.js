@@ -399,7 +399,6 @@ function getHomeLoc() {
 	var onSuccess = function(newHomeLoc) {
 		myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
 		var addr = RouteTools.addrStringToPieces(myUserInfo.homeLoc.addr);
-		console.log(addr);
 		$('span#homeAddr').empty().append(addr.street_1);
 		var needsRedraw = false;
 		for (var i=0; i<myRoute.tasks.length; i++) {
@@ -679,10 +678,9 @@ $(document).ready(function() {
 		$("#distance-option").val($(this).text());
 	});
 	$(".clickable-button").hover(function() {
-		console.log("in");
+		// None of this works, no idea why
 		RouteTools.alterImgUrlPiece($(this).find('img'), 'normal', 'hover');
 	}, function() {
-		console.log("out");
 		RouteTools.alterImgUrlPiece($(this).find('img'), 'hover', 'normal');
 	});
 
