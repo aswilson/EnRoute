@@ -27,7 +27,7 @@
 			<tr><td></td><td><div class="pinPopover-address-1" class="row-text-2">Address</div></td></tr>
 			<tr><td></td><td><div class="pinPopover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td></tr>
 			<tr><td colspan="2"><div align="center">
-				<%= image_tag "textButton-normal-useThis.png", size:"93x28", :class => "pinPopover-useMe-button" %>
+				<%= image_tag "textButton-normal-useThis.png", :class => "clickable-button", :class => "pinPopover-useMe-button" %>
 			</div></td></tr>
 		</table>
 	</div>
@@ -269,8 +269,8 @@
 					<table class="footer-table" width="100%">
 						<tr>
 							<td width="34%"></td>
-							<td><%= image_tag "textButton-normal-create.png", size:"93x28", :id => "create-new-fav-button" %></td>
-							<td><%= image_tag "textButton-normal-addToRoute.png", size:"93x28", :id => "add-fav-to-route-button" %></td>
+							<td><%= image_tag "textButton-normal-create.png", :class => "clickable-button", :id => "create-new-fav-button" %></td>
+							<td><%= image_tag "textButton-normal-addToRoute.png", :class => "clickable-button", :id => "add-fav-to-route-button" %></td>
 						</tr>
 					</table>
                 </div>
@@ -370,8 +370,8 @@
                             <tr class="footer">
                                 <td></td>
                                 <td>
-                                    <%= link_to image_tag("textButton-normal-register.png", size:"93x28"), new_user_path %>
-                                    <%= image_tag "textButton-normal-logIn.png", size:"93x28" %>
+                                    <%= link_to image_tag("textButton-normal-register.png", :class => "clickable-button"), new_user_path %>
+                                    <%= image_tag "textButton-normal-logIn.png", :class => "clickable-button" %>
                                 </td>
                             </tr>
                         </table>
@@ -454,8 +454,8 @@
                             <tr>
                                 <td width="34%"></td>
                                 <td>
-									<%= image_tag "textButton-normal-save.png", size:"93x28", :id => "task-save-button" %>
-									<%= image_tag "textButton-normal-cancel.png", size:"93x28", :id => "task-cancel-button" %>
+									<%= image_tag "textButton-normal-save.png", :class => "clickable-button", :id => "task-save-button" %>
+									<%= image_tag "textButton-normal-cancel.png", :class => "clickable-button", :id => "task-cancel-button" %>
                                 </td>
                             </tr>
                         </table>
@@ -537,8 +537,8 @@
                             <tr>
                                 <td width="34%"></td>
                                 <td>
-									<%= image_tag "textButton-normal-save.png", size:"93x28", :id => "favorite-save-button" %>
-									<%= image_tag "textButton-normal-cancel.png", size:"93x28", :id => "favorite-cancel-button" %>
+									<%= image_tag "textButton-normal-save.png", :class => "clickable-button", :id => "favorite-save-button" %>
+									<%= image_tag "textButton-normal-cancel.png", :class => "clickable-button", :id => "favorite-cancel-button" %>
                                 </td>
                             </tr>
                         </table>
