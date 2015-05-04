@@ -1,5 +1,5 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
+var FAKEIT = false;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
@@ -18,29 +18,27 @@ var pinPopoverPrototype;				//helps create popovers for pins
 var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
---Allie
-	--getting location choices from the backend (it works with fake data)
---Jackie
-	--timepicker for the times ("chronic" gem recommended)
-		-> sounds like it's done, but can you tell me just how to get and use the value?
-	--Make the images all transparent again:
---Joseph
-	--fix the lock/unlock/move mechanism
---other pages
-	--make the main page auto-redirect to the map after a moment
+--Major visual things
+	--<Jackie> Make the images all transparent again:
+	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
+	--Fixing the front page: make the logo smaller and make it auto-redirect to the main page after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
+	--make directions-table pretty
+		--better sizing
+		--add scrolling
+-- <Joseph>fix the lock/unlock/move mechanism
 --making fillInRoute actually smart (ie, acknowledge constraints)
---Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
---Add scrolling for the directions page
+	--<Jackie> read the values off the timepicker
+	--make it smart
+	--detecting impossible conditions before talking to backend (and setting task.error accordingly)
 --fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
 	--probably involves changing the lookup system in map.js
---detecting impossible conditions before talking to backend (and setting task.error accordingly)
-
---add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
---update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
-	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
---make favorites scrollable if it gets too long (or just cap it)
---cap the number of steps in the route
+--Minor visual things
+	--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
+	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
+		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
+	--make favorites scrollable if it gets too long (or just cap it)
+-cap the number of steps in the route
 */
 
 
@@ -149,6 +147,8 @@ function updateRouteForm() {
 	var distOptStr = (mySettings.distInMiles) ? "miles" : "kilometers";
 	$("#distance-option").text(distOptStr);
 	$("#distance-option").val(distOptStr);
+	$("#route-output").hide();
+	$("#route-input").show();
 	updateBackgroundSizes();
 }
 function updateFavoritesList() {
