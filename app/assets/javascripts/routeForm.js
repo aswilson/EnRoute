@@ -875,7 +875,6 @@ $(document).ready(function() {
 		if (e.type == 'blur' || e.keyCode == '13')  {
 			var value = $( this ).val();
 			if (value == "") value = "-----";
-			$ (this).val("");
 			var text = $(this).prev();
 			$(this).hide();
 			text.show();
