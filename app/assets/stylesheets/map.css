@@ -171,7 +171,6 @@ div.category-table-container td {
 }
 
 .modal-title {
-    position: relative;
     top: 50%;
     transform: translateY(-50%);
     line-height: 0px;
@@ -226,7 +225,7 @@ div.category-table-container td {
 .task-table-container {
     height: 100%;
     padding-top: 20px;
-    padding-left: 39px;
+    padding-left: 26px;
     padding-right: 17px; /* was 39px - changed so I could add another icon to the right */
     padding-bottom: 20px;
 }
@@ -275,7 +274,10 @@ div.category-table-container td {
     top: 16px;
     color: #00B4E3;
 }
-
+#alert {
+    height: 35px;
+    width: 35px;
+}
 #popover-address-1 {
     color: #e0dede;
 }
@@ -332,6 +334,14 @@ div.category-table-container td {
 
 #tabs {
     padding-left: 0px;
+}
+
+#taskModal_leave_container {
+    line-height: 1.42857143;
+}
+
+#taskModal_arrive_container {
+    line-height: 1.42857143;
 }
 
 .overlay {
