@@ -198,7 +198,7 @@
                                     <div class="location-label row-text align-left" style="color: #202020">My Location</div>
                                 </td>
                                 <td>
-                                    <div class="location-address row-text align-right" style="color: #202020">123 Main St.</div>
+                                    <div class="location-address row-text align-right" style="color: #202020"><% if logged_in?%> <%= current_user.street_1 %> <% else %> (sign in to save home)<% end %></div>
                                 </td>
                             </tr>
                             <!-- Next Stop -->
