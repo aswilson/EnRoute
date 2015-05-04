@@ -23,29 +23,20 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --Jackie
 	--timepicker for the times ("chronic" gem recommended)
 		-> sounds like it's done, but can you tell me just how to get and use the value?
-	--write getAndUpdateDirections() and updateDirections()
-		-> sounds like it's not quite done yet.
-	--make the "log in" button work
-		--EITHER kill the login popup and take user to a new page instead
-		--OR make it work somehow
-	--give a warning popup confirmation before taking user to password-changing screen
-	--make the disk image on the direction-getting page do something, or remove it
-	--Make the images all transparent again
-	--get rid of the ugly black in the background when you mouse-over an <a> tag
-	--make actually-text-field and not-actually-text-field used consistently throughout the site
+	--Make the images all transparent again:
 --Joseph
-	--stop the "too much recursion" error that happens when adding a favorite
 	--fix the lock/unlock/move mechanism
 --other pages
 	--make the main page auto-redirect to the map after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
 --making fillInRoute actually smart (ie, acknowledge constraints)
 --Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
+--Add scrolling for the directions page
 --fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
 	--probably involves changing the lookup system in map.js
 --detecting impossible conditions before talking to backend (and setting task.error accordingly)
---add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 
+--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 --update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
 --make favorites scrollable if it gets too long (or just cap it)
@@ -211,25 +202,30 @@ function updateMap() {
 	MapControls.recenter();
 }
 function updateDirections(directionData) {
-	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
+	//directionData takes this form: {steps: [{text: [] dLabel:string, dAddr:string, duration:string }]}
 	var directionsTable = $('#directions-table').empty();
-	var locationRow = locationPrototype.clone(true).attr("id", "location0");
-	locationRow.find('.location-label').attr('value', directionData.sLabel);
-	locationRow.find('.location-address').attr('value', directionData.start);
-	directionsTable.append(locationRow);
+	var startRow = locationPrototype.clone(true).attr("id", "location0");
+	startRow.find('.location-label').attr('value', directionData.sLabel);
+	startRow.find('.location-address').attr('value', directionData.start);
+	directionsTable.append(startRow);
 	for (var i=0; i < directionData.steps.length; i++) {
 		var steps = directionData.steps[i];
 		var stepsRow = stepsPrototype.clone(true).attr("id", "steps" + i);
 		var stepsTable = stepsRow.find('.step-table').empty();
 		for (var j=0; j < steps.text.length; j++) {
-			var instructionText = steps.text[j];
+			var s = steps.text[j];
 			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+j);
-			instructionRow.find('.instruction-text').attr('value', instructionText);
+			instructionRow.find('.instruction-text').attr('value', s);
 			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
 			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
 			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
 			instructionRow.find('.instruction-duration').attr('value', steps.duration);
+			directionsTable.append(instructionRow);
 		}
+		var locationRow = locationPrototype.clone(true).attr("id", "location"+(i+1));
+		locationRow.find('.location-label').attr('value', steps.dLabel);
+		locationRow.find('.location-address').attr('value', steps.dAddr);
+		directionsTable.append(locationRow);
 	}
 }
 function showAlternatePins(taskNo) {
@@ -609,40 +605,48 @@ function fillInRoute(route, locChoices) {
 	}
 };
 function getAndUpdateDirections() {
-	if (myRoute.tasks.length > 1) {
-		var directionData = {
-			steps: [ {
-				text: [],
-				destination: "",
-				dLabel: "",
-				duration: ""
-			} ],
+	if (myRoute.tasks.length < 2)
+		return;
+	showMsg("Getting directions...","info");
+	//prepare helper function
+	function translateDirections(googleDirections) {
+		var dirRoute = googleDirections.routes[0];
+		var output = {
+			steps: [],	//one step per stop, plus this blank one at the start
 			sLabel: myRoute.tasks[0].label,
-			start: myRoute.tasks[0].addr
+			start: myRoute.tasks[0].loc.addr
 		};
-		MapControls.drawRoute(myRoute, '#00FF00', function (results) {
-			if (results != undefined) {
-				var route = results.routes[0];
-				for (var i=1; i < route.legs.length; i++) {
-					var leg = route.legs[i-1];
-					var instructions = [];
-					for (var j=0; j < leg.steps.length; j++) {
-						instructions.push(leg.steps[j].instructions);
-					}
-					steps[i-1].dLabel = myRoute.tasks[i].label;
-					steps[i-1].text = instructions;
-					steps[i-1].destination = leg.end_address;
-					steps[i-1].duration = leg.duration.text;
-				}
-				updateDirections(directionData);
-				$("#route-input").hide();
-				$("#route-output").show();
-				updateBackgroundSizes();
-			} else {
-				console.log("MapControls.drawRoute returned undefined results");
-			}
-		});
+		for (var i=0; i<dirRoute.legs.length; i++) {
+			var leg = dirRoute.legs[i];
+			var instructions = [];
+			for (var j=0; j < leg.steps.length; j++)
+				instructions.push(leg.steps[j].instructions);
+			output.steps.push({
+				text: instructions,
+				dLabel: myRoute.tasks[i+1].label,
+				dAddr: myRoute.tasks[i+1].addr,
+				duration: leg.duration
+			});
+		}
+		return output;
 	}
+	//request the directions
+	MapControls.getDirections(myRoute, function(googleDirections) {
+		if (googleDirections==undefined) {
+			showMsgMomentarily("Failed to get directions from google","error",2000);
+		} else if (googleDirections.status != google.maps.DirectionsStatus.OK) {
+			showMsgMomentarily("Failed to get directions from google: "+googleDirections.status,"error",2000);
+		} else {
+			showMsg("","info");
+			MapControls.clearLines();
+			MapControls.drawRoute(googleDirections, '#00FF00');
+			var directionData = translateDirections(googleDirections);
+			updateDirections(directionData);
+			$("#route-input").hide();
+			$("#route-output").show();
+			updateBackgroundSizes();
+		}
+	});
 };
 
 
@@ -894,46 +898,3 @@ $(document).ready(function() {
 });
 
 })("enroute-dhcs.herokuapp.com", RouteTools.ROUTESTARTINGATCMU);	//end IIAF
-
-
-/* Old functions no longer in use:
-
-function updateLocChoicesArea(locSuggestions) {
-	//update message display
-	if (locSuggestions==undefined || locSuggestions.length==0) {
-		$('span#locChoices-message').empty().append("No suitable locations found (click \"Find Route\" to try again)");
-		$('ul#locChoices-list').empty();
-		return;
-	}
-	$('span#locChoices-message').empty().append("Location choices:");
-	var htmlLocList = $('ul#locChoices-list').empty();
-	function makeCallbackFn(num) {	//see http://stackoverflow.com/questions/7053965/when-using-callbacks-inside-a-loop-in-javascript-is-there-any-way-to-save-a-var
-		return function() { takeSuggestion(num); };
-	};
-	for (var i=0; i<locSuggestions.length; i++) {
-		var loc = $('<li>').click(makeCallbackFn(i)).append(locSuggestions[i].name+": "+locOps[i].addr);
-		htmlLocList.append(loc);
-	}
-}
-function showQuickEditTaskWindow(number) {
-	taskNoBeingEdited = number;
-	updateLocChoicesArea(locationOptions[myRoute.tasks[number].label]);
-	$('div#popup-task-editor').hide();
-	$('div#popup-locChoices').show();
-}
-function takeSuggestion(suggestionNumber) {
-	if (taskNoBeingEdited==undefined) return;
-	var task = myRoute.tasks[taskNoBeingEdited];
-	var locOps = locationOptions[task.label];
-	if (locOps==undefined || locOps.length<=suggestionNumber) return;
-	task.loc = locOps[suggestionNumber];
-	hideQuickEditTaskWindow();
-}
-function hideQuickEditTaskWindow() {
-	taskNoBeingEdited = undefined;
-	$('div#popup-locChoices').hide();
-}
-//	$("input.task-label").focusout(function(){setTimeout(hideQuickEditTaskWindow,150);});
-//	$("input.task-label").focusin(function(){setTimeout(showQuickEditTaskWindow(getTaskNumber($(this))),250);});
-
-*/
