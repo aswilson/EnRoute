@@ -1,8 +1,28 @@
 (function(ourServerUrl, initialRoute) {	//start IIAF
-var FAKEIT = false;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
+var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pretend we're logged in)
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
+var PINHTML = '<div class="pin-popover">\
+	<table class="table-container">\
+		<tr>\
+			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
+			<td><div id="popover-category" class="row-text">Coffee</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-address-1" class="row-text-2">Address</div></td>\
+		</tr>\
+		<tr>\
+			<td></td>\
+			<td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
+		</tr>\
+	</table>\
+  </div>';
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
@@ -14,37 +34,43 @@ var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which fa
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
-var pinPopoverPrototype;				//helps create popovers for pins
 var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
--- <Jackie> re-point enroute-map.com
--- large cosmetic issues (like making images transparent)
-	-- <Jackie> Make the images all transparent again
-	-- <Jackie> Make actually-text-field and not-actually-text-field used consistently throughout the site
-	-- The main page logo is WAY too big
-	-- Fix problems with RouteTools address stuff (isAddress(),addrStringToPieces(),piecesToAddrString(), etc)
-	-- Get google to stop adding extra pins when it draws a route
--- <Allie> getting actual locations from the backend
--- make route planning actually intelligent rather than taking the first suggestion we hear about and ignorming constraints (will be a lot easier once we have actual info from the backend)
-	-- <Jackie> making the timepicker actually yield info for our tasks
-	-- actually making it smart
-	-- <Joseph> detecting impossible conditions before talking to backend (and setting task.error accordingly)
--- <Jackie> displaying directions after you plan the route
--- <Joseph> changing the lock/unlock/move mechanism
--- <Joseph> fixing a bug with "Add to Route" on the Favorites tab (if there's not a lot of time, the button can just be removed, and we can demo the feature by typing the Favorite's name; it will find and add it correctly)
--- more minor cosmetic issues
-	-- <Jackie> make the "log in" button work or kill it
+--Allie
+	--getting location choices from the backend (it works with fake data)
+--Jackie
+	--timepicker for the times ("chronic" gem recommended)
+		-> sounds like it's done, but can you tell me just how to get and use the value?
+	--write getAndUpdateDirections() and updateDirections()
+		-> sounds like it's not quite done yet.
+	--make the "log in" button work
+		--EITHER kill the login popup and take user to a new page instead
+		--OR make it work somehow
+	--give a warning popup confirmation before taking user to password-changing screen
+	--make the disk image on the direction-getting page do something, or remove it
+	--Make the images all transparent again
+	--get rid of the ugly black in the background when you mouse-over an <a> tag
+	--make actually-text-field and not-actually-text-field used consistently throughout the site
+--Joseph
+	--let the user change the chosen location...
+		--fix showAlternatePins().  In the popup, have enough info to get both the task number to replace and the new loc to use
+	--stop the "too much recursion" error that happens when adding a favorite
+	--fix the lock/unlock/move mechanism
+--other pages
 	--make the main page auto-redirect to the map after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
-	--fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
-		--probably involves changing the lookup system in map.js
---super minor changes
-	--add hover-over hints (tooltips) for what stuff means.  See a#taskStatus for an example of how.
-	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
-		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
-	--cap the number of steps in the route
-	--make favorites scrollable if it gets too long (or just cap it)
+--making fillInRoute actually smart (ie, acknowledge constraints)
+--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
+--fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
+	--probably involves changing the lookup system in map.js
+--detecting impossible conditions before talking to backend (and setting task.error accordingly)
+--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
+
+--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
+	--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
+--make favorites scrollable if it gets too long (or just cap it)
+--cap the number of steps in the route
 */
 
 
@@ -63,9 +89,9 @@ function doAjax(ty,action,dat,onSuccess,onFail) {
 	$.ajax({ type: ty, url: action, data: dat
 	}).done( function(reply) {
 		onSuccess(reply)
-	}).fail( function( xmlHttpReply, statusText, errorThrown ) {
-		console.log("Ajax failed.\n"
-			+ "XML Http Reply: " + JSON.stringify( xmlHttpReply )
+	}).fail( function( xmlHttpRequest, statusText, errorThrown ) {
+		console.log("Ajax failed.\n\n"
+			+ "XML Http Request: " + JSON.stringify( xmlHttpRequest )
 			+ ",\nStatus Text: " + statusText
 			+ ",\nError Thrown: " + errorThrown );
 		onFail(errorThrown);
@@ -141,7 +167,7 @@ function updateRouteForm() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
-		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
+		//setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
 	//update the rest of the form
@@ -174,13 +200,15 @@ function updateTaskEditWindow(task) {
 }
 function updateFavoriteEditWindow(fav) {
 	function strOrDashes(s) {
-		return (s==="" ? "-----" : s);
+		if (s === "" || s === " ") {
+			return "-----";
+		} else return s;
 	}
 	var addr = RouteTools.piecesToAddrString(fav);
 	$('input#favoritesModal_name').val(fav.name);
 	$('input#favoritesModal_name').prev().empty().append(strOrDashes(fav.name));
 	$('input#favoritesModal_addr').val(addr);
-	$('input#favoritesModal_addr').prev().empty().append(strOrDashes(addr));
+	$('input#favoritesModal_addr').prev().empty().append(strOrDashes(fav.street_1));
 	$('input#favoritesModal_notes').val(fav.notes);
 	$('input#favoritesModal_notes').prev().empty().append(strOrDashes(fav.notes));
 	$('input#favoritesModal_category').val(fav.category.toLowerCase());
@@ -193,9 +221,7 @@ function updateMap() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var loc = myRoute.tasks[i].loc;
 		if (loc!=undefined) {
-			var id = "pinPopover_"+i;
-			var $popover = makeBasicPopup(id,loc,myRoute.tasks[i].label);
-			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){});
+			var pinNum = MapControls.placePin(loc, i, true, PINHTML);
 			if (prevPinNum!=undefined)
 				var lineNum = MapControls.addLine(prevPinNum, pinNum, '#666600');
 			prevPinNum = pinNum;
@@ -204,7 +230,7 @@ function updateMap() {
 	MapControls.recenter();
 }
 function updateDirections(directionData) {
-	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }], sLabel: string, start: string (address) }
+	//directionData takes this form: {steps: [{text: [], destination: google.maps.latlng, dLabel:string, duration:string }]}
 	var directionsTable = $('#directions-table').empty();
 	var locationRow = locationPrototype.clone(true).attr("id", "location0");
 	locationRow.find('.location-label').attr('value', directionData.sLabel);
@@ -215,42 +241,28 @@ function updateDirections(directionData) {
 		var stepsRow = stepsPrototype.clone(true).attr("id", "steps" + i);
 		var stepsTable = stepsRow.find('.step-table').empty();
 		for (var j=0; j < steps.text.length; j++) {
-			var s = steps.text[j];
-			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+"_"+j);
-			instructionRow.find('.instruction-text').attr('value', s);
-			if (s.indexOf("left") > -1) instructionRow.find('.instruction-icon').attr('value', "L");
-			else if (s.indexOf("right") > -1) instructionRow.find('.instruction-icon').attr('value', "R");
-			else if (s.indexOf("continue") > -1) instructionRow.find('.instruction-icon').attr('value', "C");
+			var instructionText = steps.text[j];
+			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+j);
+			instructionRow.find('.instruction-text').attr('value', instructionText);
+			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
+			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
+			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
 			instructionRow.find('.instruction-duration').attr('value', steps.duration);
 		}
 	}
 }
 function showAlternatePins(taskNo) {
-	function makeInitializer(id,taskNo,optNo) {
-		return function(infobox){
-			$("#"+id+" .pinPopover-useMe-button").click(function(){
-				myRoute.tasks[taskNo].loc = altOptions[optNo];
-				updateRouteForm();
-				updateMap();
-			});
-		};
-	}
 	//clear old altPins
-	for (var j=0; j<altPins.length; j++)
-		MapControls.removePin(altPins[j]);
+	for (var i=0; i<altPins.length; i++)
+		MapControls.removePin(altPins[i]);
 	altPins = [];
 	//add new altPins
 	var task = myRoute.tasks[taskNo];
 	var altOptions = locationOptions[task.label];
 	if (altOptions==undefined || $.type(altOptions)==="string")
 		return;
-	for (var j=0; j<altOptions.length; j++) {
-		if (RouteTools.objsEqual(altOptions[j],task.loc))
-			continue;
-		var id = "pinPopover_"+taskNo+"_"+j;
-		var $popover = makeBasicPopup(id,altOptions[j],task.label);
-		$popover.find('img.pinPopover-useMe-button').show();
-		var pinNum = MapControls.placePin(altOptions[j], taskNo, false, $popover.get(0), makeInitializer(id,taskNo,j));
+	for (var i=0; i<altOptions.length; i++) {
+		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML);
 		altPins.push(pinNum);
 	}
 	MapControls.recenter();
@@ -319,18 +331,6 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 		$img.hide();
 	}
 }
-function makeBasicPopup(id,loc,label) {
-	var $popover = pinPopoverPrototype.clone(true).attr("id",id).show();
-	var catName = RouteTools.coaxToCategory(label);
-	var addrLines = RouteTools.addrStringToTwoLines(loc.addr);
-	RouteTools.alterImgUrlPiece($popover.find("img.pinPopover-icon"), "name", catName);
-	$popover.find("div.pinPopover-label").empty().append(label);
-	$popover.find("div.pinPopover-name").empty().append(loc.name);
-	$popover.find("div.pinPopover-address-1").empty().append(addrLines[0]);
-	$popover.find("div.pinPopover-address-2").empty().append(addrLines[1]);
-	$popover.find('img.pinPopover-useMe-button').hide();
-	return $popover;
-}
 
 
 /* Stuff for reading from the displays */
@@ -398,7 +398,9 @@ function getHomeLoc() {
 	$('span#homeAddr').empty().append("(getting from server...)");
 	var onSuccess = function(newHomeLoc) {
 		myUserInfo.homeLoc = {name:"Home", addr:newHomeLoc.addr, lat:newHomeLoc.lat, lon:newHomeLoc.lon};
-		$('span#homeAddr').empty().append(myUserInfo.homeLoc.addr);
+		var addr = RouteTools.addrStringToPieces(myUserInfo.homeLoc.addr);
+		console.log(addr);
+		$('span#homeAddr').empty().append(addr.street_1);
 		var needsRedraw = false;
 		for (var i=0; i<myRoute.tasks.length; i++) {
 			var t = myRoute.tasks[i];
@@ -601,48 +603,40 @@ function fillInRoute(route, locChoices) {
 	}
 };
 function getAndUpdateDirections() {
-	if (myRoute.tasks.length < 2)
-		return;
-	showMsg("Getting directions...","info");
-	//prepare helper function
-	function translateDirections(googleDirections) {
-		var dirRoute = googleDirections.routes[0];
-		var output = {
-			steps: [],	//one step per stop, plus this blank one at the start
+	if (myRoute.tasks.length > 1) {
+		var directionData = {
+			steps: [ {
+				text: [],
+				destination: "",
+				dLabel: "",
+				duration: ""
+			} ],
 			sLabel: myRoute.tasks[0].label,
 			start: myRoute.tasks[0].addr
 		};
-		for (var i=0; i<dirRoute.legs.length; i++) {
-			var leg = dirRoute.legs[i];
-			var instructions = [];
-			for (var j=0; j < leg.steps.length; j++)
-				instructions.push(leg.steps[j].instructions);
-			output.steps.push({
-				text: instructions,
-				destination: leg.end_location,
-				dLabel: leg.end_address,
-				duration: leg.duration
-			});
-		}
-		return output;
+		MapControls.drawRoute(myRoute, '#00FF00', function (results) {
+			if (results != undefined) {
+				var route = results.routes[0];
+				for (var i=1; i < route.legs.length; i++) {
+					var leg = route.legs[i-1];
+					var instructions = [];
+					for (var j=0; j < leg.steps.length; j++) {
+						instructions.push(leg.steps[j].instructions);
+					}
+					steps[i-1].dLabel = myRoute.tasks[i].label;
+					steps[i-1].text = instructions;
+					steps[i-1].destination = leg.end_address;
+					steps[i-1].duration = leg.duration.text;
+				}
+				updateDirections(directionData);
+				$("#route-input").hide();
+				$("#route-output").show();
+				updateBackgroundSizes();
+			} else {
+				console.log("MapControls.drawRoute returned undefined results");
+			}
+		});
 	}
-	//request the directions
-	MapControls.getDirections(myRoute, function(googleDirections) {
-		if (googleDirections==undefined) {
-			showMsgMomentarily("Failed to get directions from google","error",2000);
-		} else if (googleDirections.status != google.maps.DirectionsStatus.OK) {
-			showMsgMomentarily("Failed to get directions from google: "+googleDirections.status,"error",2000);
-		} else {
-			showMsg("","info");
-			MapControls.clearLines();
-			MapControls.drawRoute(googleDirections, '#00FF00');
-			var directionData = translateDirections(googleDirections);
-			updateDirections(directionData);
-			$("#route-input").hide();
-			$("#route-output").show();
-			updateBackgroundSizes();
-		}
-	});
 };
 
 
@@ -683,6 +677,13 @@ $(document).ready(function() {
 		mySettings.distInMiles = (t==="miles");
 		$("#distance-option").text($(this).text());
 		$("#distance-option").val($(this).text());
+	});
+	$(".clickable-button").hover(function() {
+		console.log("in");
+		RouteTools.alterImgUrlPiece($(this).find('img'), 'normal', 'hover');
+	}, function() {
+		console.log("out");
+		RouteTools.alterImgUrlPiece($(this).find('img'), 'hover', 'normal');
 	});
 
 	/* Routes tab listeners */
@@ -725,7 +726,7 @@ $(document).ready(function() {
 			updateMap();
 		}
 	});
-	$("a.taskStatus").click(function(){
+	$("tr.taskStatus").hover(function(){
 		var taskNo = getTaskNumber($(this));
 		showAlternatePins(taskNo);
 	});
@@ -750,6 +751,7 @@ $(document).ready(function() {
 		$(this).find("input:radio[name=favToAdd]").prop('checked', true).change();
 	});
 	$('a.favorite-edit-button').click(function(){
+		console.log("clicked");
 		var fNum = getFavoriteNumber($(this));
 		favoriteNoBeingEdited = fNum;
 		updateFavoriteEditWindow(myUserInfo.favorites[fNum]);
@@ -833,6 +835,10 @@ $(document).ready(function() {
 	/* Set up relationship between .actually-text-field and .not-actually-text-field */
 	$('.actually-text-field').click(function() {
 		var input = $(this).next();
+		var value = $(this).html();
+		if (value == "-----") value = "";
+		$(this).html("");
+		input.attr("value", value);
 		$(this).hide();
 		input.show();
 		input.focus();
@@ -841,6 +847,7 @@ $(document).ready(function() {
 		if (e.type == 'blur' || e.keyCode == '13')  {
 			var value = $( this ).val();
 			if (value == "") value = "-----";
+			$ (this).val("");
 			var text = $(this).prev();
 			$(this).hide();
 			text.show();
@@ -854,7 +861,6 @@ $(document).ready(function() {
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
 	favoritePrototype = $('tr#favoritePrototype').clone(true);
-	pinPopoverPrototype = $('div#pinPopover_Prototype').clone(true);
 	locationPrototype = $('tr#locationPrototype').clone(true);
 	stepsPrototype = $('tr#stepsPrototype').clone(true);
 	instructionPrototype = $('tr#instructionPrototype').clone(true);

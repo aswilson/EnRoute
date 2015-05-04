@@ -33,7 +33,7 @@
 	</div>
 
     <!-- Transparant Background -->
-    <div id="menu-background" class="teal1 transparant menu"></div>
+    <div id="menu-background" class="teal transparant menu"></div>
 
     <!-- Menu -->
     <div id="menu" role="tabpanel" class="menu">
@@ -43,10 +43,10 @@
             <!-- Commenting out the settings tab
 			<li role="presentation"><a href="#saveTab" aria-controls="saveTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-save.png", size:"41" %></a></li>
 			-->
-            <li role="presentation"><a href="#routeTab" aria-controls="routeTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-route.png", size:"41" %></a></li>
-            <li role="presentation"><a href="#favoritesTab" aria-controls="favoritesTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-favorites.png", size:"41" %></a></li>
-            <li role="presentation"><a href="#userTab" aria-controls="userTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-user.png", size:"41" %></a></li>
-            <li role="presentation"><a href="#settingsTab" aria-controls="settingsTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-settings.png", size:"41" %></a></li>
+            <li role="presentation"><a href="#routeTab" aria-controls="routeTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-route.png", :class => "icons" %></a></li>
+            <li role="presentation"><a href="#favoritesTab" aria-controls="favoritesTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-favorites.png", :class => "icons" %></a></li>
+            <li role="presentation"><a href="#userTab" aria-controls="userTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-user.png", :class => "icons" %></a></li>
+            <li role="presentation"><a href="#settingsTab" aria-controls="settingsTab" role="tab" data-toggle="tab"><%= image_tag "tab-normal-settings.png", :class => "icons" %></a></li>
         </ul>
 
         <!-- Tab panes -->
@@ -116,29 +116,30 @@
                     <table width="100%">
                         <tr class="border-bottom">
                             <td width="50%"><div class="row-text align-left">Time limit</div></td>
-                            <td><div class="row-text align-right dropdown">
-								<input id="time-limit" type="text" class="input-text form-control inline"/>
-							</div></td>
+                            <td><div class="align-right dropdown">
+                                <a class="actually-text-field row-text align-right">-----</a>
+                                <input id="time-limit" type='text' class='not-actually-text-field' value="" hidden="true">
+                            </div></td>
                         </tr>
-						<tr class="thick-border-bottom">
+                        <tr class="thick-border-bottom">
                             <td><div class="row-text align-left">Minimize</div></td>
                             <td><div class="row-text align-right dropdown">
-								<a id="minimize-option" data-toggle="dropdown" class="dropdown-toggle" href="#" value="time">time</a>
-								<ul id="minimize-option-dropdown" class="dropdown-menu align-right">
-								   <li><a href="#" value="time">time</a></li>
-								   <li><a href="#" value="distance">distance</a></li>
-								</ul>
-							</div></td>
+                                <a id="minimize-option" data-toggle="dropdown" class="dropdown-toggle" href="#" value="time">time</a>
+                                <ul id="minimize-option-dropdown" class="dropdown-menu align-right">
+                                   <li><a href="#" value="time">time</a></li>
+                                   <li><a href="#" value="distance">distance</a></li>
+                                </ul>
+                            </div></td>
                         </tr>
                         <tr class="thick-border-bottom">
                             <td><div class="row-text align-left">Distance Unit</div></td>
                             <td><div class="row-text align-right dropdown">
-								<a id="distance-option" data-toggle="dropdown" class="dropdown-toggle" href="#" value="miles">miles</a>
-								<ul id="distance-option-dropdown" class="dropdown-menu align-right">
-								   <li><a href="#" value="miles">miles</a></li>
-								   <li><a href="#" value="kilometers">kilometers</a></li>
-								</ul>
-							</div></td>
+                                <a id="distance-option" data-toggle="dropdown" class="dropdown-toggle" href="#" value="miles">miles</a>
+                                <ul id="distance-option-dropdown" class="dropdown-menu align-right">
+                                   <li><a href="#" value="miles">miles</a></li>
+                                   <li><a href="#" value="kilometers">kilometers</a></li>
+                                </ul>
+                            </div></td>
                         </tr>
                         <!--<tr class="thick-border-bottom">
                             <td>
@@ -159,21 +160,22 @@
                 <div id="route-input" class="task-table-container">
                     <table id="tasks-table">
                         <tr id="taskPrototype" class="text-input"><td>
-							<a class="move-button"><%= image_tag "taskIcons-normal-unlocked.png", size:"22" %></a>
-							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", size:"22" %></a>
+							<a class="move-button"><%= image_tag "taskIcons-normal-unlocked.png", :class => "inrow icons", :style => "margin-bottom: 4px;" %></a>
+							<a class="edit-button"><%= image_tag "taskIcons-normal-clock.png", :class => "inrow icons" %></a>
 							<input type="text" class="task-label input-text form-control inline"/>
-							<a class="delete-button"><%= image_tag "taskIcons-normal-delete.png", size:"22" %></a>
+							<a class="delete-button">
+                                <%= image_tag "taskIcons-normal-delete.png", :class => "icons" %></a>
 							<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="" hidden="true">
-								<%= image_tag "taskIcons-normal-alert.png", size:"22" %>
+								<%= image_tag "taskIcons-normal-alert.png", :class => "inrow" %>
 							</a>
 						</td></tr>
                     </table>
                     <table class="footer-table" width="100%">
                         <tr>
-                            <td width="46px"></td>
+                            <td width="60px"></td>
                             <td>
-								<%= image_tag "textButton-normal-addStop.png", size:"93x28", :id => "add-stop-button" %>
-								<%= image_tag "textButton-normal-findRoute.png", size:"93x28", :id => "route-find-button" %>
+								<%= image_tag "textButton-normal-addStop.png", :class => "clickable-button", :id => "add-stop-button" %>
+								<%= image_tag "textButton-normal-findRoute.png", :class => "clickable-button", :id => "route-find-button" %>
                             </td>
                         </tr>
                     </table>
@@ -207,7 +209,7 @@
                                     <div>
                                         <table class="steps-table" width='100%'>
                                             <tr id="instructionPrototype">
-                                                <td><%= image_tag "Map-32.png", size:"21", :class => "instruction-icon" %></td>
+                                                <td><%= image_tag "Map-32.png", :class => "instruction-icon icons" %></td>
                                                 <td><div class="instruction-text">Head North on asdf</div></td>
                                                 <td rowspan='10'><div class="instruction-duration align-right"> 5 min </div></td>
                                             </tr>
@@ -220,7 +222,7 @@
                             <tr>
                                 <td width="201px"></td>
                                 <td>
-                                    <%= image_tag "textButton-normal-back.png", size:"93x28", :id => "route-back-button" %>
+                                    <%= image_tag "textButton-normal-back.png", :class => "clickable-button", :id => "route-back-button" %>
                                 </td>
                             </tr>
                         </table>
@@ -252,7 +254,7 @@
 					<table class="footer-table" width="100%">
 						<tr>
 							<td width="34%"></td>
-							<td><%= image_tag "textButton-normal-createNew.png", size:"93x28", :id => "create-new-fav-button" %></td>
+							<td><%= image_tag "textButton-normal-create.png", size:"93x28", :id => "create-new-fav-button" %></td>
 							<td><%= image_tag "textButton-normal-addToRoute.png", size:"93x28", :id => "add-fav-to-route-button" %></td>
 						</tr>
 					</table>
@@ -286,7 +288,7 @@
 					</table>
 					<table width="100%">
 						<tr class="thick-border-bottom">
-							<td><%= image_tag "category-blue1-home.png", size:"42" %></td>
+							<td><%= image_tag "category-blue1-home.png", :class => "icons" %></td>
 							<td><div class="row-text align-left">Home</div></td>
 							<td><div class="row-text align-right"><span id="homeAddr">5000 Forbes Ave.</span></div></td>
 						</tr>
@@ -312,7 +314,7 @@
                <hr>
                <li><a href="/feedback">Feedback</a></li>
             </ul>
-            <a id="login-button"><%= image_tag "textButton-normal-signIn.png", size:"99x34" %></a>
+            <a href="/login" id="login-button"><%= image_tag "textButton-normal-signIn.png", :class=>"clickable-button" %></a>
         </span>
     </div>
 	<!-- END Upper Right Toolbar: Help and Login Buttons -->
@@ -328,7 +330,7 @@
                     <%= image_tag "tab-normal2-user.png", size:"39" %>
                     <span class="modal-title" id="loginModalLabel">Log in</span>
                 </div>
-                <div class="modal-body teal1">
+                <div class="modal-body teal">
                     <div class="login-table-container">
                         <table>
                             <!-- Input Username -->
@@ -373,7 +375,7 @@
                     <%= image_tag "TimeSetting.png", size:"39" %>
                     <span class="modal-title" id="taskModal_label">Task #1 - Coffee</span>
                 </div>
-                <div class="modal-body teal1">
+                <div class="modal-body teal">
                     <div class="options-table-container">
                         <table width="100%">
                             <!--<tr class="border-bottom">
@@ -458,7 +460,7 @@
                     <%= image_tag "tab-normal-favorites.png", size:"39" %>
                     <span class="modal-title" id="favoritesModal_label">Edit Favorite</span>
                 </div>
-                <div class="modal-body teal1">
+                <div class="modal-body teal">
                     <div class="options-table-container">
                         <table width="100%">
                             <tr class="border-bottom">

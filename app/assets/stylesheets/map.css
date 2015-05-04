@@ -21,10 +21,6 @@ hr {
     margin-bottom: 0px;
 }
 
-img {
-    vertical-align: top;
-}
-
 .nav-tabs>li.active>a {
     background-color: #DAE5E5;
     opacity: 0.8;
@@ -34,7 +30,7 @@ input[type=text] {
     width: 165.823px;
     height: 21.545px;
     color: #0082A4;
-    border: 1px solid black;
+    border: 1px solid gray;
     border-radius: 0px;
     padding: 0px;
     padding-left: 8px;
@@ -45,7 +41,7 @@ input[type=time] {
     width: 165.823px;
     height: 21.545px;
     color: #0082A4;
-    border: 1px solid black;
+    border: 1px solid gray;
     border-radius: 0px;
     padding: 0px;
     padding-left: 8px;
@@ -54,10 +50,6 @@ input[type=time] {
 
 input[type=radio] {
     margin-left: 15px;
-}
-
-tr.text-input > td {
-    padding-bottom: 15px;
 }
 
 td.input-label {
@@ -111,6 +103,19 @@ div.category-table-container td {
     border-bottom: 1px solid #616669;
 }
 
+.clickable-button {
+    width: 99px;
+    height: 34px;
+}
+
+.icons {
+    width: 41px;
+    height: 41px;
+}
+
+.inrow {
+    margin-left: -13px;
+}
 .directions-table {
     margin-left: 15px;
     margin-right: 15px;
@@ -220,7 +225,7 @@ div.category-table-container td {
 
 .task-table-container {
     height: 100%;
-    padding-top: 29px;
+    padding-top: 20px;
     padding-left: 39px;
     padding-right: 17px; /* was 39px - changed so I could add another icon to the right */
     padding-bottom: 20px;
@@ -248,7 +253,7 @@ div.category-table-container td {
     padding-right: 0px;
 }
 
-.teal1 {
+.teal {
     background-color: #CADAE1;
 }
 
@@ -265,22 +270,22 @@ div.category-table-container td {
     right: 30px;
     top: 16px;
 }
-.pinPopover {
+.pin-popover {
     left: 22px;
     top: 16px;
     color: #00B4E3;
 }
 
-.pinPopover-address-1 {
+#popover-address-1 {
     color: #e0dede;
 }
 
-.pinPopover-address-2 {
+#popover-address-2 {
     color: #e0dede;
 }
 
-#add-stop {
-    left: 30px;
+#add-stop-button {
+    margin-right: 4px;
 }
 
 #help-button {
@@ -304,6 +309,10 @@ div.category-table-container td {
     padding: 0;
 }
 
+#move-button {
+    margin-bottom: 4px;
+}
+
 #find-route {
     background-color: #F37046;
     color: #ffffff;
@@ -317,7 +326,7 @@ div.category-table-container td {
     padding-top: 0px;
 }
 
-.pinPopover-icon {
+#popover-icon {
     margin-left: 15px;
 }
 
