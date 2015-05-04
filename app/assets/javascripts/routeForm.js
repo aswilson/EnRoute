@@ -313,16 +313,8 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 		RouteTools.alterImgUrlPiece($img, "name", "alert");
 		$statusArea.attr("title",task.error);
 		$statusArea.tooltip();
-/*	} else if (task.loc != undefined) {
-		var pinImgName = (taskNo<8 ? ""+(taskNo+1) : "blank");
-		RouteTools.alterImgUrlPiece($img, "category", "pin");
-		RouteTools.alterImgUrlPiece($img, "name", pinImgName);
-		var imgSize = $img.attr("width");
-		$img.attr("width",imgSize/2);
-		$img.css('margin-left', function(index, curValue) {
-			return parseInt(curValue,10) + (imgSize/4) + 'px';
-		});
-*/
+<<<<<<< HEAD
+	} else if (task.loc != undefined) {
 	} else {
 		$img.hide();
 	}
