@@ -19,14 +19,14 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 
 /* WORK STILL NEEDED:
 --Major visual things
-	--<Jackie> Make the images all transparent again:
+	--<Jackie?> Make the images all transparent again (especially the blank category images)
 	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 	--Fixing the front page: make the logo smaller and make it auto-redirect to the main page after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
 	--make directions-table pretty
 		--better sizing
-		--add scrolling
--- <Joseph>fix the lock/unlock/move mechanism
+		--add scrolling if it gets too large
+	--Make unlocked look more different from locked
 --making fillInRoute actually smart (ie, acknowledge constraints)
 	--<Jackie> read the values off the timepicker
 	--make it smart
@@ -134,8 +134,9 @@ function updateRouteForm() {
 	var tasksTable = $('#tasks-table').empty();
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
-		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
 		taskRow.find('span#taskId').html(i);
+		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
+		RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", (myRoute.tasks[i].flexibleOrdering?"unlocked":"locked"));
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
@@ -164,7 +165,6 @@ function updateFavoritesList() {
 }
 function updateTaskEditWindow(task) {
 	$('span#taskModal_label').empty().append("Task: "+task.label);
-	$('input#taskModal_flexibleOrdering').prop('checked', task.flexibleOrdering);
 	$('input#taskModal_minutesNeeded').val(myIntToString(task.minutesNeeded));
 	setTimerangeDisp("taskModal_arrive", task.whenToArrive);
 	setTimerangeDisp("taskModal_leave", task.whenToLeave);
@@ -340,8 +340,7 @@ function makeBasicPopup(id,loc,label) {
 /* Stuff for reading from the displays */
 function readTaskFromEditWindow(baseTask) {
 	//baseTask needed since the form does not contain all fields
-	var fav = RouteTools.makeTask(baseTask);
-	task.flexibleOrdering = $('input#taskModal_flexibleOrdering').prop('checked');
+	var task = RouteTools.makeTask(baseTask);
 	task.minutesNeeded = myStringToInt($('input#taskModal_minutesNeeded').val());
 	task.whenToArrive = getTimerange("taskModal_arrive");
 	task.whenToLeave = getTimerange("taskModal_leave");
@@ -698,14 +697,20 @@ $(document).ready(function() {
 		onGrab: function(elem) {},
 		onMove: function(elem, xChange, yChange) {},
 		onRelease: function(elem, xChange, yChange) {
+			var taskNo = getTaskNumber(elem);
 			var numSpacesMoved = Math.round(yChange / TASKHEIGHT);
-			if (Math.abs(xChange)>TASKHEIGHT*2 || numSpacesMoved==0)
+			if (Math.abs(xChange)>TASKHEIGHT*2)
 				return;
-			var oldTaskNo = getTaskNumber(elem);
-			var newPos = oldTaskNo + numSpacesMoved;
-			RouteTools.moveTask(myRoute, oldTaskNo, newPos);
-			updateRouteForm();
-			updateMap();
+			var newPos = taskNo + numSpacesMoved;
+			if (taskNo == newPos) {
+				myRoute.tasks[taskNo].flexibleOrdering = !(myRoute.tasks[taskNo].flexibleOrdering);
+				updateRouteForm();
+			} else {
+				myRoute.tasks[taskNo].flexibleOrdering = false;
+				RouteTools.moveTask(myRoute, taskNo, newPos);
+				updateRouteForm();
+				updateMap();
+			}
 		}
 	}
 	setDraggable($("a.move-button"), draggingFns);
@@ -804,8 +809,7 @@ $(document).ready(function() {
 	$('#task-save-button').click(function() {
 		if (taskNoBeingEdited!=undefined) {
 			myRoute.tasks[taskNoBeingEdited] = readTaskFromEditWindow(myRoute.tasks[taskNoBeingEdited]);
-			if (myRoute.tasks[taskNoBeingEdited].error != undefined)
-				updateRouteForm();
+			updateRouteForm();
 		}
 		taskNoBeingEdited = undefined;
 		$("#taskModal").modal('hide');
