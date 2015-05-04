@@ -1,5 +1,5 @@
 var TestData = {
-    CMULoc: { name:"CMU", addr:"500 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
+    CMULoc: { name:"CMU", addr:"5000 Forbes Avenue, Pittsburgh, PA 15213", lat:40.438194, lon:-79.9960447 },
     fakeUserId: 6,
     fakeUserName: "Bob",
     fakeHomeLoc: { name:"Home", addr:"123 Fake Street, Pittsburgh, PA 12345", lat:40.42, lon:-80 },
