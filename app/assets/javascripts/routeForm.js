@@ -21,8 +21,6 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --Major visual things
 	--Make the images all transparent again (especially the blank category images)
 	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
-	--Fixing the front page: make the logo smaller and make it auto-redirect to the main page after a moment
-		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
 --making fillInRoute actually smart (ie, acknowledge constraints)
 	--<Jackie> read the values off the timepicker
 	--make it smart
@@ -30,7 +28,6 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
 	--probably involves changing the lookup system in map.js
 --Minor visual things
-	--directions page getting to big: add scrolling OR add button to make appear in new page (we can clone the directions table, fortunately)
 	--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -876,7 +873,6 @@ $(document).ready(function() {
 		if (e.type == 'blur' || e.keyCode == '13')  {
 			var value = $( this ).val();
 			if (value == "") value = "-----";
-			$ (this).val("");
 			var text = $(this).prev();
 			$(this).hide();
 			text.show();
