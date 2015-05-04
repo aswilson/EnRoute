@@ -3,26 +3,6 @@ var FAKEIT = true;		//if FAKEIT==true, fake talking to backend (also lets us pre
 var TASKHEIGHT = 37;					//a rough number, for now
 var NUMOFNEARBYPOINTSTOGET = 5;
 var BADTIMECONSTRAINTSERROR = "Impossible time constraints";
-var PINHTML = '<div class="pin-popover">\
-	<table class="table-container">\
-		<tr>\
-			<td><img id="popover-icon" src="/assets/category-blue1-coffee.png" width="35px" height="35px"/></td>\
-			<td><div id="popover-category" class="row-text">Coffee</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-name" class="row-text-2">Starbucks</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-address-1" class="row-text-2">Address</div></td>\
-		</tr>\
-		<tr>\
-			<td></td>\
-			<td><div id="popover-address-2" class="row-text-2">Pittsburgh, PA 15219</div></td>\
-		</tr>\
-	</table>\
-  </div>';
 
 var myUserInfo = { id:-1, name:"", homeLoc:undefined, favorites:[] };
 var myRoute = initialRoute;				//one difference between this and a normal route as seen in RouteTools: here, tasks may have an additional field "error"
@@ -34,6 +14,7 @@ var favoriteNoBeingEdited = undefined;	//when saving changes, indicates which fa
 var busy = false;						//indicates we're busy talking to the server, so the user can't spam it
 var curMsgNum = 0;						//used to make showMsgMomentarily() work properly
 var taskPrototype, favoritePrototype;	//helps create new tasks/favorites; drawn from the HTML.  Will be filled in when the document is loaded.
+var pinPopoverPrototype;				//helps create popovers for pins
 var locationPrototype, stepsPrototype, instructionPrototype;	//helps create directions table; drawn from the HTML.  Will be filled in when the document is loaded.
 
 /* WORK STILL NEEDED:
@@ -167,7 +148,7 @@ function updateRouteForm() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
-		//setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
+		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
 		tasksTable.append(taskRow);
 	}
 	//update the rest of the form
@@ -221,7 +202,9 @@ function updateMap() {
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var loc = myRoute.tasks[i].loc;
 		if (loc!=undefined) {
-			var pinNum = MapControls.placePin(loc, i, true, PINHTML);
+			var id = "pinPopover_"+i;
+			var $popover = makeBasicPopup(id,loc,myRoute.tasks[i].label);
+			var pinNum = MapControls.placePin(loc, i, true, $popover.get(0), function(infobox){});
 			if (prevPinNum!=undefined)
 				var lineNum = MapControls.addLine(prevPinNum, pinNum, '#666600');
 			prevPinNum = pinNum;
@@ -252,17 +235,31 @@ function updateDirections(directionData) {
 	}
 }
 function showAlternatePins(taskNo) {
+function makeInitializer(id,taskNo,optNo) {
+		return function(infobox){
+			$("#"+id+" .pinPopover-useMe-button").click(function(){
+				myRoute.tasks[taskNo].loc = altOptions[optNo];
+				updateRouteForm();
+				updateMap();
+			});
+		};
+	}
 	//clear old altPins
-	for (var i=0; i<altPins.length; i++)
-		MapControls.removePin(altPins[i]);
+	for (var j=0; j<altPins.length; j++)
+		MapControls.removePin(altPins[j]);
 	altPins = [];
 	//add new altPins
 	var task = myRoute.tasks[taskNo];
 	var altOptions = locationOptions[task.label];
 	if (altOptions==undefined || $.type(altOptions)==="string")
 		return;
-	for (var i=0; i<altOptions.length; i++) {
-		var pinNum = MapControls.placePin(altOptions[i], taskNo, false, PINHTML);
+	for (var j=0; j<altOptions.length; j++) {
+		if (RouteTools.objsEqual(altOptions[j],task.loc))
+			continue;
+		var id = "pinPopover_"+taskNo+"_"+j;
+		var $popover = makeBasicPopup(id,altOptions[j],task.label);
+		$popover.find('img.pinPopover-useMe-button').show();
+		var pinNum = MapControls.placePin(altOptions[j], taskNo, false, $popover.get(0), makeInitializer(id,taskNo,j));
 		altPins.push(pinNum);
 	}
 	MapControls.recenter();
@@ -330,6 +327,18 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 	} else {
 		$img.hide();
 	}
+}
+function makeBasicPopup(id,loc,label) {
+	var $popover = pinPopoverPrototype.clone(true).attr("id",id).show();
+	var catName = RouteTools.coaxToCategory(label);
+	var addrLines = RouteTools.addrStringToTwoLines(loc.addr);
+	RouteTools.alterImgUrlPiece($popover.find("img.pinPopover-icon"), "name", catName);
+	$popover.find("div.pinPopover-label").empty().append(label);
+	$popover.find("div.pinPopover-name").empty().append(loc.name);
+	$popover.find("div.pinPopover-address-1").empty().append(addrLines[0]);
+	$popover.find("div.pinPopover-address-2").empty().append(addrLines[1]);
+	$popover.find('img.pinPopover-useMe-button').hide();
+	return $popover;
 }
 
 
@@ -677,12 +686,6 @@ $(document).ready(function() {
 		$("#distance-option").text($(this).text());
 		$("#distance-option").val($(this).text());
 	});
-	$(".clickable-button").hover(function() {
-		// None of this works, no idea why
-		RouteTools.alterImgUrlPiece($(this).find('img'), 'normal', 'hover');
-	}, function() {
-		RouteTools.alterImgUrlPiece($(this).find('img'), 'hover', 'normal');
-	});
 
 	/* Routes tab listeners */
 	var draggingFns = {
@@ -724,7 +727,7 @@ $(document).ready(function() {
 			updateMap();
 		}
 	});
-	$("tr.taskStatus").hover(function(){
+	$(".taskStatus").hover(function(){
 		var taskNo = getTaskNumber($(this));
 		showAlternatePins(taskNo);
 	});
@@ -830,7 +833,7 @@ $(document).ready(function() {
 		$("#favoritesModal").modal('hide');
 	});
 	
-	/* Set up relationship between .actually-text-field and .not-actually-text-field */
+	/* General listeners */
 	$('.actually-text-field').click(function() {
 		var input = $(this).next();
 		var value = $(this).html();
@@ -855,10 +858,17 @@ $(document).ready(function() {
 	$('#password').click(function() {
 		return confirm("Are you sure you want to change your password?");
 	});
+	$(".clickable-button").hover(function() {
+		// None of this works, no idea why
+		RouteTools.alterImgUrlPiece($(this), 'normal', 'hover');
+	}, function() {
+		RouteTools.alterImgUrlPiece($(this), 'hover', 'normal');
+	});
 	
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
 	taskPrototype = $('tr#taskPrototype').clone(true);
 	favoritePrototype = $('tr#favoritePrototype').clone(true);
+	pinPopoverPrototype = $('div#pinPopover_Prototype').clone(true);
 	locationPrototype = $('tr#locationPrototype').clone(true);
 	stepsPrototype = $('tr#stepsPrototype').clone(true);
 	instructionPrototype = $('tr#instructionPrototype').clone(true);
