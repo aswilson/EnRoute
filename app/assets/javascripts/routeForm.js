@@ -302,7 +302,7 @@ function setCategorySelectedDisp($catContainer, val) {
 		var oldSrc = found.attr("src");
 		if (RouteTools.imgStringToPieces(oldSrc).name == val) {
 			found.addClass("selected");
-			RouteTools.alterImgUrlPiece(found,"dispMode","red1");
+			RouteTools.alterImgUrlPiece(found,"dispMode","red2");
 		} else {
 			found.removeClass("selected");
 			RouteTools.alterImgUrlPiece(found,"dispMode","blue2");
@@ -833,6 +833,17 @@ $(document).ready(function() {
 		$('input#favoritesModal_category').val(newCat);
 		setCategorySelectedDisp($('div#favoritesModal_category_container'), newCat);
 	});
+	$(".favorite-category-icon").hover(function() {
+		var $img = $(($(this).find('img'))[0]);
+		var oldMode = RouteTools.imgStringToPieces($img.attr("src")).dispMode;
+		if (oldMode === "blue2")
+			RouteTools.alterImgUrlPiece($img, 'dispMode', 'red1');
+	}, function() {
+		var $img = $(($(this).find('img'))[0]);
+		var oldMode = RouteTools.imgStringToPieces($img.attr("src")).dispMode;
+		if (oldMode === "red1")
+			RouteTools.alterImgUrlPiece($img, 'dispMode', 'blue2');
+	});
 	$('#favorite-save-button').click(function() {
 		if (favoriteNoBeingEdited!=undefined) {
 			var favBase = (favoriteNoBeingEdited<myUserInfo.favorites.length) ? myUserInfo.favorites[favoriteNoBeingEdited] : RouteTools.EMPTYFAVORITE;
@@ -875,7 +886,7 @@ $(document).ready(function() {
 		return confirm("Are you sure you want to change your password?");
 	});
 	$(".clickable-button").hover(function() {
-		RouteTools.alterImgUrlPiece($(this), 'dispMode', 'hover');
+		RouteTools.alterImgUrlPiece($(this), 'dispMode', 'hovered');
 	}, function() {
 		RouteTools.alterImgUrlPiece($(this), 'dispMode', 'normal');
 	});
