@@ -31,7 +31,7 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
 	--probably involves changing the lookup system in map.js
 --Minor visual things
-	--add scrolling to directions page if it gets too large
+	--directions page getting to big: add scrolling OR add button to make appear in new page (we can clone the directions table, fortunately)
 	--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -394,6 +394,7 @@ function getUsernameAndId() {
 		myUserInfo.id = userInfo.id;
 		myUserInfo.name = userInfo.username;
 		$('span#username').empty().append(myUserInfo.name);
+		RouteTools.alterImgUrlPiece($('#login-button img'), "name", "signOut");
 	}
 	if (!FAKEIT) {
 		var id = myStringToInt($("#hidden-userID").val());
@@ -874,10 +875,9 @@ $(document).ready(function() {
 		return confirm("Are you sure you want to change your password?");
 	});
 	$(".clickable-button").hover(function() {
-		// None of this works, no idea why
-		RouteTools.alterImgUrlPiece($(this), 'normal', 'hover');
+		RouteTools.alterImgUrlPiece($(this), 'dispMode', 'hover');
 	}, function() {
-		RouteTools.alterImgUrlPiece($(this), 'hover', 'normal');
+		RouteTools.alterImgUrlPiece($(this), 'dispMode', 'normal');
 	});
 	
 	/* Clone HTML needed for reference (AFTER event listeners are added) */
