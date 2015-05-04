@@ -63,6 +63,10 @@ div.category-table-container td {
     padding-top: 0px;
 }
 
+span {
+    padding:0px;
+}
+
 #tabs li {
     width:25%;
 }
@@ -208,7 +212,7 @@ div.category-table-container td {
 }
 
 .row-text {
-    padding: 21px 15px;
+    padding: 12px 15px;
 }
 
 .row-text-2 {
