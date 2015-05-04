@@ -132,7 +132,7 @@ function updateRouteForm() {
 	var tasksTable = $('#tasks-table').empty();
 	for (var i=0; i<myRoute.tasks.length; i++) {
 		var taskRow = taskPrototype.clone(true).attr("id","task"+i).show();
-		taskRow.find('span#taskId').html(i);
+		taskRow.find('span#taskId').html(i+1);
 		taskRow.find('input.task-label').attr("value",myRoute.tasks[i].label);
 		RouteTools.alterImgUrlPiece(taskRow.find('a.move-button img'), "name", (myRoute.tasks[i].flexibleOrdering?"unlocked":"locked"));
 		setTaskAlertIcon(taskRow.find('.taskStatus'), myRoute.tasks[i], i);
@@ -739,6 +739,7 @@ $(document).ready(function() {
 			RouteTools.deleteTask(myRoute, taskNo);
 			updateRouteForm();
 			updateMap();
+			$("#add-stop-button").show();
 		}
 	});
 	$(".taskStatus").hover(function(){
@@ -748,6 +749,7 @@ $(document).ready(function() {
 	$("#add-stop-button").click(function(){
 		RouteTools.addTask(myRoute, {});
 		updateRouteForm();
+		if (myRoute.tasks.length > 7) $(this).hide();
 	});
 	$("#route-find-button").click(function() {
 		if (RouteTools.routeIsFilledOut(myRoute))
