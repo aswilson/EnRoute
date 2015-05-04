@@ -313,7 +313,6 @@ function setTaskAlertIcon($statusArea, task, taskNo) {
 		RouteTools.alterImgUrlPiece($img, "name", "alert");
 		$statusArea.attr("title",task.error);
 		$statusArea.tooltip();
-<<<<<<< HEAD
 	} else if (task.loc != undefined) {
 	} else {
 		$img.hide();
