@@ -4,7 +4,9 @@
 }
 
 body {
-    overflow: hidden;
+    min-height: 600px;
+    min-width: 800px;
+    overflow: auto;
     font-family: 'Open Sans', serif;
     font-size: 12px;
     font-weight: 400;
@@ -54,6 +56,13 @@ input[type=radio] {
 
 td.input-label {
     width: 61px;
+}
+
+div {
+    font-family: 'Open Sans', serif;
+    font-size: 12px;
+    font-weight: 400;
+    color: #202020;
 }
 
 div.category-table-container td {
@@ -170,6 +179,22 @@ span {
     background-color: #ffffff;
     border-radius: 0;
     border: 1px solid gray;
+}
+
+.instruction-text {
+    color: #616669;
+}
+
+.instruction-duration {
+    color: #616669;
+}
+
+.location-label {
+    color: #202020;
+}
+
+.location-address {
+    color: #0082a4;
 }
 
 .modal .modal-dialog { width: 346px; }
@@ -352,6 +377,11 @@ span {
 
 #tabs {
     padding-left: 0px;
+}
+
+#tab-content {
+    max-height: 460px;
+    overflow-y: scroll;
 }
 
 #taskModal_leave_container {

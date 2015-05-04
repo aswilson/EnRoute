@@ -177,7 +177,7 @@
 									<a class="delete-button">
 										<%= image_tag "taskIcons-normal-delete.png", :class => "icons" %>
 									<a style="display:inline" class="taskStatus" data-toggle="tooltip" data-placement="right" title="" hidden="true">
-										<%= image_tag "taskIcons-normal-alert.png", :class => "inrow", :id => "alert", size:"35"%>
+										<%= image_tag "taskIcons-normal-alert.png", :class => "inrow", :id => "alert", :style => "margin-top:3px;", size:"35"%>
 									</a>
 								</div>
 							</form>
@@ -225,9 +225,9 @@
                                     <div>
                                         <table class="steps-table" width='100%'>
                                             <tr id="instructionPrototype">
-                                                <td rowspan="1"><div class="instruction-duration align-right"> 5 min </div></td>
-                                                <td><%= image_tag "Map-32.png", :class => "instruction-icon icons" %></td>
+                                                <td><%= image_tag "map-continue.png", :class => "instruction-icon icons" %></td>
                                                 <td><div class="instruction-text">Head North on asdf</div></td>
+                                                <td rowspan="1" style="width: 70px; padding-right: 15px;"><div class="instruction-duration align-right"> 5 min </div></td>
                                             </tr>
                                         </table>
                                     </div>
