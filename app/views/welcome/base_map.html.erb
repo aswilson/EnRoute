@@ -216,7 +216,7 @@
                                     <div class="location-label row-text align-left" style="color: #202020">My Location</div>
                                 </td>
                                 <td>
-                                    <div class="location-address row-text align-right" style="color: #202020"><% if logged_in?%> <%= current_user.street_1 %> <% else %> (sign in to save home)<% end %></div>
+                                    <div class="location-address row-text align-right" style="color: #202020">123 Fake Street</div>
                                 </td>
                             </tr>
                             <!-- Next Stop -->
@@ -225,9 +225,9 @@
                                     <div>
                                         <table class="steps-table" width='100%'>
                                             <tr id="instructionPrototype">
+                                                <td rowspan="1"><div class="instruction-duration align-right"> 5 min </div></td>
                                                 <td><%= image_tag "Map-32.png", :class => "instruction-icon icons" %></td>
                                                 <td><div class="instruction-text">Head North on asdf</div></td>
-                                                <td rowspan='10'><div class="instruction-duration align-right"> 5 min </div></td>
                                             </tr>
                                         </table>
                                     </div>

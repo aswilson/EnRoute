@@ -23,9 +23,6 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 	--Fix problems with RouteTools address stuff: isAddress(),addrStringToPieces(),piecesToAddrString()
 	--Fixing the front page: make the logo smaller and make it auto-redirect to the main page after a moment
 		--deal with the bug where it breaks the map page when you go to the map from another page (ask Jackie about it)
-	--make directions-table pretty
-		--better sizing
-		--add scrolling if it gets too large
 	--Make unlocked look more different from locked
 --making fillInRoute actually smart (ie, acknowledge constraints)
 	--<Jackie> read the values off the timepicker
@@ -34,6 +31,7 @@ var locationPrototype, stepsPrototype, instructionPrototype;	//helps create dire
 --fix problems with two pins on the same location, particularly a suggestion and a chosen location: when removing the suggestion, it may remove the real one instead
 	--probably involves changing the lookup system in map.js
 --Minor visual things
+	--add scrolling to directions page if it gets too large
 	--add hover-over hints (tooltips) for what stuff means.  See taskState for an example of how.
 	--update all the textButtons: wrap in an <a> so that the icon changes when hover over, and put the id in the <a> rather than the <img>
 		--POSSIBLY make the image change when hover over (RouteTools.alterImgUrlPiece is useful for this)
@@ -206,27 +204,35 @@ function updateDirections(directionData) {
 	//directionData takes this form: {steps: [{text: [] dLabel:string, dAddr:string, duration:string }]}
 	var directionsTable = $('#directions-table').empty();
 	var startRow = locationPrototype.clone(true).attr("id", "location0");
-	startRow.find('.location-label').attr('value', directionData.sLabel);
-	startRow.find('.location-address').attr('value', directionData.start);
+	startRow.find('div.location-label').empty().append(directionData.sLabel);
+	startRow.find('div.location-address').empty().append(directionData.start);
 	directionsTable.append(startRow);
 	for (var i=0; i < directionData.steps.length; i++) {
 		var steps = directionData.steps[i];
-		var stepsRow = stepsPrototype.clone(true).attr("id", "steps" + i);
-		var stepsTable = stepsRow.find('.step-table').empty();
+		var stepsRow = stepsPrototype.clone(true).attr("id", "steps"+i);
+		var stepsTable = stepsRow.find('.steps-table').empty();
 		for (var j=0; j < steps.text.length; j++) {
 			var s = steps.text[j];
-			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+j);
-			instructionRow.find('.instruction-text').attr('value', s);
+			var instructionRow = instructionPrototype.clone(true).attr("id", "instruction"+i+"_"+j);
+			instructionRow.find('div.instruction-text').empty().append(s);
 			if (s.indexOf("left" > -1)) instructionRow.find('.instruction-icon').attr('value', "L");
 			else if (s.indexOf("right" > -1)) instructionRow.find('.instruction-icon').attr('value', "R");
 			else if (s.indexOf("continue" > -1)) instructionRow.find('.instruction-icon').attr('value', "C");
-			instructionRow.find('.instruction-duration').attr('value', steps.duration);
-			directionsTable.append(instructionRow);
+			var durationCell = instructionRow.find('.instruction-duration').closest('td');
+			if (j==0) {
+				durationCell.find('.instruction-duration').empty().append(steps.duration.text);
+				durationCell.attr("rowspan",steps.text.length);
+			} else {
+				durationCell.remove();
+			}
+			stepsTable.append(instructionRow);
 		}
-		var locationRow = locationPrototype.clone(true).attr("id", "location"+(i+1));
-		locationRow.find('.location-label').attr('value', steps.dLabel);
-		locationRow.find('.location-address').attr('value', steps.dAddr);
-		directionsTable.append(locationRow);
+		
+		directionsTable.append(stepsRow);
+		var destRow = locationPrototype.clone(true).attr("id", "location"+(i+1));
+		destRow.find('div.location-label').empty().append(steps.dLabel);
+		destRow.find('div.location-address').empty().append(steps.dAddr);
+		directionsTable.append(destRow);
 	}
 }
 function showAlternatePins(taskNo) {
@@ -575,7 +581,7 @@ function updateTaskLabelAndLoc(task, newText) {
 	if (RouteTools.isAddress(newText)) {
 		MapControls.getLatLon(newText, function(latLon) {
 			var retVal = latLon==undefined ? undefined : {
-					name: "",
+					name: newText,
 					addr: newText,
 					lat: latLon.lat,
 					lon: latLon.lon
@@ -624,7 +630,7 @@ function getAndUpdateDirections() {
 			output.steps.push({
 				text: instructions,
 				dLabel: myRoute.tasks[i+1].label,
-				dAddr: myRoute.tasks[i+1].addr,
+				dAddr: myRoute.tasks[i+1].loc.addr,
 				duration: leg.duration
 			});
 		}
@@ -641,9 +647,9 @@ function getAndUpdateDirections() {
 			MapControls.clearLines();
 			MapControls.drawRoute(googleDirections, '#00FF00');
 			var directionData = translateDirections(googleDirections);
-			updateDirections(directionData);
 			$("#route-input").hide();
 			$("#route-output").show();
+			updateDirections(directionData);
 			updateBackgroundSizes();
 		}
 	});
